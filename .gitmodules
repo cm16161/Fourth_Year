@@ -1,3 +1,6 @@
 [submodule "Applied_Deep_Learning/labsheets"]
 	path = Applied_Deep_Learning/labsheets
 	url = git@github.com:COMSM0018-Applied-Deep-Learning/labsheets.git
+[submodule "Systems_Security/labs"]
+	path = Systems_Security/labs
+	url = git@github.com:bris-sys-sec/labs.git
