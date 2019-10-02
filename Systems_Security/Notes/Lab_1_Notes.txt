@@ -1,0 +1,20 @@
+Initially start with randomly inputting ints and strings
+
+Looking into GDB to get memory information
+
+Figured out that we can crash the program via segmentation fault with
+large inputs
+Alternative method to cause a segfault was by arbitrarily inputting a
+number, and for the string, putting in multiple consecutive %d's
+followed by a %n with no spaces.
+
+Task 1:
+     i) Cause the program to crash
+        - This was done by "stack smashing" by inputting an incredibly
+          large intput number and string
+          Alternative method uses %d's followed by %n to cause a
+          segfault before printing the value
+          Another alternative was to input %s until it segfaults
+
+    ii) Print out the value of secret[1]
+        -
