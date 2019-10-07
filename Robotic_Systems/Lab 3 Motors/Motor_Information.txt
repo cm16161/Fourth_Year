@@ -1,0 +1,2 @@
+Minimum Voltage Forward   = 8/9 (L/R)
+Minimum Voltage Backwards = 7/6 (L/R)
