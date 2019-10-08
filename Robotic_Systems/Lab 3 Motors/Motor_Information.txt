@@ -1,2 +1,4 @@
-Minimum Voltage Forward   = 8/9 (L/R)
-Minimum Voltage Backwards = 7/6 (L/R)
+Minimum Voltage Forward   = 8/7 (L/R)
+Minimum Voltage Backwards = 7/8 (L/R)
+
+Maximum power = 250
