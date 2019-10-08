@@ -17,4 +17,36 @@ Task 1:
           Another alternative was to input %s until it segfaults
 
     ii) Print out the value of secret[1]
-        -
+        - Found that we can input the address of secret[1] as a
+          decimal
+        - Found that newly input address by printing %x repeatedly for
+          the string
+        - Can then use %s at that point to print it
+   iii) Modify the value of secret[1]
+        - Using steps above, replace the %s with %n
+    iv) Modify the secret[1] to a value of my choosing
+        - Using steps above, change the number of characters inserted
+          when inputting the string before calling %n
+
+Task 2:
+     i) Cause the program to crash
+        - This was done by inputting more and more %s's until the
+         program segfaults
+
+    ii) Print out the value of secret[1]
+        - Realised that it is possible to input a string and then find
+          it by usign %x's
+        - Took the address of the secret[1] and encoded it into ascii
+          using xxd -p -r
+        - Used %s at the correct locationa after a sufficient amount
+          of %x's
+
+   iii) Modify the value of secret[1]
+        - Used the same steps as above to access the location of
+          secret[1]
+        - Replaced %s with %n
+
+    iv) Modify the secret[1] to a value of my choosing
+        - Used the same steps as above to change the value, but input
+          varying amounts of characters to change the value to what I
+          want it to be
