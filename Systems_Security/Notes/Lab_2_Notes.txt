@@ -1,0 +1,96 @@
+1.0 Attack:
+
+Started by placing a large number of 0x90's (NOP's) at the start of the
+shellcode and examining register contents after execution.
+
+Progressively replaced  NOP's with more easily identifiable values to
+try and spot a pattern/location.
+
+Once found, examined addresses of data and location of malicious
+shellcode.
+
+Finally replaced the identifiable shellcode with the address of the
+shellcode to be executed.
+
+All this was done on GDB and so worked in a GDB, debugging
+environment.
+
+Transitioned into a non-gdb environment which didn't work.
+
+Found the correct address by examining the core-dump after causing a
+segfault with just the execution of the program.
+
+Repeated the above steps so that the correct address was used.
+
+2.1
+ASLR makes it so that the address of the stack constantly changes.
+This means that it is non-trivial to write shellcode such that an
+attacker can place, and point to malicious code.
+
+This is a reduction method since it doesn't stop buffer-overflow
+attacks from happening, but it does significantly reduce the
+likelihood.
+
+It is quite effective at reducing the probability of buffer overflow
+attacks due to the random layout of memory. However it does have it's
+limitations.
+
+1:-It doesn't prevent attacks, just reduce probability of successful
+attacks
+
+2:-It can only help protect binaries which have been compiled with
+ASLR support
+
+As a result of point 2, ASLR is rendered useless if a binary is not
+compiled with ASLR support.
+
+
+2.2
+Running now causes a "stack-smashing" error
+Part of the shellcode (NOP's 0x90) fills the $edx register
+More stack space is allocated
+All addresses are randomised
+Unable to find malicious payload
+Larger assembly code for the "bof" function
+
+Removing gdb
+
+
+
+
+Stack Guard:
+
+Stack Guard works by inserting a known value (canary) between the
+stack frame pointer and the return address. Upon the function return,
+the canary is checked to see if it the same as the known value. If it
+isn't then there has been a buffer overflow and the program terminates
+stating that stack-smashing has occured.
+
+Limitations:
+
+If different parts of the program expose the canary value then that
+can be carefully placed in the malicious shellcode payload
+
+Not all overflows are from the stack, therefore even with Stack Guard,
+it is still possible to have heap overflows
+
+Certain out-of-bound bugs can allow overwriting parts of the
+stack-frame without changing the canary
+
+Functions can have multiple data-types and pointers which are also
+stored on the stack and so these locations can be targeted which then
+wouldn't change the canary
+
+Some architectures store the canary and the guard_canary (the value
+which the canary is checked against) and so with a sufficiently large
+payload it can be possible to overwrite both values
+
+With -z noexecstack
+
+Causes a SIGSEG (segfault)
+Other runs result in SIGILL (illegal) instruction which means that the
+system tried to execute an instruction which is not permitted
+(e.g. execute from the stack) and so the program gets killed.
+
+This prevention works by killing a program if it tries to execute
+malicious code from a buffer overflow attack
