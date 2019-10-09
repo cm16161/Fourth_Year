@@ -66,12 +66,10 @@ void moveMotor(int pin, float scalar_speed){
   if(pin == LEFT){
     dir = DIR_PIN(L);
     pwm = PWM_PIN(L);
-    Serial.println("TEST");
   }
   else if(pin == RIGHT){
     dir = DIR_PIN(R);
     pwm = PWM_PIN(R);
-    Serial.println("FALSE");
   }
   digitalWrite(dir, motor_direction);
   analogWrite(pwm, scalar_speed);

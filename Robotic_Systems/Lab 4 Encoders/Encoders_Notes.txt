@@ -1,0 +1,10 @@
+~1435 encoder values per revolution
+
+E1 = Right
+E0 = Left
+
+When E1 = Right increments, this is equivalent to Clockwise motion
+which is in the Forwards direction
+
+When E0 = Left increments, this is equivalent to Counter-Clockwise
+motion which is in the Forwards direction
