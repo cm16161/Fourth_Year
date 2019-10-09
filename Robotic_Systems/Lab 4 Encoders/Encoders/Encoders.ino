@@ -12,7 +12,7 @@
 #define DELAY_DURATION 1000
 #define LEFT 0
 #define RIGHT 1
-#define SPEED 15
+#define SPEED 60
 #define NINETY_L 0
 #define NINETY_R 1
 #define ONE_EIGHTY 2
@@ -33,8 +33,16 @@ volatile bool old_right_B;  // used by encoder to remember prior state of B
 volatile long count_left; // used by encoder to count the rotation
 volatile bool old_left_A;  // used by encoder to remember prior state of A
 volatile bool old_left_B;  // used by encoder to remember prior state of B
+float last_timestamp;
 
+enum movement_profile{
+  accelerate,
+  stay,
+  decelerate,
+  dead
+};
 
+int index =0;
 
 // put your setup code here, to run once:
 void setup() {
@@ -43,6 +51,7 @@ void setup() {
   // change interrupts for the encoders.
   // If you want to know more, find them
   // at the end of this file.  
+  last_timestamp = millis();
   pinMode( L_PWM_PIN, OUTPUT );
   pinMode( L_DIR_PIN, OUTPUT );
   pinMode( R_PWM_PIN, OUTPUT );
@@ -89,7 +98,42 @@ void stopMotor(){
    moveMotor(RIGHT,0);
 }
 
-
+void velocityProfile(float elapsed_time, float duration){
+  static movement_profile state = accelerate;
+  static int move_speed = 10;
+  if(state == accelerate){
+    if(elapsed_time > 250){
+    move_speed += 5;
+    if(move_speed > 230){
+      move_speed = 230;
+    }
+    moveMotor(LEFT, move_speed);
+    moveMotor(RIGHT, move_speed);  
+    }
+    
+  }
+  if(state == decelerate){
+    move_speed -= 10;
+    if(move_speed < 10){
+      move_speed = 10;
+    }
+    moveMotor(LEFT, move_speed);
+    moveMotor(RIGHT, move_speed);
+  }
+  if(state == dead){
+    stopMotor();
+  }
+  if(elapsed_time > duration){
+    switch(state){
+      case accelerate: state=stay;         break;
+      case       stay: state = decelerate; break;
+      case decelerate: state = dead;       break;
+      case       dead:                     break;
+    }
+    last_timestamp = millis();
+    index = (index +1) % 3;
+  }
+}
 
 // put your main code here, to run repeatedly:
 void loop() {
@@ -102,18 +146,25 @@ void loop() {
   //       automatically updated by the ISR when 
   //       the encoder pins change.  
   //
-  if(count_left < 2000){
-  moveMotor(LEFT, SPEED);  
-  }
-  else{
-    moveMotor(LEFT,0);
-  }
-  if(count_right < 2000){
-  moveMotor(RIGHT, SPEED);  
-  }
-  else{
-    moveMotor(RIGHT,0);
-  }
+  float durations[3] = {5000, 10000, 10000};
+  float elapsed_time, current_time;
+  current_time = millis();
+  elapsed_time = current_time - last_timestamp;
+  velocityProfile(elapsed_time, durations[index]);
+  
+//  if(count_left < 2000){
+//  moveMotor(LEFT, SPEED);  
+//  }
+//  else{
+//    moveMotor(LEFT,0);
+//  }
+//  if(count_right < 2000){
+//  moveMotor(RIGHT, SPEED);  
+//  }
+//  else{
+//    moveMotor(RIGHT,0);
+//  }
+  
   
   Serial.print( count_left );
   Serial.print( ", ");

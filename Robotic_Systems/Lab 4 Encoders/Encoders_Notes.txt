@@ -8,3 +8,7 @@ which is in the Forwards direction
 
 When E0 = Left increments, this is equivalent to Counter-Clockwise
 motion which is in the Forwards direction
+
+
+As SPEED increases, it becomes harder and harder to stop movement at
+exactly the specified encoder limit
