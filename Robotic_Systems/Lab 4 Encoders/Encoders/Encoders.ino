@@ -5,6 +5,25 @@
 #define E1_A_PIN  7
 #define E1_B_PIN  23
 #define E0_A_PIN  26
+#define L_PWM_PIN 10
+#define L_DIR_PIN 16
+#define R_PWM_PIN  9
+#define R_DIR_PIN 15
+#define DELAY_DURATION 1000
+#define LEFT 0
+#define RIGHT 1
+#define SPEED 15
+#define NINETY_L 0
+#define NINETY_R 1
+#define ONE_EIGHTY 2
+#define NINETY_DEGREES 1000
+#define FORWARD 0
+#define BACKWARD 1
+#define NINETY_ROTATE_SPEED 29
+
+#define CAT(a, b) a ## b
+#define DIR_PIN(pin) CAT(pin ,_DIR_PIN)
+#define PWM_PIN(pin) CAT(pin ,_PWM_PIN)
 
 // Volatile Global variables used by Encoder ISR.
 volatile long count_right; // used by encoder to count the rotation
@@ -24,6 +43,16 @@ void setup() {
   // change interrupts for the encoders.
   // If you want to know more, find them
   // at the end of this file.  
+  pinMode( L_PWM_PIN, OUTPUT );
+  pinMode( L_DIR_PIN, OUTPUT );
+  pinMode( R_PWM_PIN, OUTPUT );
+  pinMode( R_DIR_PIN, OUTPUT );
+
+  // Set initial direction for l and r
+  // Which of these is foward, or backward?
+  digitalWrite( L_DIR_PIN, LOW);
+  digitalWrite( R_DIR_PIN, LOW);
+  
   setupEncoder0();
   setupEncoder1();
 
@@ -32,6 +61,32 @@ void setup() {
   // so that we can inspect the values of
   // our encoder using the Monitor.
   Serial.begin( 9600 );
+}
+
+void moveMotor(int pin, float scalar_speed){
+  bool motor_direction;
+  if(scalar_speed < 0) {
+    motor_direction = true;
+    scalar_speed *= -1;
+  }
+  else motor_direction = false;
+  int dir, pwm;
+  if(pin == LEFT){
+    dir = DIR_PIN(L);
+    pwm = PWM_PIN(L);
+  }
+  else if(pin == RIGHT){
+    dir = DIR_PIN(R);
+    pwm = PWM_PIN(R);
+  }
+  digitalWrite(dir, motor_direction);
+  analogWrite(pwm, scalar_speed);
+  
+}
+
+void stopMotor(){
+   moveMotor(LEFT,0);
+   moveMotor(RIGHT,0);
 }
 
 
@@ -47,6 +102,19 @@ void loop() {
   //       automatically updated by the ISR when 
   //       the encoder pins change.  
   //
+  if(count_left < 2000){
+  moveMotor(LEFT, SPEED);  
+  }
+  else{
+    moveMotor(LEFT,0);
+  }
+  if(count_right < 2000){
+  moveMotor(RIGHT, SPEED);  
+  }
+  else{
+    moveMotor(RIGHT,0);
+  }
+  
   Serial.print( count_left );
   Serial.print( ", ");
   Serial.println( count_right );
