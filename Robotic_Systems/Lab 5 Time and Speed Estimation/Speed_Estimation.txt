@@ -1,0 +1,7 @@
+Timer based counting in loop is better
+High speeds results in negative speed output due to overflow
+
+Using the ISR is less accurate as the values only change when the
+wheels move
+
+So if the wheels don't move then it mis-represents the speeds.

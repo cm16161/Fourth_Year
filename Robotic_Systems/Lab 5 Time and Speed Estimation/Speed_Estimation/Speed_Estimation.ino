@@ -38,7 +38,18 @@ volatile long count_left; // used by encoder to count the rotation
 volatile bool old_left_A;  // used by encoder to remember prior state of A
 volatile bool old_left_B;  // used by encoder to remember prior state of B
 float last_timestamp, last_change;
+long measured_speed;
+long last_count;
 bool g_move_or_rotate = true;
+
+volatile unsigned long e0_interval;
+volatile unsigned long e0_last_time;
+
+// Global volatile to hold the determined
+// speed of wheel fixed to encoder0
+volatile float e0_speed;
+
+
 
 enum movement_profile{
   accelerate,
@@ -56,7 +67,9 @@ void setup() {
   // change interrupts for the encoders.
   // If you want to know more, find them
   // at the end of this file.  
-  last_timestamp = millis();
+  last_timestamp = micros();
+  last_count = 0;
+  measured_speed = 0;
   last_change = millis();
   pinMode( L_PWM_PIN, OUTPUT );
   pinMode( L_DIR_PIN, OUTPUT );
@@ -174,8 +187,6 @@ void rotateDegrees(float degree){
     dir = 1;
   }
   float encoder_count = (degree/360) * 2 * ONE_REVOLUTION;
-  Serial.println(encoder_count);
-  Serial.println(0.25*2*ONE_REVOLUTION);
   if(dir == 0){
     if(count_left <= encoder_count){
       moveMotor(LEFT,SPEED);
@@ -254,18 +265,24 @@ void loop() {
   float durations[3] = {5000, 5000, 5000};
   float elapsed_time, current_time;
   static bool finished = false;
-  current_time = millis();
+  current_time = micros();
   elapsed_time = current_time - last_timestamp;
-  //velocityProfile(elapsed_time, durations[index]);
-  square();
-  
-  Serial.print( count_left );
-  Serial.print( ", ");
-  Serial.println( count_right );
+  last_timestamp = current_time;
+  long change_in_count = count_left - last_count;
+  measured_speed = (change_in_count*1000000) / (long)elapsed_time;
+  //moveMotor(LEFT,SPEED);
+  moveMotor(RIGHT,SPEED);
+//  Serial.println(measured_speed);
+//  Serial.print(last_count);
+//  Serial.print(" -> ");
+//  Serial.print(count_left);
+//  Serial.print(" = ");
+//  Serial.println(change_in_count);
+    Serial.print( e0_speed );
+   Serial.print("\n");
 
-  // short delay so that our plotter graph keeps
-  // some history.
-  delay( 2 );
+  last_count = count_left;
+  delay(1000);
 }
 
 // This ISR handles just Encoder 1
@@ -322,6 +339,13 @@ ISR( INT6_vect ) {
   // Save current state as old state for next call.
   old_right_A = new_right_A;
   old_right_B = new_right_B;
+  unsigned long current_time, elapsed_time;
+  unsigned long change_in_count = count_right - last_count;
+  current_time = micros();
+  e0_interval = current_time - e0_last_time;
+  e0_speed = (change_in_count * 1000000) / e0_interval;
+  e0_last_time = micros();
+  last_count = count_right;
 
 }
 

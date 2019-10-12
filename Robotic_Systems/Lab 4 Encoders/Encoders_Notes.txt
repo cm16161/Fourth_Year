@@ -1,4 +1,5 @@
 ~1435 encoder values per revolution
+Calculated 1440 encoder values per revolution
 
 E1 = Right
 E0 = Left
@@ -12,3 +13,18 @@ motion which is in the Forwards direction
 
 As SPEED increases, it becomes harder and harder to stop movement at
 exactly the specified encoder limit
+
+Wheels are 7cm diameter
+10cm = 7*pi * n_revolutions
+n_revolutions = 10/(7    *pi)
+n_revolutions =4.55
+N_Encoder_Values = 4.55*1440 = 6538
+
+angle/360 * (distance_between_tyres*pi)/circumference
+0.25*(14pi)/7pi =4.93
+
+
+Both wheels in opposite directions for 1 revolution = 180degree
+rotation
+
+n degrees/360 * 2*ONE_REVOLUTION
