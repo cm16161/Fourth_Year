@@ -59,6 +59,7 @@ as MIPS which is described below:
 | MULT        | Multiply                                         |
 | MULTU       | Multiply Unsigned                                |
 | NOOP        | No operation                                     |
+| NOR         | Bitwise NOR                                      |
 | OR          | Bitwise OR                                       |
 | ORI         | Bitwise OR Immediate                             |
 | SB          | Store Byte                                       |
@@ -77,6 +78,33 @@ as MIPS which is described below:
 | SYSCALL     | System Call                                      |
 | XOR         | Bitwise XOR                                      |
 | XORI        | Bitwise XOR Immediate                            |
+| MFHI        | Move from $HI                                    |
+| MFLO        | Move from $LO                                    |
+| LI          | Load Immediate                                   |
+
+*** Instruction Encoding
+**** R-Type Instructions
+#+ATTR_LATEX: :environment longtable :align l|l|l
+| Instruction | Syntax                         | Opcode/Funct(hex) |
+|-------------+--------------------------------+-------------------|
+| SLL         | $rd = $rt << shamt             | 0/00              |
+| SRL         | $rd = $rt >> shamt             | 0/02              |
+| SRA         | $rd = $rt >>> shamt            | 0/3               |
+| JR          | PC=$rs                         | 0/08              |
+| MULT        | ${HI,LO} = $rs * $rt           | 0/10              |
+| MULTU       | ${HI,LO} = $rs * $rt           | 0/12              |
+| DIV         | $LO = $rs/$rt, $HI = $rs % $rt | 0/1a              |
+| DIVU        | $LO = $rs/$rt, $HI = $rs % $rt | 0/1b              |
+| ADD         | $rd = $rs + $rt                | 0/20              |
+| ADDU        | $rd = $rs + $rt                | 0/21              |
+| SUB         | $rd = $rs - $rt                | 0/22              |
+| AND         | $rd = $rs & $rt                | 0/24              |
+| SUBU        | $rd = $rs - $rt                | 0/23              |
+| OR          | $rd = $rs `or` $rt             | 0/25              |
+| NOR         | $rd = ~($rs `or` $rt)          | 0/27              |
+| SLT         | $rd = ($rs<$rt)? 1:0           | 0/2a              |
+| SLTU        | $rd = ($rs<$rt)? 1:0           | 0/2b              |
+
 
 * Test Programs
 ** Livermore Loops:
