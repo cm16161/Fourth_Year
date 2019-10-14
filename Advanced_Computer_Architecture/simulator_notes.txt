@@ -1,4 +1,4 @@
-#+TITLE: Simulator
+#+title: Simulator
 
 * About
 The Simulator is modelled off the MIPS ISA. As such it has a similar
