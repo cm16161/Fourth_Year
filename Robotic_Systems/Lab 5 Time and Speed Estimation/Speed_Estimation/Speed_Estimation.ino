@@ -33,6 +33,7 @@
 volatile long count_right; // used by encoder to count the rotation
 volatile bool old_right_A;  // used by encoder to remember prior state of A
 volatile bool old_right_B;  // used by encoder to remember prior state of B
+volatile unsigned long timer3_count;
 
 volatile long count_left; // used by encoder to count the rotation
 volatile bool old_left_A;  // used by encoder to remember prior state of A
@@ -41,6 +42,9 @@ float last_timestamp, last_change;
 long measured_speed;
 long last_count;
 bool g_move_or_rotate = true;
+
+volatile long last_left = 0;
+volatile long last_timer3 = 0;
 
 volatile unsigned long e0_interval;
 volatile unsigned long e0_last_time;
@@ -71,6 +75,11 @@ void setup() {
   last_count = 0;
   measured_speed = 0;
   last_change = millis();
+  
+  // Setup our timer3
+  setupTimer3(1);
+  timer3_count = 0;
+  
   pinMode( L_PWM_PIN, OUTPUT );
   pinMode( L_DIR_PIN, OUTPUT );
   pinMode( R_PWM_PIN, OUTPUT );
@@ -270,16 +279,26 @@ void loop() {
   last_timestamp = current_time;
   long change_in_count = count_left - last_count;
   measured_speed = (change_in_count*1000000) / (long)elapsed_time;
-  //moveMotor(LEFT,SPEED);
-  moveMotor(RIGHT,SPEED);
-//  Serial.println(measured_speed);
+  moveMotor(LEFT,2*SPEED);
+  Serial.print(current_time);
+  Serial.print(", ");
+  Serial.print(timer3_count);
+  Serial.print("\n");
+  moveMotor(RIGHT,2*SPEED);
+//  Serial.println(last_left);
+//  Serial.println(count_left);
+   
 //  Serial.print(last_count);
 //  Serial.print(" -> ");
 //  Serial.print(count_left);
+long timer3_speed = (count_left - last_left)/(timer3_count - last_timer3);
+Serial.print(measured_speed);
+Serial.print(" -> ");
+Serial.println(timer3_speed);
 //  Serial.print(" = ");
 //  Serial.println(change_in_count);
-    Serial.print( e0_speed );
-   Serial.print("\n");
+//    Serial.print( e0_speed );
+//   Serial.print("\n");
 
   last_count = count_left;
   delay(1000);
@@ -346,6 +365,7 @@ ISR( INT6_vect ) {
   e0_speed = (change_in_count * 1000000) / e0_interval;
   e0_last_time = micros();
   last_count = count_right;
+  last_timer3 = timer3_count;
 
 }
 
@@ -530,4 +550,45 @@ void setupEncoder0() {
 
     // Enable
     PCICR |= (1 << PCIE0);
+}
+
+void setupTimer3( int hertz ) {
+  
+  // disable global interrupts
+  cli();          
+
+  // Reset timer3 to a blank condition.
+  // TCCR = Timer/Counter Control Register
+  TCCR3A = 0;     // set entire TCCR3A register to 0
+  TCCR3B = 0;     // set entire TCCR3B register to 0
+  
+  // First, turn on CTC mode.  Timer3 will count up
+  // and create an interrupt on a match to a value.
+  // See table 14.4 in manual, it is mode 4.
+  TCCR3B = TCCR3B | (1 << WGM32);
+
+  // Set prescaler value.
+  TCCR3B = TCCR3B | (1 << CS32);
+
+  // Set Compare Match counter value
+  OCR3A =  62500/hertz;
+
+
+  // enable timer compare interrupt:
+  TIMSK3 = TIMSK3 | (1 << OCIE3A);
+
+  // enable global interrupts:
+  sei();
+}
+
+
+
+// The ISR routine.
+// The name TIMER3_COMPA_vect is a special flag to the 
+// compiler.  It automatically associates with Timer3 in
+// CTC mode.
+ISR( TIMER3_COMPA_vect ) {
+  timer3_count++;
+  last_left = count_left;
+
 }

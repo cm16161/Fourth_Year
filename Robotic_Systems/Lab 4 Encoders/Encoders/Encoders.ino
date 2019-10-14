@@ -219,14 +219,15 @@ void square(){
   static bool move_or_rotate = true;
   static int count = 0;
   if(count >=4){
-    stopMotor();
+    rotateDegrees(90);
+    //stopMotor();
     return;
   }
   if(move_or_rotate){
     moveDistance(100);
     if(!g_move_or_rotate){
       move_or_rotate = !move_or_rotate;
-      count++;    
+      count++;
     }
   }
   
