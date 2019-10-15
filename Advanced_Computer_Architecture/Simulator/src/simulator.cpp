@@ -1,5 +1,7 @@
 #include "ISA.hpp"
+#include "ALU.hpp"
 #include <iostream>
+int* PC;
 
 using namespace std;
 

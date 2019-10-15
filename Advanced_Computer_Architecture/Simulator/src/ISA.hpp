@@ -1,4 +1,6 @@
-int *PC;
+#ifndef ISA_HPP
+#define ISA_HPP
+extern int *PC;
 
 class Instruction
 {
@@ -363,73 +365,4 @@ public:
 	}
 };
 
-class ALU
-{
-public:
-	int add(int *rs, int *rt, int *rd)
-	{
-		ADD addition(rs, rt, rd);
-		return addition.run();
-	}
-	int sub(int *rs, int *rt, int *rd)
-	{
-		SUB subtraction(rs, rt, rd);
-		return subtraction.run();
-	}
-	int mul(int *rs, int *rt, int *rd)
-	{
-		MUL multiplication(rs, rt, rd);
-		{
-			return multiplication.run();
-		}
-	}
-	int div(int *rs, int *rt, int *rd)
-	{
-		DIV division(rs, rt, rd);
-		{
-			return division.run();
-		}
-	}
-	int mod(int *rs, int *rt, int *rd)
-	{
-		MOD modular(rs, rt, rd);
-		{
-			return modular.run();
-		}
-	}
-	int sll(int *rt, int shamt, int *rd)
-	{
-		SLL shift_left_logical(rt, shamt, rd);
-		return shift_left_logical.run();
-	}
-	int srl(int *rt, int shamt, int *rd)
-	{
-		SRL shift_right_logical(rt, shamt, rd);
-		return shift_right_logical.run();
-	}
-	int and_op(int *rs, int *rt, int *rd)
-	{
-		AND and_gate(rs, rt, rd);
-		return and_gate.run();
-	}
-	int orr(int *rs, int *rt, int *rd)
-	{
-		ORR orr(rs, rt, rd);
-		return orr.run();
-	}
-	int nor(int *rs, int *rt, int *rd)
-	{
-		NOR nor(rs, rt, rd);
-		return nor.run();
-	}
-	int jr(int *rs)
-	{
-		JR jr(rs);
-		return jr.run();
-	}
-	int slt(int *rs, int *rt, int *rd)
-	{
-		SLT slt(rs, rt, rd);
-		return slt.run();
-	}
-};
+#endif

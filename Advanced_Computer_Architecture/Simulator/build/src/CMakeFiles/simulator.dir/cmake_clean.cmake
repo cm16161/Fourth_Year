@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "../../bin/simulator"
   "../../bin/simulator.pdb"
+  "CMakeFiles/simulator.dir/ALU.cpp.o"
   "CMakeFiles/simulator.dir/simulator.cpp.o"
 )
 

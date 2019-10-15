@@ -125,6 +125,33 @@ simulator/fast:
 	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/build
 .PHONY : simulator/fast
 
+ALU.o: ALU.cpp.o
+
+.PHONY : ALU.o
+
+# target to build an object file
+ALU.cpp.o:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/ALU.cpp.o
+.PHONY : ALU.cpp.o
+
+ALU.i: ALU.cpp.i
+
+.PHONY : ALU.i
+
+# target to preprocess a source file
+ALU.cpp.i:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/ALU.cpp.i
+.PHONY : ALU.cpp.i
+
+ALU.s: ALU.cpp.s
+
+.PHONY : ALU.s
+
+# target to generate assembly for a file
+ALU.cpp.s:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/ALU.cpp.s
+.PHONY : ALU.cpp.s
+
 simulator.o: simulator.cpp.o
 
 .PHONY : simulator.o
@@ -161,6 +188,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... simulator"
 	@echo "... edit_cache"
+	@echo "... ALU.o"
+	@echo "... ALU.i"
+	@echo "... ALU.s"
 	@echo "... simulator.o"
 	@echo "... simulator.i"
 	@echo "... simulator.s"
