@@ -13,7 +13,7 @@ public:
 	int nor(int *rs, int *rt, int *rd);
 	int jr(int *rs);
 	int slt(int *rs, int *rt, int *rd);
-  
+
 	int addi(int *rs, int *rd, int immediate);
 	int subi(int *rs, int *rd, int immediate);
 	int muli(int *rs, int *rd, int immediate);
@@ -21,4 +21,5 @@ public:
 	int ori(int *rs, int *rd, int immediate);
 	int divi(int *rs, int *rd, int immediate);
 	int modi(int *rs, int *rd, int immediate);
+	int slti(int *rs, int *rd, int immediate);
 };

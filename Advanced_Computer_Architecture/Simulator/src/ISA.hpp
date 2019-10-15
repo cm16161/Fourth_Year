@@ -1,6 +1,6 @@
 #ifndef ISA_HPP
 #define ISA_HPP
-extern int *PC;
+extern int PC;
 
 #define ADD(rs, rt, rd) alu.add(rs, rt, rd)
 #define ADDI(rs, rd, immediate) alu.addi(rs, rd, immediate)
@@ -351,7 +351,7 @@ public:
 	}
 	int run()
 	{
-		PC = m_rs;
+		PC = *m_rs;
 		return 0;
 	}
 };
@@ -530,6 +530,27 @@ public:
 	{
 		*m_rd = *m_rs % m_immediate;
 		return *m_rd;
+	}
+};
+
+class SLTI : public I
+{
+public:
+	SLTI()
+	{
+		m_opcode = 10;
+	}
+	SLTI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 13;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs < m_immediate ? 1 : 0;
+                return *m_rd;
 	}
 };
 

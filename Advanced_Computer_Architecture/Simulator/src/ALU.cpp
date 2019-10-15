@@ -118,3 +118,9 @@ int ALU::modi(int *rs, int *rd, int immediate)
 	MODI modi(rs, rd, immediate);
 	return modi.run();
 }
+
+int ALU::slti(int *rs, int *rd, int immediate)
+{
+	SLTI slti(rs, rd, immediate);
+	return slti.run();
+}
