@@ -1,7 +1,7 @@
-#include "ISA.hpp"
 #include "ALU.hpp"
+#include "ISA.hpp"
 #include <iostream>
-int* PC;
+int *PC;
 
 using namespace std;
 
@@ -24,5 +24,13 @@ int main()
 	cout << " [ ORR ] " << alu.orr(&a, &b, &c) << endl;
 	cout << " [ NOR ] " << alu.nor(&a, &b, &c) << endl;
 	cout << " [ SLT ] " << alu.slt(&a, &b, &c) << endl;
+
+	cout << " [ ADDI ] " << alu.addi(&a, &c, 5) << endl;
+	cout << " [ SUBI ] " << alu.subi(&a, &c, 5) << endl;
+	cout << " [ MULI ] " << alu.muli(&a, &c, 5) << endl;
+	cout << " [ ANDI ] " << alu.andi(&a, &c, 5) << endl;
+	cout << " [ ORI ] " << alu.ori(&a, &c, 5) << endl;
+	cout << " [ DIVI ] " << alu.divi(&a, &c, 5) << endl;
+	cout << " [ MODI ] " << alu.modi(&a, &c, 5) << endl;
 	return 0;
 }

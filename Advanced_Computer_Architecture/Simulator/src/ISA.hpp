@@ -24,16 +24,18 @@ public:
 	R(){};
 };
 
-class I : Instruction
+class I : public Instruction
 {
-	int m_rs, m_rt, m_immediate;
-	I(int opcode, int rs, int rt, int immediate)
+public:
+	int *m_rs, *m_rd, m_immediate;
+	I(int opcode, int *rs, int *rd, int immediate)
 	{
 		m_opcode = opcode;
 		m_rs = rs;
-		m_rt = rt;
+		m_rd = rd;
 		m_immediate = immediate;
 	};
+	I(){};
 };
 
 class J : Instruction
@@ -46,6 +48,14 @@ class J : Instruction
 	};
 };
 
+/*
+///////////////////////////////////////////////////////////////////////////
+
+////// Below are definitions for all implemented R-type Instructions //////
+
+///////////////////////////////////////////////////////////////////////////
+*/
+
 class ADD : public R
 {
 
@@ -55,7 +65,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 32;
-	};
+	}
 	ADD(int *rs, int *rt, int *rd)
 	{
 		m_opcode = 0;
@@ -70,7 +80,7 @@ public:
 	{
 		*m_rd = *m_rs + *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class SUB : public R
@@ -81,7 +91,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 34;
-	};
+	}
 
 	SUB(int *rs, int *rt, int *rd)
 	{
@@ -97,7 +107,7 @@ public:
 	{
 		*m_rd = *m_rs - *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class MUL : public R
@@ -108,7 +118,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 24;
-	};
+	}
 
 	MUL(int *rs, int *rt, int *rd)
 	{
@@ -124,7 +134,7 @@ public:
 	{
 		*m_rd = *m_rs * *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class DIV : public R
@@ -135,7 +145,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 26;
-	};
+	}
 
 	DIV(int *rs, int *rt, int *rd)
 	{
@@ -151,7 +161,7 @@ public:
 	{
 		*m_rd = *m_rs / *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class MOD : public R
@@ -162,7 +172,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 27;
-	};
+	}
 
 	MOD(int *rs, int *rt, int *rd)
 	{
@@ -178,7 +188,7 @@ public:
 	{
 		*m_rd = *m_rs % *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class SLL : public R
@@ -189,7 +199,7 @@ public:
 		m_opcode = 0;
 		m_funct = 0;
 		m_rs = 0;
-	};
+	}
 
 	SLL(int *rt, int shamt, int *rd)
 	{
@@ -205,7 +215,7 @@ public:
 	{
 		*m_rd = *m_rt << m_shamt;
 		return *m_rd;
-	};
+	}
 };
 
 class SRL : public R
@@ -216,7 +226,7 @@ public:
 		m_opcode = 0;
 		m_rs = 0;
 		m_funct = 2;
-	};
+	}
 
 	SRL(int *rt, int shamt, int *rd)
 	{
@@ -232,7 +242,7 @@ public:
 	{
 		*m_rd = *m_rt >> m_shamt;
 		return *m_rd;
-	};
+	}
 };
 
 class AND : public R
@@ -243,7 +253,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 36;
-	};
+	}
 
 	AND(int *rs, int *rt, int *rd)
 	{
@@ -259,7 +269,7 @@ public:
 	{
 		*m_rd = *m_rs & *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class ORR : public R
@@ -270,7 +280,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 37;
-	};
+	}
 
 	ORR(int *rs, int *rt, int *rd)
 	{
@@ -286,7 +296,7 @@ public:
 	{
 		*m_rd = *m_rs | *m_rt;
 		return *m_rd;
-	};
+	}
 };
 
 class NOR : public R
@@ -297,7 +307,7 @@ public:
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 39;
-	};
+	}
 
 	NOR(int *rs, int *rt, int *rd)
 	{
@@ -313,7 +323,7 @@ public:
 	{
 		*m_rd = !(*m_rs | *m_rt);
 		return *m_rd;
-	};
+	}
 };
 
 class JR : public R
@@ -361,6 +371,161 @@ public:
 	int run()
 	{
 		*m_rd = *m_rs < *m_rt ? 1 : 0;
+		return *m_rd;
+	}
+};
+
+/*
+///////////////////////////////////////////////////////////////////////////
+
+////// Below are definitions for all implemented I-type Instructions //////
+
+///////////////////////////////////////////////////////////////////////////
+*/
+
+class ADDI : public I
+{
+public:
+	ADDI()
+	{
+		m_opcode = 8;
+	}
+	ADDI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 8;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs + m_immediate;
+		return *m_rd;
+	}
+};
+
+class SUBI : public I
+{
+public:
+	SUBI()
+	{
+		m_opcode = 8;
+	}
+	SUBI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 8;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs - m_immediate;
+		return *m_rd;
+	}
+};
+
+class MULI : public I
+{
+public:
+	MULI()
+	{
+		m_opcode = 8;
+	}
+	MULI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 8;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs * m_immediate;
+		return *m_rd;
+	}
+};
+
+class ANDI : public I
+{
+public:
+	ANDI()
+	{
+		m_opcode = 12;
+	}
+	ANDI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 12;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs & m_immediate;
+		return *m_rd;
+	}
+};
+
+class ORI : public I
+{
+public:
+	ORI()
+	{
+		m_opcode = 13;
+	}
+	ORI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 13;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs | m_immediate;
+		return *m_rd;
+	}
+};
+
+class DIVI : public I
+{
+public:
+	DIVI()
+	{
+		m_opcode = 13;
+	}
+	DIVI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 13;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs / m_immediate;
+		return *m_rd;
+	}
+};
+
+class MODI : public I
+{
+public:
+	MODI()
+	{
+		m_opcode = 13;
+	}
+	MODI(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 13;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs % m_immediate;
 		return *m_rd;
 	}
 };

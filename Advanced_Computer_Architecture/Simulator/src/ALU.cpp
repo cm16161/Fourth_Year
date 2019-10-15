@@ -76,3 +76,45 @@ int ALU::slt(int *rs, int *rt, int *rd)
 	SLT slt(rs, rt, rd);
 	return slt.run();
 }
+
+int ALU::addi(int *rs, int *rd, int immediate)
+{
+	ADDI addi(rs, rd, immediate);
+	return addi.run();
+}
+
+int ALU::subi(int *rs, int *rd, int immediate)
+{
+	SUBI subi(rs, rd, immediate);
+	return subi.run();
+}
+
+int ALU::muli(int *rs, int *rd, int immediate)
+{
+	MULI muli(rs, rd, immediate);
+	return muli.run();
+}
+
+int ALU::andi(int *rs, int *rd, int immediate)
+{
+	ANDI andi(rs, rd, immediate);
+	return andi.run();
+}
+
+int ALU::ori(int *rs, int *rd, int immediate)
+{
+	ORI ori(rs, rd, immediate);
+	return ori.run();
+}
+
+int ALU::divi(int *rs, int *rd, int immediate)
+{
+	DIVI divi(rs, rd, immediate);
+	return divi.run();
+}
+
+int ALU::modi(int *rs, int *rd, int immediate)
+{
+	MODI modi(rs, rd, immediate);
+	return modi.run();
+}
