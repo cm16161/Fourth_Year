@@ -1,5 +1,5 @@
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/CMakeFiles/rebuild_cache.dir
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/CMakeFiles/edit_cache.dir
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/src/CMakeFiles/rebuild_cache.dir
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/src/CMakeFiles/simulator.dir
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/src/CMakeFiles/edit_cache.dir
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles/rebuild_cache.dir
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles/edit_cache.dir
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/rebuild_cache.dir
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/simulator.dir
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/edit_cache.dir

@@ -6,7 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/src/simulator.cpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/simulator.cpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
 iostream
 -
 

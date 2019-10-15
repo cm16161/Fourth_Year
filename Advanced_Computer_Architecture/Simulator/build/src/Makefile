@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture
+CMAKE_SOURCE_DIR = /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build
+CMAKE_BINARY_DIR = /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/CMakeFiles /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/src/CMakeFiles/progress.marks
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build/CMakeFiles 0
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/progress.marks
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/CMakeFiles/simulator.dir/rule:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/simulator.dir/rule
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/simulator.dir/rule
 .PHONY : src/CMakeFiles/simulator.dir/rule
 
 # Convenience name for target.
@@ -122,7 +122,7 @@ simulator: src/CMakeFiles/simulator.dir/rule
 
 # fast build rule for target.
 simulator/fast:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/build
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/build
 .PHONY : simulator/fast
 
 simulator.o: simulator.cpp.o
@@ -131,7 +131,7 @@ simulator.o: simulator.cpp.o
 
 # target to build an object file
 simulator.cpp.o:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/simulator.cpp.o
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/simulator.cpp.o
 .PHONY : simulator.cpp.o
 
 simulator.i: simulator.cpp.i
@@ -140,7 +140,7 @@ simulator.i: simulator.cpp.i
 
 # target to preprocess a source file
 simulator.cpp.i:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/simulator.cpp.i
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/simulator.cpp.i
 .PHONY : simulator.cpp.i
 
 simulator.s: simulator.cpp.s
@@ -149,7 +149,7 @@ simulator.s: simulator.cpp.s
 
 # target to generate assembly for a file
 simulator.cpp.s:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/simulator.cpp.s
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/simulator.cpp.s
 .PHONY : simulator.cpp.s
 
 # Help Target
@@ -175,6 +175,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

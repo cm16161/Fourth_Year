@@ -1,4 +1,4 @@
-# Install script for directory: /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/src
+# Install script for directory: /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
