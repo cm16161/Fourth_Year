@@ -4,7 +4,7 @@
 int ALU::add(int *rs, int *rt, int *rd)
 {
 
-	ADD addition(rs, rt, rd);
+	alu_ADD addition(rs, rt, rd);
 	return addition.run();
 }
 
@@ -79,7 +79,7 @@ int ALU::slt(int *rs, int *rt, int *rd)
 
 int ALU::addi(int *rs, int *rd, int immediate)
 {
-	ADDI addi(rs, rd, immediate);
+	alu_ADDI addi(rs, rd, immediate);
 	return addi.run();
 }
 

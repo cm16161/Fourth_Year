@@ -2,6 +2,9 @@
 #define ISA_HPP
 extern int *PC;
 
+#define ADD(rs, rt, rd) alu.add(rs, rt, rd)
+#define ADDI(rs, rd, immediate) alu.addi(rs, rd, immediate)
+
 class Instruction
 {
 public:
@@ -56,17 +59,17 @@ class J : Instruction
 ///////////////////////////////////////////////////////////////////////////
 */
 
-class ADD : public R
+class alu_ADD : public R
 {
 
 public:
-	ADD()
+	alu_ADD()
 	{
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 32;
 	}
-	ADD(int *rs, int *rt, int *rd)
+	alu_ADD(int *rs, int *rt, int *rd)
 	{
 		m_opcode = 0;
 		m_shamt = 0;
@@ -383,14 +386,14 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 */
 
-class ADDI : public I
+class alu_ADDI : public I
 {
 public:
-	ADDI()
+	alu_ADDI()
 	{
 		m_opcode = 8;
 	}
-	ADDI(int *rs, int *rd, int immediate)
+	alu_ADDI(int *rs, int *rd, int immediate)
 	{
 		m_opcode = 8;
 		m_rs = rs;

@@ -13,7 +13,7 @@ int main()
 	c = 0;
 	ALU alu;
 	cout << "A = " << a << " B = " << b << " C = " << c << endl;
-	cout << " [ ADD ] " << alu.add(&a, &b, &c) << endl;
+	cout << " [ ADD ] " << ADD(&a, &b, &c) << endl;
 	cout << " [ SUB ] " << alu.sub(&b, &a, &c) << endl;
 	cout << " [ MUL ] " << alu.mul(&a, &b, &c) << endl;
 	cout << " [ DIV ] " << alu.div(&a, &b, &c) << endl;
@@ -25,7 +25,7 @@ int main()
 	cout << " [ NOR ] " << alu.nor(&a, &b, &c) << endl;
 	cout << " [ SLT ] " << alu.slt(&a, &b, &c) << endl;
 
-	cout << " [ ADDI ] " << alu.addi(&a, &c, 5) << endl;
+        cout << " [ ADDI ] " << ADDI(&a, &c, 5) << endl;
 	cout << " [ SUBI ] " << alu.subi(&a, &c, 5) << endl;
 	cout << " [ MULI ] " << alu.muli(&a, &c, 5) << endl;
 	cout << " [ ANDI ] " << alu.andi(&a, &c, 5) << endl;
