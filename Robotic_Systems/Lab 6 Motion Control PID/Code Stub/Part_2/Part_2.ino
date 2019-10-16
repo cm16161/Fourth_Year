@@ -18,19 +18,19 @@
 
 
 #define kp_left 0.005
-#define ki_left 0.0000000005
-#define kd_left 15  
-#define DELAY_DURATION 2000
+#define ki_left 0.0000005
+#define kd_left 10
 
 PID left_pid( kp_left, ki_left, kd_left );
-PID right_pid(kp_left, ki_left, kd_left );
-unsigned long last_time;
+PID right_pid( kp_left, ki_left, kd_left );
+
 volatile unsigned long timer3_count;
 volatile long last_left = 0;
 volatile long last_timer3 = 0;
 volatile long timer3_speed_left = 0;
 volatile long last_right = 0;
 volatile long timer3_speed_right = 0;
+unsigned long target_count = 1435;
 
 // Remember, setup only runs once.
 void setup()
@@ -38,10 +38,13 @@ void setup()
 
   // Initialise your other globals variables
   // and devices.
-  last_time = millis();
+
   // Initialise the Serial communication
   setupEncoder0();
   setupEncoder1();
+  setupTimer3(1);
+  timer3_count = 0;
+
 
   pinMode( L_PWM_PIN, OUTPUT );
   pinMode( L_DIR_PIN, OUTPUT );
@@ -68,8 +71,8 @@ void moveMotor(int pin, float scalar_speed) {
   if (scalar_speed >= 230) {
     scalar_speed = 230;
   }
-  else if (scalar_speed <= 10) {
-    scalar_speed = 10;
+  else if (scalar_speed <= 8) {
+    scalar_speed = 8;
   }
   int dir, pwm;
   if (pin == LEFT) {
@@ -95,28 +98,21 @@ void stopMotor() {
 // Remmeber, loop is called again and again.
 void loop()
 {
-  unsigned long elapsed_time, current_time;
-  current_time = millis();
-  elapsed_time = current_time - last_time;
-  if(elapsed_time >= DELAY_DURATION){
-    float output_l = left_pid.update(5000, count_left);
-  moveMotor(LEFT, output_l);
-  float output_r = right_pid.update(5000,count_right);
-  moveMotor(RIGHT,output_r);
-  Serial.print("Left wheel output is: ");
-  Serial.println(output_l);
-  Serial.println(count_left);
-  last_time = millis();
-  }
-  
   // build your main code here.
   // Call your pid.update() at a regular time interval.
   //    output_signal <----PID-- demand, measurement
-//  float output_l = left_pid.update(5000, count_left);
-//  moveMotor(LEFT, output_l);
-//  float output_r = right.pid.update(5000,count_right);
-//  moveMotor(RIGHT,output_r);
-  
+  static float speed_l;
+  static float speed_r;
+  float output_l = left_pid.update(1435, timer3_speed_left);
+  speed_l += output_l;
+  moveMotor(LEFT, speed_l);
+  float output_r = right_pid.update(1435, timer3_speed_right);
+  speed_r += output_r;
+  moveMotor(RIGHT, speed_r);
+  Serial.print("Left wheel output is: ");
+  Serial.println(speed_l);
+  Serial.println(timer3_speed_left);
+  delay(1000);
 }
 
 void setupTimer3( int hertz ) {
