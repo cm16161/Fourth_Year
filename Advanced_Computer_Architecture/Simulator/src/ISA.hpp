@@ -2,6 +2,7 @@
 #define ISA_HPP
 #include <cstring>
 #include <string>
+#include <iostream>
 extern int PC;
 
 class Instruction

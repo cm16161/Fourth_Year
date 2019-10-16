@@ -13,6 +13,8 @@ cstring
 -
 string
 -
+iostream
+-
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 

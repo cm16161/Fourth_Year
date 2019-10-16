@@ -20,6 +20,7 @@ enum ISA
 	MODI,
 	SLTI,
 	NOP,
+	EOP,
 
 };
 
@@ -100,6 +101,10 @@ ISA cmp(std::string inst)
 	else if (inst.compare("SLTI") == 0)
 	{
 		return SLTI;
+	}
+	else if (inst.compare("EOP") == 0)
+	{
+		return EOP;
 	}
 	else
 		return NOP;
