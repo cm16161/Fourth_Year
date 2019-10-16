@@ -1,9 +1,8 @@
 #ifndef ISA_HPP
 #define ISA_HPP
+#include <cstring>
+#include <string>
 extern int PC;
-
-#define ADD(rs, rt, rd) alu.add(rs, rt, rd)
-#define ADDI(rs, rd, immediate) alu.addi(rs, rd, immediate)
 
 class Instruction
 {
@@ -550,7 +549,7 @@ public:
 	int run()
 	{
 		*m_rd = *m_rs < m_immediate ? 1 : 0;
-                return *m_rd;
+		return *m_rd;
 	}
 };
 

@@ -9,13 +9,23 @@
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+cstring
+-
+string
+-
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/simulator.cpp
 ALU.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
 ISA.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+decode.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 algorithm
+-
+cstdlib
 -
 fstream
 -

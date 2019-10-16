@@ -45,6 +45,7 @@ bool g_move_or_rotate = true;
 
 volatile long last_left = 0;
 volatile long last_timer3 = 0;
+volatile long timer3_speed = 0;
 
 volatile unsigned long e0_interval;
 volatile unsigned long e0_last_time;
@@ -55,14 +56,14 @@ volatile float e0_speed;
 
 
 
-enum movement_profile{
+enum movement_profile {
   accelerate,
   stay,
   decelerate,
   dead
 };
 
-int index =0;
+int index = 0;
 
 // put your setup code here, to run once:
 void setup() {
@@ -70,16 +71,16 @@ void setup() {
   // These two function set up the pin
   // change interrupts for the encoders.
   // If you want to know more, find them
-  // at the end of this file.  
+  // at the end of this file.
   last_timestamp = micros();
   last_count = 0;
   measured_speed = 0;
   last_change = millis();
-  
+
   // Setup our timer3
   setupTimer3(1);
   timer3_count = 0;
-  
+
   pinMode( L_PWM_PIN, OUTPUT );
   pinMode( L_DIR_PIN, OUTPUT );
   pinMode( R_PWM_PIN, OUTPUT );
@@ -89,7 +90,7 @@ void setup() {
   // Which of these is foward, or backward?
   digitalWrite( L_DIR_PIN, LOW);
   digitalWrite( R_DIR_PIN, LOW);
-  
+
   setupEncoder0();
   setupEncoder1();
 
@@ -100,163 +101,163 @@ void setup() {
   Serial.begin( 9600 );
 }
 
-void moveMotor(int pin, float scalar_speed){
+void moveMotor(int pin, float scalar_speed) {
   bool motor_direction;
-  if(scalar_speed < 0) {
+  if (scalar_speed < 0) {
     motor_direction = true;
     scalar_speed *= -1;
   }
   else motor_direction = false;
   int dir, pwm;
-  if(pin == LEFT){
+  if (pin == LEFT) {
     dir = DIR_PIN(L);
     pwm = PWM_PIN(L);
   }
-  else if(pin == RIGHT){
+  else if (pin == RIGHT) {
     dir = DIR_PIN(R);
     pwm = PWM_PIN(R);
   }
   digitalWrite(dir, motor_direction);
   analogWrite(pwm, scalar_speed);
-  
+
 }
 
-void stopMotor(){
-   moveMotor(LEFT,0);
-   moveMotor(RIGHT,0);
+void stopMotor() {
+  moveMotor(LEFT, 0);
+  moveMotor(RIGHT, 0);
 }
 
-void velocityProfile(float elapsed_time, float duration){
+void velocityProfile(float elapsed_time, float duration) {
   static movement_profile state = accelerate;
   static int move_speed = 10;
   float current_time = millis();
   float change_split = current_time - last_change;
-  if(state == accelerate){
-    if(change_split > 500){
-    move_speed += 10;
-    last_change = millis();
-    if(move_speed > 230){
-      move_speed = 230;
+  if (state == accelerate) {
+    if (change_split > 500) {
+      move_speed += 10;
+      last_change = millis();
+      if (move_speed > 230) {
+        move_speed = 230;
+      }
+      moveMotor(LEFT, move_speed);
+      moveMotor(RIGHT, move_speed);
     }
-    moveMotor(LEFT, move_speed);
-    moveMotor(RIGHT, move_speed);  
-    }
-    
+
   }
-  if(state == decelerate){
-    if(change_split > 500){
+  if (state == decelerate) {
+    if (change_split > 500) {
       move_speed -= 10;
       last_change = millis();
     }
-    if(move_speed < 10){
+    if (move_speed < 10) {
       move_speed = 10;
     }
     moveMotor(LEFT, move_speed);
     moveMotor(RIGHT, move_speed);
   }
-  if(state == dead){
+  if (state == dead) {
     stopMotor();
   }
-  if(elapsed_time > duration){
-    switch(state){
-      case accelerate: state=stay;         break;
+  if (elapsed_time > duration) {
+    switch (state) {
+      case accelerate: state = stay;         break;
       case       stay: state = decelerate; break;
       case decelerate: state = dead;       break;
       case       dead:                     break;
     }
     last_timestamp = millis();
-    index = (index +1) % 3;
+    index = (index + 1) % 3;
   }
   Serial.println(move_speed);
 }
 
-void moveDistance(float distance){
+void moveDistance(float distance) {
   distance *= 0.1;
- int encoder_count = (distance/CIRCUMFERENCE)*ONE_REVOLUTION;
-   if(count_left <= encoder_count){
-    moveMotor(LEFT, SPEED);  
-    }
-  if(count_right <= encoder_count){
-    moveMotor(RIGHT, SPEED);  
-    } 
-  
-  if(count_left >= encoder_count && count_right >= encoder_count){
-    moveMotor(LEFT,0);
-    moveMotor(RIGHT,0);
+  int encoder_count = (distance / CIRCUMFERENCE) * ONE_REVOLUTION;
+  if (count_left <= encoder_count) {
+    moveMotor(LEFT, SPEED);
+  }
+  if (count_right <= encoder_count) {
+    moveMotor(RIGHT, SPEED);
+  }
+
+  if (count_left >= encoder_count && count_right >= encoder_count) {
+    moveMotor(LEFT, 0);
+    moveMotor(RIGHT, 0);
     g_move_or_rotate = false;
     count_left = 0;
-    count_right =0;
+    count_right = 0;
   }
 }
 
-void rotateDegrees(float degree){
+void rotateDegrees(float degree) {
   int dir = 0;
-  if(degree < 0){
-    degree *=-1;
+  if (degree < 0) {
+    degree *= -1;
     dir = 1;
   }
-  float encoder_count = (degree/360) * 2 * ONE_REVOLUTION;
-  if(dir == 0){
-    if(count_left <= encoder_count){
-      moveMotor(LEFT,SPEED);
+  float encoder_count = (degree / 360) * 2 * ONE_REVOLUTION;
+  if (dir == 0) {
+    if (count_left <= encoder_count) {
+      moveMotor(LEFT, SPEED);
     }
-    else{
-      moveMotor(LEFT,0);
+    else {
+      moveMotor(LEFT, 0);
     }
-    if(count_right >= -encoder_count){
-      moveMotor(RIGHT,-SPEED);
+    if (count_right >= -encoder_count) {
+      moveMotor(RIGHT, -SPEED);
     }
-    else{
-      moveMotor(RIGHT,0);
-     }  
-     if(count_right <= -encoder_count && count_left >= encoder_count){
-       g_move_or_rotate = true;
+    else {
+      moveMotor(RIGHT, 0);
     }
-  }
-  else{
-    if(count_left >= -encoder_count){
-      moveMotor(LEFT,-SPEED);
-    }
-    else{
-      moveMotor(LEFT,0);
-    }
-    if(count_right <= encoder_count){
-      moveMotor(RIGHT,SPEED);
-    }
-    else{
-      moveMotor(RIGHT,0);
-     }
-    if(count_left <= -encoder_count && count_right >= encoder_count){
-       g_move_or_rotate = true;
-       count_left = 0;
-       count_right =0;
+    if (count_right <= -encoder_count && count_left >= encoder_count) {
+      g_move_or_rotate = true;
     }
   }
-  
+  else {
+    if (count_left >= -encoder_count) {
+      moveMotor(LEFT, -SPEED);
+    }
+    else {
+      moveMotor(LEFT, 0);
+    }
+    if (count_right <= encoder_count) {
+      moveMotor(RIGHT, SPEED);
+    }
+    else {
+      moveMotor(RIGHT, 0);
+    }
+    if (count_left <= -encoder_count && count_right >= encoder_count) {
+      g_move_or_rotate = true;
+      count_left = 0;
+      count_right = 0;
+    }
+  }
+
 }
 
-void square(){
+void square() {
   static bool move_or_rotate = true;
   static int count = 0;
-  if(count >=4){
+  if (count >= 4) {
     stopMotor();
     return;
   }
-  if(move_or_rotate){
+  if (move_or_rotate) {
     moveDistance(100);
-    if(!g_move_or_rotate){
+    if (!g_move_or_rotate) {
       move_or_rotate = !move_or_rotate;
-      count++;    
+      count++;
     }
   }
-  
-  else{
+
+  else {
     rotateDegrees(90);
-    if(g_move_or_rotate){
+    if (g_move_or_rotate) {
       count_left = 0;
-      count_right =0;
-    move_or_rotate = !move_or_rotate;
-    } 
+      count_right = 0;
+      move_or_rotate = !move_or_rotate;
+    }
   }
 }
 
@@ -267,9 +268,9 @@ void loop() {
   // with a comma seperation, which allows for
   // two lines to be drawn on the Plotter.
   //
-  // NOTE: count_left and count_right values are now 
-  //       automatically updated by the ISR when 
-  //       the encoder pins change.  
+  // NOTE: count_left and count_right values are now
+  //       automatically updated by the ISR when
+  //       the encoder pins change.
   //
   float durations[3] = {5000, 5000, 5000};
   float elapsed_time, current_time;
@@ -278,27 +279,28 @@ void loop() {
   elapsed_time = current_time - last_timestamp;
   last_timestamp = current_time;
   long change_in_count = count_left - last_count;
-  measured_speed = (change_in_count*1000000) / (long)elapsed_time;
-  moveMotor(LEFT,2*SPEED);
-  Serial.print(current_time);
-  Serial.print(", ");
-  Serial.print(timer3_count);
-  Serial.print("\n");
-  moveMotor(RIGHT,2*SPEED);
-//  Serial.println(last_left);
-//  Serial.println(count_left);
-   
-//  Serial.print(last_count);
-//  Serial.print(" -> ");
-//  Serial.print(count_left);
-long timer3_speed = (count_left - last_left)/(timer3_count - last_timer3);
-Serial.print(measured_speed);
-Serial.print(" -> ");
-Serial.println(timer3_speed);
-//  Serial.print(" = ");
-//  Serial.println(change_in_count);
-//    Serial.print( e0_speed );
-//   Serial.print("\n");
+  measured_speed = (change_in_count * 1000000) / (long)elapsed_time;
+  moveMotor(LEFT, 2 * SPEED);
+  //  Serial.print(current_time);
+  //  Serial.print(", ");
+  //  Serial.print(timer3_count);
+  //  Serial.print("\n");
+  moveMotor(RIGHT, 2 * SPEED);
+  //  Serial.println(last_left);
+  //  Serial.println(count_left);
+
+  //  Serial.print(last_count);
+  //  Serial.print(" -> ");
+  //  Serial.print(count_left);
+  //long timer3_speed = (count_left - last_left) / (timer3_count - last_timer3);
+ 
+  Serial.print(e0_speed);
+  Serial.print(" -> ");
+  Serial.println(timer3_speed);
+  //  Serial.print(" = ");
+  //  Serial.println(change_in_count);
+  //    Serial.print( e0_speed );
+  //   Serial.print("\n");
 
   last_count = count_left;
   delay(1000);
@@ -319,7 +321,7 @@ ISR( INT6_vect ) {
   // true value.
   new_right_A ^= new_right_B;
 
-  // Create a bitwise representation of our states
+  // Create a bitwise representationright of our states
   // We do this by shifting the boolean value up by
   // the appropriate number of bits, as per our table
   // header:
@@ -365,7 +367,6 @@ ISR( INT6_vect ) {
   e0_speed = (change_in_count * 1000000) / e0_interval;
   e0_last_time = micros();
   last_count = count_right;
-  last_timer3 = timer3_count;
 
 }
 
@@ -380,23 +381,23 @@ ISR( PCINT0_vect ) {
 
   // Mask for a specific pin from the port.
   // Non-standard pin, so we access the register
-  // directly.  
+  // directly.
   // Reading just PINE would give us a number
   // composed of all 8 bits.  We want only bit 2.
   // B00000100 masks out all but bit 2
-  boolean new_left_B = PINE & (1<<PINE2);
+  boolean new_left_B = PINE & (1 << PINE2);
   //boolean newE0_B = PINE & B00000100;  // Does same as above.
 
   // Standard read fro the other pin.
   boolean new_left_A = digitalRead( E0_A_PIN ); // 26 the same as A8
 
   // Some clever electronics combines the
-  // signals and this XOR restores the 
+  // signals and this XOR restores the
   // true value.
   new_left_A ^= new_left_B;
 
 
-  
+
   // Create a bitwise representation of our states
   // We do this by shifting the boolean value up by
   // the appropriate number of bits, as per our table
@@ -404,7 +405,7 @@ ISR( PCINT0_vect ) {
   //
   // State :  (bit3)  (bit2)  (bit1)  (bit0)
   // State :  New A,  New B,  Old A,  Old B.
-  byte state = 0;                   
+  byte state = 0;
   state = state | ( new_left_A  << 3 );
   state = state | ( new_left_B  << 2 );
   state = state | ( old_left_A  << 1 );
@@ -412,8 +413,8 @@ ISR( PCINT0_vect ) {
 
   // This is an inefficient way of determining
   // the direction.  However it illustrates well
-  // against the lecture slides.  
-  switch( state ) {
+  // against the lecture slides.
+  switch ( state ) {
     case 0:  break; // No movement.
     case 1:  count_left--; break;  // clockwise
     case 2:  count_left++; break;  // anti-clockwise
@@ -431,10 +432,10 @@ ISR( PCINT0_vect ) {
     case 14: count_left--; break;  // clockwise?
     case 15:               break;  // No movement.
   }
-     
+
   // Save current state as old state for next call.
   old_left_A = new_left_A;
-  old_left_B = new_left_B; 
+  old_left_B = new_left_B;
 }
 
 
@@ -468,9 +469,9 @@ void setupEncoder1() {
   // Page 90, 11.1.3 External Interrupt Mask Register – EIMSK
   // Disable external interrupts for INT6 first
   // Set INT6 bit low, preserve other bits
-  EIMSK = EIMSK & ~(1<<INT6);
+  EIMSK = EIMSK & ~(1 << INT6);
   //EIMSK = EIMSK & B1011111; // Same as above.
-  
+
   // Page 89, 11.1.2 External Interrupt Control Register B – EICRB
   // Used to set up INT6 interrupt
   EICRB |= ( 1 << ISC60 );  // using header file names, push 1 to bit ISC60
@@ -493,75 +494,75 @@ void setupEncoder1() {
 
 void setupEncoder0() {
 
-    // Initialise our count value to 0.
-    count_left = 0;
+  // Initialise our count value to 0.
+  count_left = 0;
 
-    // Initialise the prior A & B signals
-    // to zero, we don't know what they were.
-    old_left_A = 0;
-    old_left_B = 0;
+  // Initialise the prior A & B signals
+  // to zero, we don't know what they were.
+  old_left_A = 0;
+  old_left_B = 0;
 
-    // Setting up E0_PIN_B:
-    // The Romi board uses the pin PE2 (port E, pin 2) which is
-    // very unconventional.  It doesn't have a standard
-    // arduino alias (like d6, or a5, for example).
-    // We set it up here with direct register access
-    // Writing a 0 to a DDR sets as input
-    // DDRE = Data Direction Register (Port)E
-    // We want pin PE2, which means bit 2 (counting from 0)
-    // PE Register bits [ 7  6  5  4  3  2  1  0 ]
-    // Binary mask      [ 1  1  1  1  1  0  1  1 ]
-    //    
-    // By performing an & here, the 0 sets low, all 1's preserve
-    // any previous state.
-    DDRE = DDRE & ~(1<<DDE6);
-    //DDRE = DDRE & B11111011; // Same as above. 
+  // Setting up E0_PIN_B:
+  // The Romi board uses the pin PE2 (port E, pin 2) which is
+  // very unconventional.  It doesn't have a standard
+  // arduino alias (like d6, or a5, for example).
+  // We set it up here with direct register access
+  // Writing a 0 to a DDR sets as input
+  // DDRE = Data Direction Register (Port)E
+  // We want pin PE2, which means bit 2 (counting from 0)
+  // PE Register bits [ 7  6  5  4  3  2  1  0 ]
+  // Binary mask      [ 1  1  1  1  1  0  1  1 ]
+  //
+  // By performing an & here, the 0 sets low, all 1's preserve
+  // any previous state.
+  DDRE = DDRE & ~(1 << DDE6);
+  //DDRE = DDRE & B11111011; // Same as above.
 
-    // We need to enable the pull up resistor for the pin
-    // To do this, once a pin is set to input (as above)
-    // You write a 1 to the bit in the output register
-    PORTE = PORTE | (1<< PORTE2 );
-    //PORTE = PORTE | 0B00000100;
+  // We need to enable the pull up resistor for the pin
+  // To do this, once a pin is set to input (as above)
+  // You write a 1 to the bit in the output register
+  PORTE = PORTE | (1 << PORTE2 );
+  //PORTE = PORTE | 0B00000100;
 
-    // Encoder0 uses conventional pin 26
-    pinMode( E0_A_PIN, INPUT );
-    digitalWrite( E0_A_PIN, HIGH ); // Encoder 0 xor
+  // Encoder0 uses conventional pin 26
+  pinMode( E0_A_PIN, INPUT );
+  digitalWrite( E0_A_PIN, HIGH ); // Encoder 0 xor
 
-    // Enable pin-change interrupt on A8 (PB4) for encoder0, and disable other
-    // pin-change interrupts.
-    // Note, this register will normally create an interrupt a change to any pins
-    // on the port, but we use PCMSK0 to set it only for PCINT4 which is A8 (PB4)
-    // When we set these registers, the compiler will now look for a routine called
-    // ISR( PCINT0_vect ) when it detects a change on the pin.  PCINT0 seems like a
-    // mismatch to PCINT4, however there is only the one vector servicing a change
-    // to all PCINT0->7 pins.
-    // See Manual 11.1.5 Pin Change Interrupt Control Register - PCICR
-    
-    // Page 91, 11.1.5, Pin Change Interrupt Control Register 
-    // Disable interrupt first
-    PCICR = PCICR & ~( 1 << PCIE0 );
-    // PCICR &= B11111110;  // Same as above
-    
-    // 11.1.7 Pin Change Mask Register 0 – PCMSK0
-    PCMSK0 |= (1 << PCINT4);
-    
-    // Page 91, 11.1.6 Pin Change Interrupt Flag Register – PCIFR
-    PCIFR |= (1 << PCIF0);  // Clear its interrupt flag by writing a 1.
+  // Enable pin-change interrupt on A8 (PB4) for encoder0, and disable other
+  // pin-change interrupts.
+  // Note, this register will normally create an interrupt a change to any pins
+  // on the port, but we use PCMSK0 to set it only for PCINT4 which is A8 (PB4)
+  // When we set these registers, the compiler will now look for a routine called
+  // ISR( PCINT0_vect ) when it detects a change on the pin.  PCINT0 seems like a
+  // mismatch to PCINT4, however there is only the one vector servicing a change
+  // to all PCINT0->7 pins.
+  // See Manual 11.1.5 Pin Change Interrupt Control Register - PCICR
 
-    // Enable
-    PCICR |= (1 << PCIE0);
+  // Page 91, 11.1.5, Pin Change Interrupt Control Register
+  // Disable interrupt first
+  PCICR = PCICR & ~( 1 << PCIE0 );
+  // PCICR &= B11111110;  // Same as above
+
+  // 11.1.7 Pin Change Mask Register 0 – PCMSK0
+  PCMSK0 |= (1 << PCINT4);
+
+  // Page 91, 11.1.6 Pin Change Interrupt Flag Register – PCIFR
+  PCIFR |= (1 << PCIF0);  // Clear its interrupt flag by writing a 1.
+
+  // Enable
+  PCICR |= (1 << PCIE0);
 }
 
 void setupTimer3( int hertz ) {
-  
+
   // disable global interrupts
-  cli();          
+  cli();
 
   // Reset timer3 to a blank condition.
   // TCCR = Timer/Counter Control Register
   TCCR3A = 0;     // set entire TCCR3A register to 0
   TCCR3B = 0;     // set entire TCCR3B register to 0
-  
+
   // First, turn on CTC mode.  Timer3 will count up
   // and create an interrupt on a match to a value.
   // See table 14.4 in manual, it is mode 4.
@@ -571,7 +572,7 @@ void setupTimer3( int hertz ) {
   TCCR3B = TCCR3B | (1 << CS32);
 
   // Set Compare Match counter value
-  OCR3A =  62500/hertz;
+  OCR3A =  62500 / hertz;
 
 
   // enable timer compare interrupt:
@@ -584,11 +585,15 @@ void setupTimer3( int hertz ) {
 
 
 // The ISR routine.
-// The name TIMER3_COMPA_vect is a special flag to the 
+// The name TIMER3_COMPA_vect is a special flag to the
 // compiler.  It automatically associates with Timer3 in
 // CTC mode.
 ISR( TIMER3_COMPA_vect ) {
   timer3_count++;
+  float time_diff = timer3_count - last_timer3;
+  float delta_c = count_left - last_left;
+   timer3_speed = delta_c/time_diff;
   last_left = count_left;
+  last_timer3 = timer3_count;
 
 }
