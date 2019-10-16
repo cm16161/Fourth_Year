@@ -44,7 +44,6 @@ void getRegisters(string line, vector<int> *registers)
 	char *token = strtok(my_line, "$");
 	while (token != nullptr)
 	{
-		cout << token << endl;
 		token = strtok(NULL, "$");
 		if (token != nullptr)
 		{
@@ -53,9 +52,23 @@ void getRegisters(string line, vector<int> *registers)
 	}
 }
 
+void getImmediates(string line, int *immediate)
+{
+	char *my_line = const_cast<char *>(line.c_str());
+	char *token = strtok(my_line, "$");
+	while (token != nullptr)
+	{
+		token = strtok(NULL, "#");
+		if (token != nullptr)
+		{
+			*immediate = atoi(token);
+		}
+	}
+}
+
 int main()
 {
-	PC = 0;
+	PC = 2;
 	int a, b, c;
 	a = 1;
 	b = 2;
@@ -65,15 +78,16 @@ int main()
 
 	vector<string> tokens, code;
 	vector<int> register_file;
+        int* immediate;
 	getCode(&code);
 	cout << code[PC] << endl;
 	getInstruction(code[PC], &tokens);
 	getRegisters(code[PC], &register_file);
-	for (auto i : tokens)
+        getImmediates(code[PC], immediate);
+	for (auto i : register_file)
 	{
 		cout << i << endl;
 	}
-
 	switch (cmp(tokens[0]))
 	{
 	case ADD:
@@ -82,24 +96,50 @@ int main()
 		     << endl;
 		break;
 	case SUB:
+		cout << " [ SUB ] "
+		     << alu.sub(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case MUL:
+		cout << " [ MUL ] "
+		     << alu.mul(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case DIV:
+		cout << " [ DIV ] "
+		     << alu.div(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case MOD:
+		cout << " [ MOD ] "
+		     << alu.mod(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case SLL:
+		cout << " [ SLL ] " << alu.sll(&registers[register_file[1]], *immediate, &registers[register_file[0]]) << endl;
 		break;
 	case SRL:
+		cout << " [ SRL ] " << alu.srl(&registers[register_file[1]], *immediate, &registers[register_file[0]]) << endl;
 		break;
 	case AND:
+		cout << " [ AND ] "
+		     << alu.and_op(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case ORR:
+		cout << " [ ORR ] "
+		     << alu.orr(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case NOR:
+		cout << " [ NOR ] "
+		     << alu.nor(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case SLT:
+		cout << " [ SLT ] "
+		     << alu.slt(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
+		     << endl;
 		break;
 	case ADDI:
 		break;
