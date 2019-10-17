@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/simulator.dir/ALU.cpp.o"
   "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/simulator.dir/decode.cpp.o"
   "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/simulator.dir/execute.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/simulator.dir/fetch.cpp.o"
   "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/simulator.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src/CMakeFiles/simulator.dir/simulator.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

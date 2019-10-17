@@ -1,0 +1,52 @@
+#include "fetch.hpp"
+
+void Fetch::getInstruction(string line, vector<string> *tokens){
+  tokens->clear();
+  istringstream iss(line);
+  copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(*tokens));
+}
+
+void Fetch::getCode(vector<string> *instructions)
+{
+  ifstream file("alu_processes.txt");
+  if (file.is_open())
+    {
+      string line;
+      while (getline(file, line))
+        {
+          instructions->push_back(line);
+        }
+      file.close();
+    }
+}
+
+void Fetch::getRegisters(string line, vector<int> *registers)
+{
+  registers->clear();
+  char *my_line = const_cast<char *>(line.c_str());
+  char *token = strtok(my_line, "$");
+  while (token != nullptr)
+    {
+      token = strtok(NULL, "$");
+      if (token != nullptr)
+        {
+          registers->push_back(atoi(token));
+        }
+    }
+}
+
+int Fetch::getImmediate(string line)
+{
+  char *my_line = const_cast<char *>(line.c_str());
+  char *token = strtok(my_line, "#");
+  while (token != nullptr)
+    {
+      token = strtok(nullptr, "#");
+
+      if (token != nullptr)
+        {
+          return atoi(token);
+        }
+    }
+  return 0;
+}

@@ -206,6 +206,33 @@ execute.cpp.s:
 	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/execute.cpp.s
 .PHONY : execute.cpp.s
 
+fetch.o: fetch.cpp.o
+
+.PHONY : fetch.o
+
+# target to build an object file
+fetch.cpp.o:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/fetch.cpp.o
+.PHONY : fetch.cpp.o
+
+fetch.i: fetch.cpp.i
+
+.PHONY : fetch.i
+
+# target to preprocess a source file
+fetch.cpp.i:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/fetch.cpp.i
+.PHONY : fetch.cpp.i
+
+fetch.s: fetch.cpp.s
+
+.PHONY : fetch.s
+
+# target to generate assembly for a file
+fetch.cpp.s:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/fetch.cpp.s
+.PHONY : fetch.cpp.s
+
 simulator.o: simulator.cpp.o
 
 .PHONY : simulator.o
@@ -251,6 +278,9 @@ help:
 	@echo "... execute.o"
 	@echo "... execute.i"
 	@echo "... execute.s"
+	@echo "... fetch.o"
+	@echo "... fetch.i"
+	@echo "... fetch.s"
 	@echo "... simulator.o"
 	@echo "... simulator.i"
 	@echo "... simulator.s"
