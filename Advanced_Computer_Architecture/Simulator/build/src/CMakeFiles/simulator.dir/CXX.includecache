@@ -17,6 +17,18 @@ iostream
 -
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+string
+-
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
+decode.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+ALU.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
+vector
+-
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/simulator.cpp
 ALU.hpp
@@ -41,4 +53,6 @@ string
 -
 vector
 -
+execute.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
 

@@ -5,8 +5,18 @@ src/CMakeFiles/simulator.dir/ALU.cpp.o
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.cpp
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+src/CMakeFiles/simulator.dir/decode.cpp.o
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.cpp
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+src/CMakeFiles/simulator.dir/execute.cpp.o
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+ /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
  /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/simulator.cpp

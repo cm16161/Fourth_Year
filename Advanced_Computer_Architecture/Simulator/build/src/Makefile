@@ -152,6 +152,60 @@ ALU.cpp.s:
 	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/ALU.cpp.s
 .PHONY : ALU.cpp.s
 
+decode.o: decode.cpp.o
+
+.PHONY : decode.o
+
+# target to build an object file
+decode.cpp.o:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/decode.cpp.o
+.PHONY : decode.cpp.o
+
+decode.i: decode.cpp.i
+
+.PHONY : decode.i
+
+# target to preprocess a source file
+decode.cpp.i:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/decode.cpp.i
+.PHONY : decode.cpp.i
+
+decode.s: decode.cpp.s
+
+.PHONY : decode.s
+
+# target to generate assembly for a file
+decode.cpp.s:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/decode.cpp.s
+.PHONY : decode.cpp.s
+
+execute.o: execute.cpp.o
+
+.PHONY : execute.o
+
+# target to build an object file
+execute.cpp.o:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/execute.cpp.o
+.PHONY : execute.cpp.o
+
+execute.i: execute.cpp.i
+
+.PHONY : execute.i
+
+# target to preprocess a source file
+execute.cpp.i:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/execute.cpp.i
+.PHONY : execute.cpp.i
+
+execute.s: execute.cpp.s
+
+.PHONY : execute.s
+
+# target to generate assembly for a file
+execute.cpp.s:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/execute.cpp.s
+.PHONY : execute.cpp.s
+
 simulator.o: simulator.cpp.o
 
 .PHONY : simulator.o
@@ -191,6 +245,12 @@ help:
 	@echo "... ALU.o"
 	@echo "... ALU.i"
 	@echo "... ALU.s"
+	@echo "... decode.o"
+	@echo "... decode.i"
+	@echo "... decode.s"
+	@echo "... execute.o"
+	@echo "... execute.i"
+	@echo "... execute.s"
 	@echo "... simulator.o"
 	@echo "... simulator.i"
 	@echo "... simulator.s"

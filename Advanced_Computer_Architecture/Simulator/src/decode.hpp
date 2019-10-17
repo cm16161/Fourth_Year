@@ -1,3 +1,7 @@
+#ifndef DECODE_HPP
+#define DECODE_HPP
+#include <string>
+
 enum ISA
 {
 	ADD,
@@ -24,88 +28,90 @@ enum ISA
 
 };
 
-ISA cmp(std::string inst)
-{
-	if (inst.compare("ADD") == 0)
-	{
-		return ADD;
-	}
-	else if (inst.compare("SUB") == 0)
-	{
-		return SUB;
-	}
-	else if (inst.compare("MUL") == 0)
-	{
-		return MUL;
-	}
-	else if (inst.compare("DIV") == 0)
-	{
-		return DIV;
-	}
-	else if (inst.compare("MOD") == 0)
-	{
-		return MOD;
-	}
-	else if (inst.compare("SLL") == 0)
-	{
-		return SLL;
-	}
-	else if (inst.compare("SRL") == 0)
-	{
-		return SRL;
-	}
-	else if (inst.compare("AND") == 0)
-	{
-		return AND;
-	}
-	else if (inst.compare("ORR") == 0)
-	{
-		return ORR;
-	}
-	else if (inst.compare("NOR") == 0)
-	{
-		return NOR;
-	}
-	else if (inst.compare("SLT") == 0)
-	{
-		return SLT;
-	}
-	else if (inst.compare("ADDI") == 0)
-	{
-		return ADDI;
-	}
-	else if (inst.compare("SUBI") == 0)
-	{
-		return SUBI;
-	}
-	else if (inst.compare("MULI") == 0)
-	{
-		return MULI;
-	}
-	else if (inst.compare("DIVI") == 0)
-	{
-		return DIVI;
-	}
-	else if (inst.compare("MODI") == 0)
-	{
-		return MODI;
-	}
-	else if (inst.compare("ANDI") == 0)
-	{
-		return ANDI;
-	}
-	else if (inst.compare("ORI") == 0)
-	{
-		return ORI;
-	}
-	else if (inst.compare("SLTI") == 0)
-	{
-		return SLTI;
-	}
-	else if (inst.compare("EOP") == 0)
-	{
-		return EOP;
-	}
-	else
-		return NOP;
-}
+ISA cmp(std::string inst);
+// {
+// 	if (inst.compare("ADD") == 0)
+// 	{
+// 		return ADD;
+// 	}
+// 	else if (inst.compare("SUB") == 0)
+// 	{
+// 		return SUB;
+// 	}
+// 	else if (inst.compare("MUL") == 0)
+// 	{
+// 		return MUL;
+// 	}
+// 	else if (inst.compare("DIV") == 0)
+// 	{
+// 		return DIV;
+// 	}
+// 	else if (inst.compare("MOD") == 0)
+// 	{
+// 		return MOD;
+// 	}
+// 	else if (inst.compare("SLL") == 0)
+// 	{
+// 		return SLL;
+// 	}
+// 	else if (inst.compare("SRL") == 0)
+// 	{
+// 		return SRL;
+// 	}
+// 	else if (inst.compare("AND") == 0)
+// 	{
+// 		return AND;
+// 	}
+// 	else if (inst.compare("ORR") == 0)
+// 	{
+// 		return ORR;
+// 	}
+// 	else if (inst.compare("NOR") == 0)
+// 	{
+// 		return NOR;
+// 	}
+// 	else if (inst.compare("SLT") == 0)
+// 	{
+// 		return SLT;
+// 	}
+// 	else if (inst.compare("ADDI") == 0)
+// 	{
+// 		return ADDI;
+// 	}
+// 	else if (inst.compare("SUBI") == 0)
+// 	{
+// 		return SUBI;
+// 	}
+// 	else if (inst.compare("MULI") == 0)
+// 	{
+// 		return MULI;
+// 	}
+// 	else if (inst.compare("DIVI") == 0)
+// 	{
+// 		return DIVI;
+// 	}
+// 	else if (inst.compare("MODI") == 0)
+// 	{
+// 		return MODI;
+// 	}
+// 	else if (inst.compare("ANDI") == 0)
+// 	{
+// 		return ANDI;
+// 	}
+// 	else if (inst.compare("ORI") == 0)
+// 	{
+// 		return ORI;
+// 	}
+// 	else if (inst.compare("SLTI") == 0)
+// 	{
+// 		return SLTI;
+// 	}
+// 	else if (inst.compare("EOP") == 0)
+// 	{
+// 		return EOP;
+// 	}
+// 	else
+// 		return NOP;
+// }
+
+#endif

@@ -9,15 +9,17 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "execute.hpp"
 
 #define N_REGISTERS 64
 int PC;
+
+//TODO CHECK EXECUTE.CPP
 
 using namespace std;
 
 void getInstruction(string line, vector<string> *tokens)
 {
-	//PC++;
 	tokens->clear();
 	istringstream iss(line);
 	copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(*tokens));
@@ -87,99 +89,7 @@ int main()
 		getRegisters(code[PC], &register_file);
 		immediate = getImmediate(code[PC]);
 		PC++;
-		switch (cmp(tokens[0]))
-		{
-		case ADD:
-			cout << " [ ADD ] "
-			     << alu.add(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case SUB:
-			cout << " [ SUB ] "
-			     << alu.sub(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case MUL:
-			cout << " [ MUL ] "
-			     << alu.mul(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case DIV:
-			cout << " [ DIV ] "
-			     << alu.div(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case MOD:
-			cout << " [ MOD ] "
-			     << alu.mod(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case SLL:
-			cout << " [ SLL ] " << alu.sll(&registers[register_file[1]], immediate, &registers[register_file[0]])
-			     << endl;
-			break;
-		case SRL:
-			cout << " [ SRL ] " << alu.srl(&registers[register_file[1]], immediate, &registers[register_file[0]])
-			     << endl;
-			break;
-		case AND:
-			cout << " [ AND ] "
-			     << alu.and_op(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case ORR:
-			cout << " [ ORR ] "
-			     << alu.orr(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case NOR:
-			cout << " [ NOR ] "
-			     << alu.nor(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case SLT:
-			cout << " [ SLT ] "
-			     << alu.slt(&registers[register_file[1]], &registers[register_file[2]], &registers[register_file[0]])
-			     << endl;
-			break;
-		case ADDI:
-			cout << " [ ADDI ] " << alu.addi(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case SUBI:
-			cout << " [ SUBI ] " << alu.subi(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case MULI:
-			cout << " [ MULI ] " << alu.muli(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case DIVI:
-			cout << " [ DIVI ] " << alu.divi(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case ANDI:
-			cout << " [ ANDI ] " << alu.andi(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case ORI:
-			cout << " [ ORI ] " << alu.ori(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case MODI:
-			cout << " [ MODI ] " << alu.modi(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case SLTI:
-			cout << " [ SLTI ] " << alu.slti(&registers[register_file[1]], &registers[register_file[0]], immediate)
-			     << endl;
-			break;
-		case EOP:
-			cout << " [ EOP ] Program terminated successfully " << endl;
-			exit(EXIT_SUCCESS);
-		case NOP:
-			break;
-		}
+		execute(alu, cmp(tokens[0]), registers, register_file, immediate);
 	}
 	cout << "A = " << a << " B = " << b << " C = " << c << endl;
 	cout << " [ ADD ] " << alu.add(&a, &b, &c) << endl;

@@ -83,19 +83,49 @@ src/CMakeFiles/simulator.dir/ALU.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simulator.dir/ALU.cpp.s"
 	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.cpp -o CMakeFiles/simulator.dir/ALU.cpp.s
 
+src/CMakeFiles/simulator.dir/execute.cpp.o: src/CMakeFiles/simulator.dir/flags.make
+src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/execute.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/simulator.dir/execute.cpp.o"
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simulator.dir/execute.cpp.o -c /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp
+
+src/CMakeFiles/simulator.dir/execute.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simulator.dir/execute.cpp.i"
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp > CMakeFiles/simulator.dir/execute.cpp.i
+
+src/CMakeFiles/simulator.dir/execute.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simulator.dir/execute.cpp.s"
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp -o CMakeFiles/simulator.dir/execute.cpp.s
+
+src/CMakeFiles/simulator.dir/decode.cpp.o: src/CMakeFiles/simulator.dir/flags.make
+src/CMakeFiles/simulator.dir/decode.cpp.o: ../src/decode.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/simulator.dir/decode.cpp.o"
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/simulator.dir/decode.cpp.o -c /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.cpp
+
+src/CMakeFiles/simulator.dir/decode.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simulator.dir/decode.cpp.i"
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.cpp > CMakeFiles/simulator.dir/decode.cpp.i
+
+src/CMakeFiles/simulator.dir/decode.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simulator.dir/decode.cpp.s"
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.cpp -o CMakeFiles/simulator.dir/decode.cpp.s
+
 # Object files for target simulator
 simulator_OBJECTS = \
 "CMakeFiles/simulator.dir/simulator.cpp.o" \
-"CMakeFiles/simulator.dir/ALU.cpp.o"
+"CMakeFiles/simulator.dir/ALU.cpp.o" \
+"CMakeFiles/simulator.dir/execute.cpp.o" \
+"CMakeFiles/simulator.dir/decode.cpp.o"
 
 # External object files for target simulator
 simulator_EXTERNAL_OBJECTS =
 
 ../bin/simulator: src/CMakeFiles/simulator.dir/simulator.cpp.o
 ../bin/simulator: src/CMakeFiles/simulator.dir/ALU.cpp.o
+../bin/simulator: src/CMakeFiles/simulator.dir/execute.cpp.o
+../bin/simulator: src/CMakeFiles/simulator.dir/decode.cpp.o
 ../bin/simulator: src/CMakeFiles/simulator.dir/build.make
 ../bin/simulator: src/CMakeFiles/simulator.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable ../../bin/simulator"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable ../../bin/simulator"
 	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/simulator.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

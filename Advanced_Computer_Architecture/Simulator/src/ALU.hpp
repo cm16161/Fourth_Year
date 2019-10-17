@@ -1,3 +1,6 @@
+#ifndef ALU_HPP
+#define ALU_HPP
+
 class ALU
 {
 public:
@@ -23,3 +26,5 @@ public:
 	int modi(int *rs, int *rd, int immediate);
 	int slti(int *rs, int *rd, int immediate);
 };
+
+#endif
