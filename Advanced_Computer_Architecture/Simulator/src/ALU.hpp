@@ -14,7 +14,6 @@ public:
 	int and_op(int *rs, int *rt, int *rd);
 	int orr(int *rs, int *rt, int *rd);
 	int nor(int *rs, int *rt, int *rd);
-	int jr(int *rs);
 	int slt(int *rs, int *rt, int *rd);
 
 	int addi(int *rs, int *rd, int immediate);
@@ -25,6 +24,12 @@ public:
 	int divi(int *rs, int *rd, int immediate);
 	int modi(int *rs, int *rd, int immediate);
 	int slti(int *rs, int *rd, int immediate);
+
+	int ji(int address);
+	int jr(int *rs);
+	int beq(int *rs, int *rt, int address);
+	int bne(int *rs, int *rt, int address);
+  //int jal(int address);
 };
 
 #endif

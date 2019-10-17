@@ -65,12 +65,6 @@ int ALU::nor(int *rs, int *rt, int *rd)
 	return nor.run();
 }
 
-int ALU::jr(int *rs)
-{
-	JR jr(rs);
-	return jr.run();
-}
-
 int ALU::slt(int *rs, int *rt, int *rd)
 {
 	SLT slt(rs, rt, rd);
@@ -123,4 +117,26 @@ int ALU::slti(int *rs, int *rd, int immediate)
 {
 	SLTI slti(rs, rd, immediate);
 	return slti.run();
+}
+
+int ALU::ji(int immediate)
+{
+	JI ji(immediate);
+	return ji.run();
+}
+
+int ALU::jr(int *rs)
+{
+	JR jr(rs);
+	return jr.run();
+}
+int ALU::beq(int *rs, int *rt, int address)
+{
+	BEQ beq(rs, rt, address);
+	return beq.run();
+}
+int ALU::bne(int *rs, int *rt, int address)
+{
+	BNE bne(rs, rt, address);
+	return bne.run();
 }

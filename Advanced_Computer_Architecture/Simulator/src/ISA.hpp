@@ -1,8 +1,8 @@
 #ifndef ISA_HPP
 #define ISA_HPP
 #include <cstring>
-#include <string>
 #include <iostream>
+#include <string>
 extern int PC;
 
 class Instruction
@@ -43,12 +43,15 @@ public:
 
 class J : Instruction
 {
+public:
 	int m_address;
+	int m_opcode;
 	J(int opcode, int address)
 	{
 		m_opcode = opcode;
 		m_address = address;
 	};
+	J(){};
 };
 
 /*
@@ -329,33 +332,6 @@ public:
 	}
 };
 
-class JR : public R
-{
-public:
-	JR()
-	{
-		m_opcode = 0;
-		m_shamt = 0;
-		m_funct = 8;
-		m_rt = 0;
-		m_rd = 0;
-	}
-	JR(int *rs)
-	{
-		m_opcode = 0;
-		m_shamt = 0;
-		m_funct = 8;
-		m_rt = 0;
-		m_rd = 0;
-		m_rs = rs;
-	}
-	int run()
-	{
-		PC = *m_rs;
-		return 0;
-	}
-};
-
 class SLT : public R
 {
 public:
@@ -551,6 +527,100 @@ public:
 	{
 		*m_rd = *m_rs < m_immediate ? 1 : 0;
 		return *m_rd;
+	}
+};
+
+/*
+///////////////////////////////////////////////////////////////////////////
+
+////// Below are definitions for all implemented J-type Instructions //////
+
+///////////////////////////////////////////////////////////////////////////
+*/
+
+class JI : public J
+{
+public:
+	JI()
+	{
+		m_opcode = 2;
+	}
+	JI(int address)
+	{
+		m_opcode = 2;
+		m_address = address;
+	}
+	int run()
+	{
+		PC = m_address;
+		return PC;
+	}
+};
+
+class JR : public R
+{
+public:
+	JR()
+	{
+		m_opcode = 8;
+	}
+	JR(int *rs)
+	{
+		m_opcode = 8;
+		m_rs = rs;
+	}
+	int run()
+	{
+		PC = *m_rs;
+		return PC;
+	}
+};
+
+class BEQ : public I
+{
+public:
+	BEQ()
+	{
+		m_opcode = 4;
+	}
+	BEQ(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 4;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		if (*m_rs == *m_rd)
+		{
+			PC = m_immediate;
+		}
+		return PC;
+	}
+};
+
+class BNE : public I
+{
+public:
+	BNE()
+	{
+		m_opcode = 5;
+	}
+	BNE(int *rs, int *rd, int immediate)
+	{
+		m_opcode = 5;
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		if (*m_rs != *m_rd)
+		{
+			PC = m_immediate;
+		}
+		return PC;
 	}
 };
 

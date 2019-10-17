@@ -6,18 +6,30 @@
 
 #IncludeRegexTransform: 
 
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.cpp
+ALU.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
 cstring
 -
-string
--
 iostream
+-
+string
 -
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 string
+-
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp
+execute.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
+iostream
 -
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
@@ -29,10 +41,6 @@ ALU.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
 vector
 -
-
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.cpp
-fetch.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 iostream
@@ -61,6 +69,10 @@ ISA.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
 decode.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+execute.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
+fetch.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 algorithm
 -
 cstdlib
@@ -77,8 +89,4 @@ string
 -
 vector
 -
-execute.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
-fetch.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 

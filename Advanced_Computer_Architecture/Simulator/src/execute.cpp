@@ -1,8 +1,6 @@
 #include "execute.hpp"
 #include <iostream>
 
-extern int PC;
-
 //TODO Move Registers to separate folder!
 void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
@@ -83,6 +81,9 @@ void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_
 	case SLTI:
 		cout << " [ SLTI ] " << alu.slti(&registers[register_file[1]], &registers[register_file[0]], immediate) << endl;
 		break;
+	case JI:
+		cout << " [ JI ] " << alu.ji(immediate) << endl;
+                break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
 		exit(EXIT_SUCCESS);

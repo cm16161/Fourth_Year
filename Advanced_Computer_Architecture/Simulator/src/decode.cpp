@@ -78,6 +78,22 @@ ISA cmp(std::string inst)
 	{
 		return SLTI;
 	}
+	else if (inst.compare("JI") == 0)
+	{
+		return JI;
+	}
+	else if (inst.compare("JR") == 0)
+	{
+		return JR;
+	}
+	else if (inst.compare("BEQ") == 0)
+	{
+		return BEQ;
+	}
+	else if (inst.compare("BNE") == 0)
+	{
+		return BNE;
+	}
 	else if (inst.compare("EOP") == 0)
 	{
 		return EOP;
@@ -85,4 +101,3 @@ ISA cmp(std::string inst)
 	else
 		return NOP;
 }
-
