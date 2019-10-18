@@ -3,6 +3,8 @@ import hashlib
 import threading
 import argparse
 
+STOP_THREADS = False
+
 def get_args():
     '''Get the commandline arguments passed into the program'''
     parser = argparse.ArgumentParser()
@@ -16,17 +18,23 @@ def get_args():
 def find_nonce(difficulty_level, start_val=0, end_val=2**32, block="COMSM0010cloud"):
     """This function will continually generate nonces and see if they
     are golden"""
-    for i in range(start_val, end_val):
-        sha_f = hashlib.sha256()
-        block += str(i)
-        block_bytes = bytes(block, 'ascii')
-        sha_f.update(block_bytes)
-        sha_f.update(sha_f.digest())
-        result = sha_f.digest()
-        bit_shift = 257-difficulty_level
-        if (int.from_bytes(result, byteorder='little', signed=False) >> bit_shift) == 0:
-            print("Golden Nonce: "+str(i))
-            return
+    while True:
+        for i in range(start_val, end_val):
+            global STOP_THREADS
+            sha_f = hashlib.sha256()
+            block += str(i)
+            block_bytes = bytes(block, 'ascii')
+            sha_f.update(block_bytes)
+            sha_f.update(sha_f.digest())
+            result = sha_f.digest()
+            bit_shift = 257-difficulty_level
+            if STOP_THREADS:
+                return
+            if (int.from_bytes(result, byteorder='little', signed=False) >> bit_shift) == 0:
+                print("Golden Nonce: "+str(i))
+                STOP_THREADS = True
+                return
+            
 
 
 def main():

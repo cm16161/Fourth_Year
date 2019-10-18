@@ -83,7 +83,16 @@ void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_
 		break;
 	case JI:
 		cout << " [ JI ] " << alu.ji(immediate) << endl;
-                break;
+		break;
+	case JR:
+		cout << " [ JR ] " << alu.jr(&registers[register_file[0]]) << endl;
+		break;
+	case BEQ:
+		cout << " [ BEQ ] " << alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		break;
+	case BNE:
+		cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
 		exit(EXIT_SUCCESS);

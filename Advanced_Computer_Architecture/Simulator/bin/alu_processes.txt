@@ -1,7 +1,7 @@
-ADDI $1 $1 #1
 ADDI $2 $2 #2
+ADDI $1 $1 #1
+BNE $1 $2 #1
 ADD $3 $1 $2
 SUB $3 $2 $1
 ADDI $1 $1 #5
-JI #0
 EOP
