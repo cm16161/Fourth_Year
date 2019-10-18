@@ -2,11 +2,11 @@
 #define _Line_follow_h
 
 //Number of readings to take for calibration
-//const int NUM_CALIBRATIONS = ????;
+const int NUM_CALIBRATIONS = 50;
 
-/* 
- *  Class to represent a single line sensor
- */
+/*
+    Class to represent a single line sensor
+*/
 class LineSensor
 {
   public:
@@ -21,18 +21,19 @@ class LineSensor
 
     // You may wish to add other functions!
     // ...
-    
+    float calibrated_value;
+
   private:
-  
+
     int pin;
     /*
-     * Add any variables needed for calibration here
-     */
-    
+       Add any variables needed for calibration here
+    */
+
 };
 
 
-// Class Constructor: 
+// Class Constructor:
 // Sets pin passed in as argument to input
 LineSensor::LineSensor(int Line_pin)
 {
@@ -41,7 +42,7 @@ LineSensor::LineSensor(int Line_pin)
 }
 
 // Returns unmodified reading.
-int Line_Sensor::read_raw()
+int LineSensor::read_raw()
 {
   return analogRead(pin);
 }
@@ -49,21 +50,31 @@ int Line_Sensor::read_raw()
 // Write this function to measure any
 // systematic error in your sensor and
 // set some bias values.
-void Line_Sensor::calibrate()
+void LineSensor::calibrate()
 {
+  for (int i = 0; i < NUM_CALIBRATIONS;i++){
+  calibrated_value += read_raw() / NUM_CALIBRATIONS;
+  }
+  Serial.println(calibrated_value);
+  digitalWrite(6, HIGH);
+  digitalWrite(6, LOW);
+
   /*
-   * Write code to calibrate your sensor here
-   */
+     Write code to calibrate your sensor here
+  */
 }
 
 
 // Use the above bias values to return a
 // compensated ("corrected") sensor reading.
-int Line_Sensor::read_calibrated()
+int LineSensor::read_calibrated()
 {
+  int raw = analogRead(pin);
+  int ret = raw - (int) calibrated_value;
+  return ret;
   /*
-   * Write code to return a calibrated reading here
-   */
+     Write code to return a calibrated reading here
+  */
 }
 
 
