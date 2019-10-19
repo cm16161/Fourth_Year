@@ -1,1 +1,1 @@
-/usr/bin/c++     CMakeFiles/simulator.dir/simulator.cpp.o CMakeFiles/simulator.dir/ALU.cpp.o CMakeFiles/simulator.dir/execute.cpp.o CMakeFiles/simulator.dir/decode.cpp.o CMakeFiles/simulator.dir/fetch.cpp.o  -o ../../bin/simulator 
+/usr/bin/c++     CMakeFiles/simulator.dir/simulator.cpp.o CMakeFiles/simulator.dir/ALU.cpp.o CMakeFiles/simulator.dir/execute.cpp.o CMakeFiles/simulator.dir/decode.cpp.o CMakeFiles/simulator.dir/fetch.cpp.o CMakeFiles/simulator.dir/memory.cpp.o  -o ../../bin/simulator 

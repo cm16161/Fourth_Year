@@ -62,17 +62,17 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 */
 
-class alu_ADD : public R
+class ADD : public R
 {
 
 public:
-	alu_ADD()
+	ADD()
 	{
 		m_opcode = 0;
 		m_shamt = 0;
 		m_funct = 32;
 	}
-	alu_ADD(int *rs, int *rt, int *rd)
+	ADD(int *rs, int *rt, int *rd)
 	{
 		m_opcode = 0;
 		m_shamt = 0;
@@ -362,14 +362,14 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 */
 
-class alu_ADDI : public I
+class ADDI : public I
 {
 public:
-	alu_ADDI()
+	ADDI()
 	{
 		m_opcode = 8;
 	}
-	alu_ADDI(int *rs, int *rd, int immediate)
+	ADDI(int *rs, int *rd, int immediate)
 	{
 		m_opcode = 8;
 		m_rs = rs;
@@ -621,6 +621,21 @@ public:
 			PC = m_immediate;
 		}
 		return PC;
+	}
+};
+
+class LDI : public I
+{
+public:
+	LDI(int *rs, int immediate)
+	{
+		m_rs = rs;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rs = m_immediate;
+		return *m_rs;
 	}
 };
 

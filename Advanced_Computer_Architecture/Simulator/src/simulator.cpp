@@ -3,6 +3,7 @@
 #include "decode.hpp"
 #include "execute.hpp"
 #include "fetch.hpp"
+#include "memory.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
@@ -23,6 +24,7 @@ int main()
 {
 	PC = 0;
 	ALU alu;
+	MEM mem;
 	Fetch fetch;
 	int registers[N_REGISTERS] = { 0 };
 	vector<string> tokens, code;
@@ -35,8 +37,7 @@ int main()
 		fetch.getRegisters(code[PC], &register_file);
 		immediate = fetch.getImmediate(code[PC]);
 		PC++;
-		execute(alu, cmp(tokens[0]), registers, register_file,
-                immediate);
+		execute(alu, mem, cmp(tokens[0]), registers, register_file, immediate);
 	}
 	return 0;
 }

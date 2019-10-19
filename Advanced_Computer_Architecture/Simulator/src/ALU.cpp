@@ -4,7 +4,7 @@
 int ALU::add(int *rs, int *rt, int *rd)
 {
 
-	alu_ADD addition(rs, rt, rd);
+	ADD addition(rs, rt, rd);
 	return addition.run();
 }
 
@@ -73,7 +73,7 @@ int ALU::slt(int *rs, int *rt, int *rd)
 
 int ALU::addi(int *rs, int *rd, int immediate)
 {
-	alu_ADDI addi(rs, rd, immediate);
+	ADDI addi(rs, rd, immediate);
 	return addi.run();
 }
 
@@ -139,4 +139,10 @@ int ALU::bne(int *rs, int *rt, int address)
 {
 	BNE bne(rs, rt, address);
 	return bne.run();
+}
+
+int ALU::ldi(int *rs, int immediate)
+{
+	LDI ldi(rs, immediate);
+	return ldi.run();
 }

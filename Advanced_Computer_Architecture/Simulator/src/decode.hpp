@@ -23,12 +23,15 @@ enum ISA
 	ORI,
 	MODI,
 	SLTI,
-        JI,
-        JR,
-        BEQ,
-        BNE,
+	JI,
+	JR,
+	BEQ,
+	BNE,
 	NOP,
 	EOP,
+	LD,
+	LDI,
+	ST,
 
 };
 

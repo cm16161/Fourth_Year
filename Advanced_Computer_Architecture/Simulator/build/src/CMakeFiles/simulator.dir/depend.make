@@ -13,14 +13,19 @@ src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/ISA.hpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/decode.hpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/execute.cpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/execute.hpp
+src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/memory.hpp
 
 src/CMakeFiles/simulator.dir/fetch.cpp.o: ../src/fetch.cpp
 src/CMakeFiles/simulator.dir/fetch.cpp.o: ../src/fetch.hpp
+
+src/CMakeFiles/simulator.dir/memory.cpp.o: ../src/memory.cpp
+src/CMakeFiles/simulator.dir/memory.cpp.o: ../src/memory.hpp
 
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/ALU.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/ISA.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/decode.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/execute.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/fetch.hpp
+src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/memory.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/simulator.cpp
 

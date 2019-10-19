@@ -5,6 +5,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/simulator.dir/decode.cpp.o"
   "CMakeFiles/simulator.dir/execute.cpp.o"
   "CMakeFiles/simulator.dir/fetch.cpp.o"
+  "CMakeFiles/simulator.dir/memory.cpp.o"
   "CMakeFiles/simulator.dir/simulator.cpp.o"
 )
 

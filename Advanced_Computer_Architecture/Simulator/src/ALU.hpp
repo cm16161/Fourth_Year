@@ -29,7 +29,8 @@ public:
 	int jr(int *rs);
 	int beq(int *rs, int *rt, int address);
 	int bne(int *rs, int *rt, int address);
-  //int jal(int address);
+
+	int ldi(int *rs, int immediate);
 };
 
 #endif

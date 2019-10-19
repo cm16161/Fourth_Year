@@ -2,7 +2,7 @@
 #include <iostream>
 
 //TODO Move Registers to separate folder!
-void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+void execute(ALU alu, MEM mem, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
 	switch (instructions)
 	{
@@ -92,6 +92,16 @@ void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_
 		break;
 	case BNE:
 		cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		break;
+	case LD:
+		cout << " [ LD ] " << mem.ld(&registers[register_file[0]], immediate) << endl;
+		break;
+	case ST:
+		mem.st(&registers[register_file[0]], immediate);
+		cout << " [ ST ] " << endl;
+		break;
+	case LDI:
+		cout << "[ LDI ] " << alu.ldi(&registers[register_file[0]], immediate) << endl;
 		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;

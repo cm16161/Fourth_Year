@@ -33,12 +33,14 @@ iostream
 -
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
-decode.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
-ISA.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
 ALU.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+decode.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
+memory.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/memory.hpp
 vector
 -
 
@@ -62,6 +64,8 @@ sstream
 cstring
 -
 
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/memory.hpp
+
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/simulator.cpp
 ALU.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
@@ -73,6 +77,8 @@ execute.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
 fetch.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
+memory.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/memory.hpp
 algorithm
 -
 cstdlib
