@@ -1,5 +1,11 @@
 #include "fetch.hpp"
 
+Fetch &Fetch::getInstance()
+{
+	static Fetch fetch;
+	return fetch;
+}
+
 void Fetch::getInstruction(string line, vector<string> *tokens)
 {
 	tokens->clear();

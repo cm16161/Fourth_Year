@@ -15,6 +15,7 @@
 
 #define N_REGISTERS 64
 int PC;
+int executed_instructions;
 
 //TODO CHECK EXECUTE.CPP
 
@@ -23,18 +24,17 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 	string file_name;
+	executed_instructions = 0;
 	if (argc > 1)
 	{
 		file_name = argv[1];
 	}
 	else
 	{
-		file_name = "../apps/ld_str.txt";
+		file_name = "../apps/all_ops.txt";
 	}
 	PC = 0;
-	ALU alu;
-	static MEM &mem = MEM::getInstance();
-	Fetch fetch;
+	Fetch &fetch = Fetch::getInstance();
 	int registers[N_REGISTERS] = { 0 };
 	vector<string> tokens, code;
 	vector<int> register_file;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 		fetch.getRegisters(code[PC], &register_file);
 		immediate = fetch.getImmediate(code[PC]);
 		PC++;
-		execute(alu, mem, cmp(tokens[0]), registers, register_file, immediate);
+		execute(decode(tokens[0]), registers, register_file, immediate);
 	}
 	return 0;
 }

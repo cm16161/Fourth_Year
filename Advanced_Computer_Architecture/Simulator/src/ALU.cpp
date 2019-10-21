@@ -1,6 +1,12 @@
 #include "ALU.hpp"
 #include "ISA.hpp"
 
+ALU &ALU::getInstance()
+{
+	static ALU alu;
+	return alu;
+}
+
 int ALU::add(int *rs, int *rt, int *rd)
 {
 

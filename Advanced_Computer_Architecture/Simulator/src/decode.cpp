@@ -1,6 +1,6 @@
 #include "decode.hpp"
 
-ISA cmp(std::string inst)
+ISA decode(std::string inst)
 {
 	if (inst.compare("ADD") == 0)
 	{

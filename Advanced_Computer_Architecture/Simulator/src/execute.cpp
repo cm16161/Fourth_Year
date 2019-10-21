@@ -1,9 +1,11 @@
 #include "execute.hpp"
 #include <iostream>
-
+extern int executed_instructions;
 //TODO Move Registers to separate folder!
-void execute(ALU alu, MEM &mem, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+void execute(ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
+  static ALU &alu = ALU::getInstance();
+  static MEM &mem = MEM::getInstance();
 	switch (instructions)
 	{
 	case ADD:
@@ -105,8 +107,10 @@ void execute(ALU alu, MEM &mem, ISA instructions, int registers[64], vector<int>
 		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
+		cout << " { " << executed_instructions << " } Instructions Executed" << endl;
 		exit(EXIT_SUCCESS);
 	case NOP:
 		break;
 	}
+	executed_instructions++;
 }

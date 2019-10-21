@@ -3,7 +3,10 @@
 
 class ALU
 {
+	ALU(){};
+
 public:
+	static ALU &getInstance();
 	int add(int *rs, int *rt, int *rd);
 	int sub(int *rs, int *rt, int *rd);
 	int mul(int *rs, int *rt, int *rd);

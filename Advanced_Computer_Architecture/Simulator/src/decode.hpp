@@ -35,6 +35,6 @@ enum ISA
 
 };
 
-ISA cmp(std::string inst);
+ISA decode(std::string inst);
 
 #endif
