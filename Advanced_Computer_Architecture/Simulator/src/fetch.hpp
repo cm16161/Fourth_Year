@@ -1,12 +1,12 @@
-#include <iostream>
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <sstream>
-#include <cstring>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -14,7 +14,7 @@ class Fetch
 {
 public:
 	void getInstruction(string line, vector<string> *tokens);
-	void getCode(vector<string> *instructions);
+	void getCode(string file_name, vector<string> *instructions);
 	void getRegisters(string line, vector<int> *registers);
 	int getImmediate(string line);
 };

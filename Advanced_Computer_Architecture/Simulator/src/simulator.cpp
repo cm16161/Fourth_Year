@@ -20,8 +20,17 @@ int PC;
 
 using namespace std;
 
-int main(int argc, char argv[])
+int main(int argc, char *argv[])
 {
+	string file_name;
+	if (argc > 1)
+	{
+		file_name = argv[1];
+	}
+	else
+	{
+		file_name = "../apps/ld_str.txt";
+	}
 	PC = 0;
 	ALU alu;
 	static MEM &mem = MEM::getInstance();
@@ -30,7 +39,7 @@ int main(int argc, char argv[])
 	vector<string> tokens, code;
 	vector<int> register_file;
 	int immediate;
-	fetch.getCode(&code);
+	fetch.getCode(file_name, &code);
 	for (;;)
 	{
 		fetch.getInstruction(code[PC], &tokens);
