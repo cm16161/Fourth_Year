@@ -20,11 +20,11 @@ int PC;
 
 using namespace std;
 
-int main()
+int main(int argc, char argv[])
 {
 	PC = 0;
 	ALU alu;
-	MEM mem;
+	static MEM &mem = MEM::getInstance();
 	Fetch fetch;
 	int registers[N_REGISTERS] = { 0 };
 	vector<string> tokens, code;

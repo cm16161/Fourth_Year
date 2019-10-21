@@ -2,11 +2,9 @@
 
 MEM::MEM()
 {
+	for (int i = 0; i < MEM_SIZE; i++)
 	{
-		for (int i = 0; i < MEM_SIZE; i++)
-		{
-			memory[i] = i;
-		}
+		memory[i] = i;
 	}
 }
 
@@ -26,4 +24,10 @@ int MEM::ld(int *rs, int address)
 void MEM::st(int *rs, int address)
 {
 	STORE(*rs, address);
+}
+
+MEM &MEM::getInstance()
+{
+	static MEM mem;
+	return mem;
 }

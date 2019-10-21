@@ -2,7 +2,7 @@
 #include <iostream>
 
 //TODO Move Registers to separate folder!
-void execute(ALU alu, MEM mem, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+void execute(ALU alu, MEM &mem, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
 	switch (instructions)
 	{

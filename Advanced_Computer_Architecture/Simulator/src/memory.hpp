@@ -1,13 +1,15 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 #define MEM_SIZE 128
+#include <iostream>
 
 class MEM
 {
 	int memory[MEM_SIZE];
+	MEM();
 
 public:
-	MEM();
+	static MEM &getInstance();
 	int LOAD(int index);
 	void STORE(int value, int index);
 	int ld(int *rs, int address);

@@ -8,7 +8,8 @@ void Fetch::getInstruction(string line, vector<string> *tokens){
 
 void Fetch::getCode(vector<string> *instructions)
 {
-  ifstream file("alu_processes.txt");
+  //ifstream file("../apps/alu_processes.txt");
+  ifstream file("../apps/ld_str.txt");
   if (file.is_open())
     {
       string line;

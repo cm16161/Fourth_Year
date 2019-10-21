@@ -94,6 +94,18 @@ ISA cmp(std::string inst)
 	{
 		return BNE;
 	}
+	else if (inst.compare("LD") == 0)
+	{
+		return LD;
+	}
+	else if (inst.compare("LDI") == 0)
+	{
+		return LDI;
+	}
+	else if (inst.compare("ST") == 0)
+	{
+		return ST;
+	}
 	else if (inst.compare("EOP") == 0)
 	{
 		return EOP;
