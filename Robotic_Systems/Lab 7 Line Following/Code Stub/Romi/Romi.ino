@@ -145,21 +145,53 @@ void bangBang() {
   }
 }
 
+bool getFirstLine() {
+  int left_val = line_left.read_calibrated();
+  int cent_val = line_centre.read_calibrated();
+  int right_val = line_right.read_calibrated();
+  if (left_val >= 500 || cent_val >= 500 || right_val >= 500) {
+    return true;
+
+  }
+  else return false;
+}
+
 bool checkForLine() {
   int left_val = line_left.read_calibrated();
   int cent_val = line_centre.read_calibrated();
   int right_val = line_right.read_calibrated();
+  static int confidence_value = 0;
+  const int confidence_threshold = 0;
   Serial.print(left_val);
   Serial.print(", ");
   Serial.print(cent_val);
   Serial.print(", ");
   Serial.println(right_val);
+  //  if (left_val >= 500) {
+  //    confidence_value += 1;
+  //  }
+  //  else if (cent_val >= 500) {
+  //    confidence_value += 1;
+  //  }
+  //  else if (right_val >= 500) {
+  //    confidence_value += 1;
+  //  }
   if (left_val >= 500 || cent_val >= 500 || right_val >= 500) {
     return true;
+
   }
   else {
+    stopMotor();
     return false;
+    //    confidence_value -= 1;
   }
+
+  //  if (confidence_value >= confidence_threshold) {
+  //    return true;
+  //  }
+  //  else {
+  //    return false;
+  //  }
 }
 
 void rotateDegrees(float degree) {
@@ -211,64 +243,70 @@ void loop()
   unsigned long elapsed_time, current_time;
   current_time = millis();
   elapsed_time = current_time - last_time;
-  onLine = checkForLine();
-  if (onLine && !block) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    firstFound = true;
-
-    if (elapsed_time > DELAY_DURATION) {
-      int left_val = line_left.read_calibrated();
-      int cent_val = line_centre.read_calibrated();
-      int right_val = line_right.read_calibrated();
-      float total_calibrate = left_val + cent_val + right_val;
-      pL = left_val / total_calibrate;
-      pC = cent_val / total_calibrate;
-      pR = right_val / total_calibrate;
-      LineCentre = (1000 * pL + 2000 * pC + 3000 * pR);
-      float output_line = line_pid.update(2000, LineCentre);
-      if (output_line > 5) {
-        moveMotor(LEFT, -30);
-        moveMotor(RIGHT, 30);
-      }
-      else if (output_line < -3.5) {
-        moveMotor(RIGHT, -30);
-        moveMotor(LEFT, 30);
-      }
-      else {
-        moveMotor(LEFT, 11);
-        moveMotor(RIGHT, 11);
-      }
-      //    Serial.print(LineCentre);
-      //    Serial.print(", ");
-      //    Serial.println(output_line);
-      last_time = millis();
-
-    }
+  if (!firstFound) {
+    firstFound = getFirstLine();
   }
   else {
-    digitalWrite(LED_BUILTIN, LOW);
-    if (firstFound) {
-      int random_v = random(3);
-      if (elapsed_time > 1000) {
-        block=!block;
-        if (random_v == 0) {
-          rotateDegrees(30);
+    onLine = checkForLine();
+    if (onLine && !block) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      firstFound = true;
+
+      if (elapsed_time > DELAY_DURATION) {
+        int left_val = line_left.read_calibrated();
+        int cent_val = line_centre.read_calibrated();
+        int right_val = line_right.read_calibrated();
+        float total_calibrate = left_val + cent_val + right_val;
+        pL = left_val / total_calibrate;
+        pC = cent_val / total_calibrate;
+        pR = right_val / total_calibrate;
+        LineCentre = (1000 * pL + 2000 * pC + 3000 * pR);
+        float output_line = line_pid.update(2000, LineCentre);
+        if (output_line > 5) {
+          moveMotor(LEFT, -30);
+          moveMotor(RIGHT, 30);
         }
-        else if (random_v == 1) {
-          rotateDegrees(-30);
+        else if (output_line < -3.5) {
+          moveMotor(RIGHT, -30);
+          moveMotor(LEFT, 30);
         }
-        else if (random_v == 2) {
-          moveMotor(LEFT, -12);
-          moveMotor(RIGHT, -12);
-          
+        else {
+          moveMotor(LEFT, 11);
+          moveMotor(RIGHT, 11);
         }
+        //    Serial.print(LineCentre);
+        //    Serial.print(", ");
+        //    Serial.println(output_line);
         last_time = millis();
+
       }
+    }
+    else {
+      stopMotor();
+      digitalWrite(LED_BUILTIN, LOW);
+      if (firstFound) {
+        stopMotor();
+        digitalWrite(6, HIGH);
+        int random_v = random(3);
+        if (elapsed_time > 1000) {
+          block = !block;
+          if (random_v == 0) {
+            rotateDegrees(30);
+          }
+          else if (random_v == 1) {
+            rotateDegrees(-30);
+          }
+          else if (random_v == 2) {
+            moveMotor(LEFT, -12);
+            moveMotor(RIGHT, -12);
 
-
+          }
+          last_time = millis();
+        }
+      }
+      stopMotor();
     }
   }
-
 
 
 
