@@ -8,6 +8,14 @@
 #define R_PWM_PIN  9
 #define R_DIR_PIN 15
 
+#define LEFT 0
+#define RIGHT 1
+#define FORWARD 0
+#define BACKWARD 1
+#define CAT(a, b) a ## b
+#define DIR_PIN(pin) CAT(pin ,_DIR_PIN)
+#define PWM_PIN(pin) CAT(pin ,_PWM_PIN)
+
 float Kp_left = 0; //Proportional gain for position controller
 float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
@@ -43,6 +51,38 @@ void setupMotorPins()
   digitalWrite( R_DIR_PIN, LOW );
 }
 
+void moveMotor(int pin, float scalar_speed) {
+  bool motor_direction;
+  if (scalar_speed < 0) {
+    motor_direction = true;
+    scalar_speed *= -1;
+  }
+  else motor_direction = false;
+  if (scalar_speed >= 230) {
+    scalar_speed = 230;
+  }
+  else if (scalar_speed <= 10) {
+    scalar_speed = 10;
+  }
+  int dir, pwm;
+  if (pin == LEFT) {
+    dir = DIR_PIN(L);
+    pwm = PWM_PIN(L);
+  }
+  else if (pin == RIGHT) {
+    dir = DIR_PIN(R);
+    pwm = PWM_PIN(R);
+  }
+  digitalWrite(dir, motor_direction);
+  analogWrite(pwm, scalar_speed);
+
+}
+
+void stopMotor() {
+  moveMotor(LEFT, 0);
+  moveMotor(RIGHT, 0);
+}
+
 // Remember, setup only runs once.
 void setup()
 {
@@ -67,25 +107,40 @@ void setup()
   pR = line_right.calibrated_value / total_calibrate;
   LineCentre = (1000 * pL + 2000 * pC + 3000 * pR) - 2000;
   delay(1000);
+  moveMotor(RIGHT, 12);
+  moveMotor(LEFT, 12);
 }
 
 
+void bangBang(){
+    int left_val = line_left.read_calibrated();
+  int cent_val = line_centre.read_calibrated();
+  int right_val = line_right.read_calibrated();
+  Serial.print(left_val);
+  Serial.print(", ");
+  Serial.print(cent_val);
+  Serial.print(", ");
+  Serial.println(right_val);
+  if (left_val >= 200) {
+    Serial.println(left_val);
+    //moveMotor(RIGHT, 15);
+    moveMotor(LEFT, -15);
+  }
+  else if (cent_val >= 200) {
+    Serial.println(cent_val);
+    moveMotor(LEFT, 12);
+    moveMotor(RIGHT, 12);  }
+  else if (right_val >= 200) {
+    Serial.println(right_val);
+    //moveMotor(LEFT, 15);
+    moveMotor(RIGHT, -15);
+  }
+}
 
 // Remmeber, loop is called again and again.
 void loop()
 {
   // build your main code here.
-  int left_val = line_left.read_calibrated();
-  int cent_val = line_centre.read_calibrated();
-  int right_val = line_right.read_calibrated();
-  if (left_val >= 100) {
-    Serial.println(left_val);
-  }
-  if (cent_val >= 100) {
-    Serial.println(cent_val);
-  }
-  if (right_val >= 100) {
-    Serial.println(right_val);
-  }
-  delay(250);
+  bangBang();
+
 }
