@@ -2,7 +2,7 @@
 #define _Line_follow_h
 
 //Number of readings to take for calibration
-const int NUM_CALIBRATIONS = 50;
+const int NUM_CALIBRATIONS = 500;
 
 /*
     Class to represent a single line sensor

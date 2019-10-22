@@ -19,7 +19,7 @@
 
 #define kp_left 0.005
 #define ki_left 0.0000000005
-#define kd_left 15  
+#define kd_left 15
 #define DELAY_DURATION 2000
 
 PID left_pid( kp_left, ki_left, kd_left );
@@ -98,25 +98,25 @@ void loop()
   unsigned long elapsed_time, current_time;
   current_time = millis();
   elapsed_time = current_time - last_time;
-  if(elapsed_time >= DELAY_DURATION){
+  if (elapsed_time >= DELAY_DURATION) {
     float output_l = left_pid.update(5000, count_left);
-  moveMotor(LEFT, output_l);
-  float output_r = right_pid.update(5000,count_right);
-  moveMotor(RIGHT,output_r);
-  Serial.print("Left wheel output is: ");
-  Serial.println(output_l);
-  Serial.println(count_left);
-  last_time = millis();
+    moveMotor(LEFT, output_l);
+    float output_r = right_pid.update(5000, count_right);
+    moveMotor(RIGHT, output_r);
+    Serial.print("Left wheel output is: ");
+    Serial.println(output_l);
+    Serial.println(count_left);
+    last_time = millis();
   }
-  
+
   // build your main code here.
   // Call your pid.update() at a regular time interval.
   //    output_signal <----PID-- demand, measurement
-//  float output_l = left_pid.update(5000, count_left);
-//  moveMotor(LEFT, output_l);
-//  float output_r = right.pid.update(5000,count_right);
-//  moveMotor(RIGHT,output_r);
-  
+  //  float output_l = left_pid.update(5000, count_left);
+  //  moveMotor(LEFT, output_l);
+  //  float output_r = right.pid.update(5000,count_right);
+  //  moveMotor(RIGHT,output_r);
+
 }
 
 void setupTimer3( int hertz ) {

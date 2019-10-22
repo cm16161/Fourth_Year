@@ -15,12 +15,23 @@
 #define CAT(a, b) a ## b
 #define DIR_PIN(pin) CAT(pin ,_DIR_PIN)
 #define PWM_PIN(pin) CAT(pin ,_PWM_PIN)
+#define ONE_REVOLUTION 1435
+#define CIRCUMFERENCE 22
+#define SPEED 30
+
 
 float Kp_left = 0; //Proportional gain for position controller
 float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
 PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel position
 
+#define kp_left 0.075
+#define ki_left 0
+#define kd_left 00
+#define DELAY_DURATION 1
+unsigned long last_time;
+
+PID line_pid( kp_left, ki_left, kd_left );
 
 // You may need to change these depending on how you wire
 // in your line sensor.
@@ -44,6 +55,7 @@ void setupMotorPins()
   pinMode( R_PWM_PIN, OUTPUT );
   pinMode( R_DIR_PIN, OUTPUT );
   pinMode(6, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   // Set initial direction for l and r
   // Which of these is foward, or backward?
@@ -86,7 +98,7 @@ void stopMotor() {
 // Remember, setup only runs once.
 void setup()
 {
-
+  last_time = millis();
   // These two function set up the pin
   // change interrupts for the encoders.
   setupEncoder0();
@@ -101,19 +113,14 @@ void setup()
   line_left.calibrate();
   line_centre.calibrate();
   line_right.calibrate();
-  float total_calibrate = line_left.calibrated_value + line_centre.calibrated_value + line_right.calibrated_value;
-  pL = line_left.calibrated_value / total_calibrate;
-  pC = line_centre.calibrated_value / total_calibrate;
-  pR = line_right.calibrated_value / total_calibrate;
-  LineCentre = (1000 * pL + 2000 * pC + 3000 * pR) - 2000;
   delay(1000);
   moveMotor(RIGHT, 12);
   moveMotor(LEFT, 12);
 }
 
 
-void bangBang(){
-    int left_val = line_left.read_calibrated();
+void bangBang() {
+  int left_val = line_left.read_calibrated();
   int cent_val = line_centre.read_calibrated();
   int right_val = line_right.read_calibrated();
   Serial.print(left_val);
@@ -129,7 +136,8 @@ void bangBang(){
   else if (cent_val >= 200) {
     Serial.println(cent_val);
     moveMotor(LEFT, 12);
-    moveMotor(RIGHT, 12);  }
+    moveMotor(RIGHT, 12);
+  }
   else if (right_val >= 200) {
     Serial.println(right_val);
     //moveMotor(LEFT, 15);
@@ -137,10 +145,134 @@ void bangBang(){
   }
 }
 
+bool checkForLine() {
+  int left_val = line_left.read_calibrated();
+  int cent_val = line_centre.read_calibrated();
+  int right_val = line_right.read_calibrated();
+  Serial.print(left_val);
+  Serial.print(", ");
+  Serial.print(cent_val);
+  Serial.print(", ");
+  Serial.println(right_val);
+  if (left_val >= 500 || cent_val >= 500 || right_val >= 500) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+void rotateDegrees(float degree) {
+  int dir = 0;
+  if (degree < 0) {
+    degree *= -1;
+    dir = 1;
+  }
+  float encoder_count = (degree / 360) * 2 * ONE_REVOLUTION;
+  Serial.println(encoder_count);
+  Serial.println(0.25 * 2 * ONE_REVOLUTION);
+  if (dir == 0) {
+    if (count_left <= encoder_count) {
+      moveMotor(LEFT, SPEED);
+    }
+    else {
+      moveMotor(LEFT, 0);
+    }
+    if (count_right >= -encoder_count) {
+      moveMotor(RIGHT, -SPEED);
+    }
+    else {
+      moveMotor(RIGHT, 0);
+    }
+  }
+  else {
+    if (count_left >= -encoder_count) {
+      moveMotor(LEFT, -SPEED);
+    }
+    else {
+      moveMotor(LEFT, 0);
+    }
+    if (count_right <= encoder_count) {
+      moveMotor(RIGHT, SPEED);
+    }
+    else {
+      moveMotor(RIGHT, 0);
+    }
+  }
+
+}
+
 // Remmeber, loop is called again and again.
 void loop()
 {
+  static bool onLine;
+  static bool firstFound = false;
+  static bool block = false;
+  unsigned long elapsed_time, current_time;
+  current_time = millis();
+  elapsed_time = current_time - last_time;
+  onLine = checkForLine();
+  if (onLine && !block) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    firstFound = true;
+
+    if (elapsed_time > DELAY_DURATION) {
+      int left_val = line_left.read_calibrated();
+      int cent_val = line_centre.read_calibrated();
+      int right_val = line_right.read_calibrated();
+      float total_calibrate = left_val + cent_val + right_val;
+      pL = left_val / total_calibrate;
+      pC = cent_val / total_calibrate;
+      pR = right_val / total_calibrate;
+      LineCentre = (1000 * pL + 2000 * pC + 3000 * pR);
+      float output_line = line_pid.update(2000, LineCentre);
+      if (output_line > 5) {
+        moveMotor(LEFT, -30);
+        moveMotor(RIGHT, 30);
+      }
+      else if (output_line < -3.5) {
+        moveMotor(RIGHT, -30);
+        moveMotor(LEFT, 30);
+      }
+      else {
+        moveMotor(LEFT, 11);
+        moveMotor(RIGHT, 11);
+      }
+      //    Serial.print(LineCentre);
+      //    Serial.print(", ");
+      //    Serial.println(output_line);
+      last_time = millis();
+
+    }
+  }
+  else {
+    digitalWrite(LED_BUILTIN, LOW);
+    if (firstFound) {
+      int random_v = random(3);
+      if (elapsed_time > 1000) {
+        block=!block;
+        if (random_v == 0) {
+          rotateDegrees(30);
+        }
+        else if (random_v == 1) {
+          rotateDegrees(-30);
+        }
+        else if (random_v == 2) {
+          moveMotor(LEFT, -12);
+          moveMotor(RIGHT, -12);
+          
+        }
+        last_time = millis();
+      }
+
+
+    }
+  }
+
+
+
+
   // build your main code here.
-  bangBang();
+  //bangBang();
 
 }
