@@ -114,8 +114,8 @@ void setup()
   line_centre.calibrate();
   line_right.calibrate();
   delay(1000);
-  moveMotor(RIGHT, 12);
-  moveMotor(LEFT, 12);
+  moveMotor(RIGHT, 20);
+  moveMotor(LEFT, 20);
 }
 
 
@@ -271,8 +271,8 @@ void loop()
           moveMotor(LEFT, 30);
         }
         else {
-          moveMotor(LEFT, 11);
-          moveMotor(RIGHT, 11);
+          moveMotor(LEFT, 20);
+          moveMotor(RIGHT, 20);
         }
         //    Serial.print(LineCentre);
         //    Serial.print(", ");
