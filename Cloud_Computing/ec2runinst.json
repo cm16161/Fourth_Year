@@ -1,0 +1,17 @@
+{
+    "DryRun": false,
+    "ImageId": "ami-0b69ea66ff7391e80",
+    "KeyName": "Cloud_Computing",
+    "SecurityGroups": [
+        "launch-wizard-1"
+    ],
+    "InstanceType": "t2.micro",
+    "Monitoring": {
+        "Enabled": true
+    },
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0b36d2b3cdcb0c8dd",
+        "LaunchTemplateName": "",
+        "Version": "2"
+    }
+}

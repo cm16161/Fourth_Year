@@ -42,8 +42,8 @@ def main():
     args = get_args()
     threads = list()
     for _t in range(args.n_threads):
-        start_val = (2**32 / 4)*_t
-        end_val = (2**32 / 4)*(_t+1)
+        start_val = (2**32 / args.n_threads)*_t
+        end_val = (2**32 / args.n_threads)*(_t+1)
         _x = threading.Thread(target=find_nonce, args=(args.difficulty,
                                                        int(start_val), int(end_val),))
         threads.append(_x)
