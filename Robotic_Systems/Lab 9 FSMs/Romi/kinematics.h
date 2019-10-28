@@ -50,11 +50,15 @@ void Kinematics::update(int count_left, int count_right) {
   float d_r = delta_r * WHEEL_CIRCUMFERENCE / COUNTS_PER_WHEEL_REVOLUTION;
   float delta_d = d_l - d_r;
   m_theta += (delta_d / WHEEL_SEPERATION) * 180 / PI;
+  m_theta = (float)((int)m_theta% 360);
   float mean_distance = (delta_l + delta_r) / 2;
   m_x += mean_distance *cos(m_theta);
   m_y += mean_distance *sin(m_theta);
   float mm_distance = (mean_distance * WHEEL_CIRCUMFERENCE) / COUNTS_PER_WHEEL_REVOLUTION;
   m_distance_travelled += mm_distance;
+  Serial.print(m_distance_travelled);
+  Serial.print(", ");
+  Serial.println(m_theta);
   
 
 
