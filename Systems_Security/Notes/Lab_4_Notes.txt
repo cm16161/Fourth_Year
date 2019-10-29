@@ -8,3 +8,11 @@ VM2c:
 VM3s:
      IP-192.168.255.33
     MAC-08:00:27:58:69:fa
+
+Need to start xinetd service on port 23 in order to connect from vm2c
+to vm3s
+
+Check all ports with: sudo lsof -i -P -n
+Check all listening ports with: sudo lsof -i -P -n | grep LISTEN
+
+Ensure that an xinetd service is running on vm3s
