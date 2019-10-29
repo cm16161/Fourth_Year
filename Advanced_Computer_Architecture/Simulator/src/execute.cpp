@@ -4,8 +4,8 @@ extern int executed_instructions;
 //TODO Move Registers to separate folder!
 void execute(ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
-  static ALU &alu = ALU::getInstance();
-  static MEM &mem = MEM::getInstance();
+	static ALU &alu = ALU::getInstance();
+	static MEM &mem = MEM::getInstance();
 	switch (instructions)
 	{
 	case ADD:
@@ -110,6 +110,7 @@ void execute(ISA instructions, int registers[64], vector<int> register_file, int
 		cout << " { " << executed_instructions << " } Instructions Executed" << endl;
 		exit(EXIT_SUCCESS);
 	case NOP:
+		cout << " [ NOP ]\n";
 		break;
 	}
 	executed_instructions++;

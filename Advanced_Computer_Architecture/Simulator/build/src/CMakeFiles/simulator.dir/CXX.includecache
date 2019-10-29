@@ -6,12 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.cpp
-ALU.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
-ISA.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
-
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
@@ -21,10 +15,6 @@ iostream
 -
 string
 -
-
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.cpp
-decode.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 cstring
@@ -32,12 +22,6 @@ cstring
 string
 -
 vector
--
-
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp
-execute.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
-iostream
 -
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
@@ -51,10 +35,6 @@ memory.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/memory.hpp
 vector
 -
-
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.cpp
-fetch.hpp
-/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 algorithm

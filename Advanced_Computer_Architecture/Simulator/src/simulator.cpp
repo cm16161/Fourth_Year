@@ -38,19 +38,22 @@ int main(int argc, char *argv[])
 	Decode &decode = Decode::getInstance();
 	int registers[N_REGISTERS] = { 0 };
 	vector<string> tokens, code;
-	vector<int> register_file;
+	vector<int> registers_to_use;
 	int immediate;
 	fetch.getCode(file_name, &code);
 	int clock = 0;
+	string current_line, current_inst;
+	int immediate_to_use;
+	ISA inst_to_use, inst;
+	vector<int> pipeline_registers_to_use;
 	for (;;)
 	{
 		fetch.getInstruction(code[PC], &tokens);
-		decode.getRegisters(code[PC], &register_file);
+		decode.getRegisters(code[PC], &registers_to_use);
 		immediate = decode.getImmediate(code[PC]);
-		ISA inst = decode.decode(tokens[0]);
 		PC++;
-		execute(inst, registers, register_file, immediate);
-		clock++;
+		ISA inst = decode.decode(tokens[0]);
+		execute(inst, registers, registers_to_use, immediate);
 	}
 	return 0;
 }
