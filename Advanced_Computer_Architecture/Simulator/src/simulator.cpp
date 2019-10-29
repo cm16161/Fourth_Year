@@ -35,18 +35,22 @@ int main(int argc, char *argv[])
 	}
 	PC = 0;
 	Fetch &fetch = Fetch::getInstance();
+	Decode &decode = Decode::getInstance();
 	int registers[N_REGISTERS] = { 0 };
 	vector<string> tokens, code;
 	vector<int> register_file;
 	int immediate;
 	fetch.getCode(file_name, &code);
+	int clock = 0;
 	for (;;)
 	{
 		fetch.getInstruction(code[PC], &tokens);
-		fetch.getRegisters(code[PC], &register_file);
-		immediate = fetch.getImmediate(code[PC]);
+		decode.getRegisters(code[PC], &register_file);
+		immediate = decode.getImmediate(code[PC]);
+		ISA inst = decode.decode(tokens[0]);
 		PC++;
-		execute(decode(tokens[0]), registers, register_file, immediate);
+		execute(inst, registers, register_file, immediate);
+		clock++;
 	}
 	return 0;
 }

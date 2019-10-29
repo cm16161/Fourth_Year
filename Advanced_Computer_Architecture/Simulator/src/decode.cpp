@@ -1,6 +1,6 @@
 #include "decode.hpp"
 
-ISA decode(std::string inst)
+ISA Decode::decode(std::string inst)
 {
 	if (inst.compare("ADD") == 0)
 	{
@@ -112,4 +112,41 @@ ISA decode(std::string inst)
 	}
 	else
 		return NOP;
+}
+
+Decode &Decode::getInstance()
+{
+	static Decode decode;
+	return decode;
+}
+
+void Decode::getRegisters(string line, vector<int> *registers)
+{
+	registers->clear();
+	char *my_line = const_cast<char *>(line.c_str());
+	char *token = strtok(my_line, "$");
+	while (token != nullptr)
+	{
+		token = strtok(NULL, "$");
+		if (token != nullptr)
+		{
+			registers->push_back(atoi(token));
+		}
+	}
+}
+
+int Decode::getImmediate(string line)
+{
+	char *my_line = const_cast<char *>(line.c_str());
+	char *token = strtok(my_line, "#");
+	while (token != nullptr)
+	{
+		token = strtok(nullptr, "#");
+
+		if (token != nullptr)
+		{
+			return atoi(token);
+		}
+	}
+	return 0;
 }

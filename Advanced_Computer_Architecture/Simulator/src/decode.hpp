@@ -1,6 +1,10 @@
 #ifndef DECODE_HPP
 #define DECODE_HPP
+#include <cstring>
 #include <string>
+#include <vector>
+
+using namespace std;
 
 enum ISA
 {
@@ -35,6 +39,15 @@ enum ISA
 
 };
 
-ISA decode(std::string inst);
+class Decode
+{
+	Decode(){};
+
+public:
+	static Decode &getInstance();
+	ISA decode(std::string inst);
+	void getRegisters(string line, vector<int> *registers);
+	int getImmediate(string line);
+};
 
 #endif
