@@ -103,7 +103,7 @@ void execute(ISA instructions, int registers[64], vector<int> register_file, int
 		cout << " [ ST ] " << endl;
 		break;
 	case LDI:
-		cout << "[ LDI ] " << alu.ldi(&registers[register_file[0]], immediate) << endl;
+		cout << " [ LDI ] " << alu.ldi(&registers[register_file[0]], immediate) << endl;
 		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;

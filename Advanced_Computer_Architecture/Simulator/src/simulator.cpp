@@ -80,8 +80,6 @@ int main(int argc, char *argv[])
 			{
 				IFID_command = IF_instruction_tokens[0];
 				IFID_instruction = code[PC];
-				//cout << IFID_instruction << endl;
-
 				if (!branch_taken)
 				{
 					PC++;
