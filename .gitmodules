@@ -3,4 +3,4 @@
 	url = git@github.com:COMSM0018-Applied-Deep-Learning/labsheets.git
 [submodule "Systems_Security/labs"]
 	path = Systems_Security/labs
-	url = git@github.com:bris-sys-sec/labs.git
+	url = https://github.com/bris-sys-sec/labs.git
