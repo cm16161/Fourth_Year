@@ -152,6 +152,33 @@ ALU.cpp.s:
 	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/ALU.cpp.s
 .PHONY : ALU.cpp.s
 
+branch.o: branch.cpp.o
+
+.PHONY : branch.o
+
+# target to build an object file
+branch.cpp.o:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/branch.cpp.o
+.PHONY : branch.cpp.o
+
+branch.i: branch.cpp.i
+
+.PHONY : branch.i
+
+# target to preprocess a source file
+branch.cpp.i:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/branch.cpp.i
+.PHONY : branch.cpp.i
+
+branch.s: branch.cpp.s
+
+.PHONY : branch.s
+
+# target to generate assembly for a file
+branch.cpp.s:
+	cd /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/build && $(MAKE) -f src/CMakeFiles/simulator.dir/build.make src/CMakeFiles/simulator.dir/branch.cpp.s
+.PHONY : branch.cpp.s
+
 decode.o: decode.cpp.o
 
 .PHONY : decode.o
@@ -299,6 +326,9 @@ help:
 	@echo "... ALU.o"
 	@echo "... ALU.i"
 	@echo "... ALU.s"
+	@echo "... branch.o"
+	@echo "... branch.i"
+	@echo "... branch.s"
 	@echo "... decode.o"
 	@echo "... decode.i"
 	@echo "... decode.s"

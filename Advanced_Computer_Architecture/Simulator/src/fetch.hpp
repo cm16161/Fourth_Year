@@ -16,6 +16,6 @@ class Fetch
 
 public:
 	static Fetch &getInstance();
-	void getInstruction(string line, vector<string> *tokens);
+	vector<string> getInstruction(string line);
 	void getCode(string file_name, vector<string> *instructions);
 };

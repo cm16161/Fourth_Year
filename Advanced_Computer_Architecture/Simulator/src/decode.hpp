@@ -46,7 +46,7 @@ class Decode
 public:
 	static Decode &getInstance();
 	ISA decode(std::string inst);
-	void getRegisters(string line, vector<int> *registers);
+	vector<int> getRegisters(string line);
 	int getImmediate(string line);
 };
 

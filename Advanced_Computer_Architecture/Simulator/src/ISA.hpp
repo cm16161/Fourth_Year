@@ -512,49 +512,49 @@ public:
 	}
 };
 
-class BEQ : public I
-{
-public:
-	BEQ()
-	{
-	}
-	BEQ(int *rs, int *rd, int immediate)
-	{
-		m_rs = rs;
-		m_rd = rd;
-		m_immediate = immediate;
-	}
-	int run()
-	{
-		if (*m_rs == *m_rd)
-		{
-			PC = m_immediate;
-		}
-		return PC;
-	}
-};
+// class BEQ : public I
+// {
+// public:
+// 	BEQ()
+// 	{
+// 	}
+// 	BEQ(int *rs, int *rd, int immediate)
+// 	{
+// 		m_rs = rs;
+// 		m_rd = rd;
+// 		m_immediate = immediate;
+// 	}
+// 	int run()
+// 	{
+// 		if (*m_rs == *m_rd)
+// 		{
+// 			PC = m_immediate;
+// 		}
+// 		return PC;
+// 	}
+// };
 
-class BNE : public I
-{
-public:
-	BNE()
-	{
-	}
-	BNE(int *rs, int *rd, int immediate)
-	{
-		m_rs = rs;
-		m_rd = rd;
-		m_immediate = immediate;
-	}
-	int run()
-	{
-		if (*m_rs != *m_rd)
-		{
-			PC = m_immediate;
-		}
-		return PC;
-	}
-};
+// class BNE : public I
+// {
+// public:
+// 	BNE()
+// 	{
+// 	}
+// 	BNE(int *rs, int *rd, int immediate)
+// 	{
+// 		m_rs = rs;
+// 		m_rd = rd;
+// 		m_immediate = immediate;
+// 	}
+// 	int run()
+// 	{
+// 		if (*m_rs != *m_rd)
+// 		{
+// 			PC = m_immediate;
+// 		}
+// 		return PC;
+// 	}
+// };
 
 class LDI : public I
 {

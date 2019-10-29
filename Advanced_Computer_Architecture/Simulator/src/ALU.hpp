@@ -1,5 +1,8 @@
 #ifndef ALU_HPP
 #define ALU_HPP
+#include "ISA.hpp"
+#include "branch.hpp"
+
 
 class ALU
 {

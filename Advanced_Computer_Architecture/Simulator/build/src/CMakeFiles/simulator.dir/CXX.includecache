@@ -7,6 +7,10 @@
 #IncludeRegexTransform: 
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
+branch.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/branch.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
 cstring
@@ -15,6 +19,10 @@ iostream
 -
 string
 -
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/branch.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/decode.hpp
 cstring

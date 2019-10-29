@@ -4,12 +4,18 @@
 src/CMakeFiles/simulator.dir/ALU.cpp.o: ../src/ALU.cpp
 src/CMakeFiles/simulator.dir/ALU.cpp.o: ../src/ALU.hpp
 src/CMakeFiles/simulator.dir/ALU.cpp.o: ../src/ISA.hpp
+src/CMakeFiles/simulator.dir/ALU.cpp.o: ../src/branch.hpp
+
+src/CMakeFiles/simulator.dir/branch.cpp.o: ../src/ISA.hpp
+src/CMakeFiles/simulator.dir/branch.cpp.o: ../src/branch.cpp
+src/CMakeFiles/simulator.dir/branch.cpp.o: ../src/branch.hpp
 
 src/CMakeFiles/simulator.dir/decode.cpp.o: ../src/decode.cpp
 src/CMakeFiles/simulator.dir/decode.cpp.o: ../src/decode.hpp
 
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/ALU.hpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/ISA.hpp
+src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/branch.hpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/decode.hpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/execute.cpp
 src/CMakeFiles/simulator.dir/execute.cpp.o: ../src/execute.hpp
@@ -23,6 +29,7 @@ src/CMakeFiles/simulator.dir/memory.cpp.o: ../src/memory.hpp
 
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/ALU.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/ISA.hpp
+src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/branch.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/decode.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/execute.hpp
 src/CMakeFiles/simulator.dir/simulator.cpp.o: ../src/fetch.hpp

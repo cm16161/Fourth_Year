@@ -1,5 +1,4 @@
 #include "ALU.hpp"
-#include "ISA.hpp"
 
 ALU &ALU::getInstance()
 {

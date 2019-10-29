@@ -16,6 +16,7 @@
 #define N_REGISTERS 64
 int PC;
 int executed_instructions;
+extern bool branch_taken;
 
 //TODO CHECK EXECUTE.CPP
 
@@ -43,17 +44,62 @@ int main(int argc, char *argv[])
 	fetch.getCode(file_name, &code);
 	int clock = 0;
 	string current_line, current_inst;
-	int immediate_to_use;
-	ISA inst_to_use, inst;
-	vector<int> pipeline_registers_to_use;
+	string IFID_command;
+	int IDEX_immediate;
+	ISA IDEX_command;
+	vector<int> IDEX_registers;
+	string IFID_instruction_keyword, IFID_instruction;
+	vector<string> IF_instruction_tokens;
+	vector<int> ID_registers;
+	int ID_immediate;
+	ISA ID_command;
 	for (;;)
 	{
-		fetch.getInstruction(code[PC], &tokens);
-		decode.getRegisters(code[PC], &registers_to_use);
-		immediate = decode.getImmediate(code[PC]);
-		PC++;
-		ISA inst = decode.decode(tokens[0]);
-		execute(inst, registers, registers_to_use, immediate);
+		if ((clock % 2) == 0)
+		{
+			IF_instruction_tokens.clear();
+			if (PC < code.size())
+			{
+				IF_instruction_tokens = fetch.getInstruction(code[PC]);
+			}
+
+			if (clock > 0)
+			{
+				ID_registers = decode.getRegisters(IFID_instruction);
+				ID_immediate = decode.getImmediate(IFID_instruction);
+				ID_command = decode.decode(IFID_command);
+			}
+			if (clock > 2)
+			{
+				execute(IDEX_command, registers, IDEX_registers, IDEX_immediate);
+			}
+		}
+		else
+		{
+			if (!IF_instruction_tokens.empty())
+			{
+				IFID_command = IF_instruction_tokens[0];
+				IFID_instruction = code[PC];
+				//cout << IFID_instruction << endl;
+
+				if (!branch_taken)
+				{
+					PC++;
+				}
+				else
+				{
+					branch_taken = !branch_taken;
+				}
+			}
+			if (clock > 1)
+			{
+				IDEX_registers = ID_registers;
+				IDEX_immediate = ID_immediate;
+				IDEX_command = ID_command;
+			}
+		}
+
+		clock++;
 	}
 	return 0;
 }

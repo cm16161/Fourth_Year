@@ -120,9 +120,9 @@ Decode &Decode::getInstance()
 	return decode;
 }
 
-void Decode::getRegisters(string line, vector<int> *registers)
+vector<int> Decode::getRegisters(string line)
 {
-	registers->clear();
+        vector<int> registers_to_use;
 	char *my_line = const_cast<char *>(line.c_str());
 	char *token = strtok(my_line, "$");
 	while (token != nullptr)
@@ -130,9 +130,10 @@ void Decode::getRegisters(string line, vector<int> *registers)
 		token = strtok(NULL, "$");
 		if (token != nullptr)
 		{
-			registers->push_back(atoi(token));
+			registers_to_use.push_back(atoi(token));
 		}
 	}
+        return registers_to_use;
 }
 
 int Decode::getImmediate(string line)
