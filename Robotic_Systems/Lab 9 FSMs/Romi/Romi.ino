@@ -90,15 +90,18 @@ void moveMotor(int pin, float scalar_speed) {
     scalar_speed *= -1;
   }
   else motor_direction = false;
+
   if (scalar_speed >= 230) {
     scalar_speed = 230;
   }
-  //  else if (scalar_speed <= 10) {
+
+//  else if (scalar_speed <= 10) {
   //    scalar_speed = 10;
   //  }
   //  else if(scalar_speed == 0){
   //    scalar_speed = 0;
   //  }
+
   int dir, pwm;
   if (pin == LEFT) {
     dir = DIR_PIN(L);

