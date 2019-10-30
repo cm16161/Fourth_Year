@@ -90,8 +90,6 @@ void stopMotor() {
   moveMotor(RIGHT, 0);
 }
 
-
-
 // Remmeber, loop is called again and again.
 void loop()
 {
@@ -99,10 +97,10 @@ void loop()
   current_time = millis();
   elapsed_time = current_time - last_time;
   if (elapsed_time >= DELAY_DURATION) {
-    float output_l = left_pid.update(5000, count_left);
-    moveMotor(LEFT, output_l);
-    float output_r = right_pid.update(5000, count_right);
-    moveMotor(RIGHT, output_r);
+      float output_l = left_pid.update(5000, count_left);
+      moveMotor(LEFT, output_l);
+      float output_r = right_pid.update(5000, count_right);
+      moveMotor(RIGHT, output_r);
     Serial.print("Left wheel output is: ");
     Serial.println(output_l);
     Serial.println(count_left);

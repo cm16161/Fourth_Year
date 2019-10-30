@@ -17,8 +17,9 @@
 #define CAT(a, b) a ## b
 #define DIR_PIN(pin) CAT(pin ,_DIR_PIN)
 #define PWM_PIN(pin) CAT(pin ,_PWM_PIN)
+
 #define ONE_REVOLUTION 1435
-#define CIRCUMFERENCE 22
+#define CIRCUMFERENCE 220
 #define SPEED 30
 
 
@@ -27,13 +28,25 @@ float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
 PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel position
 
-#define kp_left 0.075
-#define ki_left 0
-#define kd_left 00
+#define kp_left 0.05
+#define ki_left 0.0000000005
+#define kd_left 20
+
+#define kp_line 0.075
+#define ki_line 0
+#define kd_line 00
+
+#define kp_head 1
+#define ki_head 0
+#define kd_head 0
+
 #define DELAY_DURATION 1
 unsigned long last_time;
 
-PID line_pid( kp_left, ki_left, kd_left );
+PID line_pid( kp_line, ki_line, kd_line );
+PID left_pid( kp_left, ki_left, kd_left );
+PID right_pid(kp_left, ki_left, kd_left );
+PID head_pid(kp_head, ki_head, kd_head);
 
 // You may need to change these depending on how you wire
 // in your line sensor.
@@ -95,12 +108,12 @@ void moveMotor(int pin, float scalar_speed) {
     scalar_speed = 230;
   }
 
-//  else if (scalar_speed <= 10) {
-  //    scalar_speed = 10;
-  //  }
-  //  else if(scalar_speed == 0){
-  //    scalar_speed = 0;
-  //  }
+  else if (scalar_speed <= 5) {
+    scalar_speed = 0;
+  }
+  else if (scalar_speed <= 15){
+    scalar_speed = 15;
+  }
 
   int dir, pwm;
   if (pin == LEFT) {
@@ -121,92 +134,6 @@ void stopMotor() {
   moveMotor(RIGHT, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-//void moveDistance(float distance) {
-//  static bool init = true;
-//  if (init) {
-//    count_left = 0;
-//    count_right = 0;
-//    init = !init;
-//  }
-//  if (g_move_rotate) {
-//    int dir = 0;
-//    distance *= 0.1;
-//    if (distance < 0) {
-//      dir = 1;
-//    }
-//    int encoder_count = (distance / CIRCUMFERENCE) * ONE_REVOLUTION;
-//    if (dir == 1) {
-//      if (count_left >= encoder_count) {
-//        moveMotor(LEFT, -SPEED);
-//      }
-//      if (count_right >= encoder_count) {
-//        moveMotor(RIGHT, -SPEED);
-//      }
-//      if (count_left <= encoder_count && count_right <= encoder_count) {
-//        moveMotor(LEFT, 0);
-//        moveMotor(RIGHT, 0);
-//      }
-//    }
-//    else {
-//      if (count_left <= encoder_count) {
-//        moveMotor(LEFT, SPEED);
-//      }
-//      if (count_right <= encoder_count) {
-//        moveMotor(RIGHT, SPEED);
-//      }
-//
-//      if (count_left >= encoder_count && count_right >= encoder_count) {
-//        moveMotor(LEFT, 0);
-//        moveMotor(RIGHT, 0);
-//      }
-//    }
-//  }
-//
-//}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-//void rotateDegrees(float degree) {
-//  int dir = 0;
-//  if (degree < 0) {
-//    degree *= -1;
-//    dir = 1;
-//  }
-//  float encoder_count = (degree / 360) * 2 * ONE_REVOLUTION;
-//  if (dir == 0) {
-//    if (count_left <= encoder_count) {
-//      moveMotor(LEFT, SPEED);
-//    }
-//    else {
-//      moveMotor(LEFT, 0);
-//    }
-//    if (count_right >= -encoder_count) {
-//      moveMotor(RIGHT, -SPEED);
-//    }
-//    else {
-//      moveMotor(RIGHT, 0);
-//    }
-//  }
-//  else {
-//    if (count_left >= -encoder_count) {
-//      moveMotor(LEFT, -SPEED);
-//    }
-//    else {
-//      moveMotor(LEFT, 0);
-//    }
-//    if (count_right <= encoder_count) {
-//      moveMotor(RIGHT, SPEED);
-//    }
-//    else {
-//      moveMotor(RIGHT, 0);
-//    }
-//  }
-//
-//}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 // Remember, setup only runs once.
 void setup()
@@ -281,8 +208,8 @@ bool checkForLine() {
   int left_val = line_left.read_calibrated();
   int cent_val = line_centre.read_calibrated();
   int right_val = line_right.read_calibrated();
-  static long confidence_value = 10000;
-  const int confidence_threshold = 10000;
+  static long confidence_value = 100000;
+  const int confidence_threshold = 0;
   //  Serial.print(left_val);
   //  Serial.print(", ");
   //  Serial.print(cent_val);
@@ -292,7 +219,7 @@ bool checkForLine() {
     confidence_value += 1;
   }
   else if (cent_val >= 500) {
-    confidence_value += 1;
+    confidence_value += 10;
   }
   else if (right_val >= 500) {
     confidence_value += 1;
@@ -303,7 +230,8 @@ bool checkForLine() {
   //  }
   if (left_val < 500 && cent_val < 500 && right_val < 500)
   {
-    confidence_value -= 100000000000000000000000000000;
+//    confidence_value = 0; // Kills movement, used for debugging and testing
+    confidence_value -= 2000;
   }
 
   if (confidence_value >= confidence_threshold) {
@@ -325,7 +253,7 @@ void moveDistance(float distance) {
       init = !init;
     }
     int dir = 0;
-    distance *= 0.1;
+    //distance *= 0.1;
     if (distance < 0) {
       dir = 1;
     }
@@ -344,7 +272,13 @@ void moveDistance(float distance) {
     }
     else {
       if (count_left <= encoder_count) {
-        moveMotor(LEFT, SPEED);
+        if (g_state == go_home) {
+          moveMotor(LEFT, (SPEED + 1));
+        }
+        else {
+          moveMotor(LEFT, SPEED);
+        }
+
       }
       if (count_right <= encoder_count) {
         moveMotor(RIGHT, SPEED);
@@ -364,9 +298,10 @@ void moveDistance(float distance) {
 void rotateDegrees(float degree) {
   if (!g_move_rotate) {
     static bool init = true;
+    static int rotate_l, rotate_r;
     if (init) {
-      count_left = 0;
-      count_right = 0;
+      rotate_l = count_left;
+      rotate_r = count_right;
       init = !init;
     }
     int dir = 0;
@@ -378,36 +313,36 @@ void rotateDegrees(float degree) {
     //  Serial.println(encoder_count);
     //  Serial.println(0.25 * 2 * ONE_REVOLUTION);
     if (dir == 0) {
-      if (count_left <= encoder_count) {
+      if (count_left <= encoder_count + rotate_l) {
         moveMotor(LEFT, SPEED);
       }
       else {
         moveMotor(LEFT, 0);
       }
-      if (count_right >= -encoder_count) {
+      if (count_right >= -encoder_count - rotate_r) {
         moveMotor(RIGHT, -SPEED);
       }
       else {
         moveMotor(RIGHT, 0);
       }
-      if (count_left >= encoder_count && count_right <= -encoder_count) {
+      if (count_left >= encoder_count + rotate_l && count_right <= -encoder_count - rotate_r) {
         g_move_rotate = true;
       }
     }
     else {
-      if (count_left >= -encoder_count) {
+      if (count_left >= -encoder_count - rotate_l) {
         moveMotor(LEFT, -SPEED);
       }
       else {
         moveMotor(LEFT, 0);
       }
-      if (count_right <= encoder_count) {
+      if (count_right <= encoder_count + rotate_r) {
         moveMotor(RIGHT, SPEED);
       }
       else {
         moveMotor(RIGHT, 0);
       }
-      if (count_left <= -encoder_count && count_right >= encoder_count) {
+      if (count_left <= -encoder_count - rotate_l && count_right >= encoder_count + rotate_r) {
         g_move_rotate = true;
       }
     }
@@ -449,8 +384,38 @@ void goHome(Kinematics kinematics) {
   double home_theta = getHomeAngle(kinematics);
   double home_distance = getHomeDistance(kinematics);
   float home_theta_degrees = home_theta * 180 / PI;
-  rotateDegrees(home_theta_degrees);
-  moveDistance((float)home_distance);
+  if(!g_move_rotate){
+    kinematics.update(count_left, count_right);
+  }
+  float head_output = head_pid.update(home_theta_degrees, kinematics.m_theta);
+  //Serial.println(home_distance);
+//  Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
+
+  if (!g_move_rotate) {
+    if (head_output < -10) {
+      moveMotor(LEFT, head_output);
+      moveMotor(RIGHT, -head_output);
+    }
+    else if (head_output > 10) {
+      moveMotor(RIGHT, -head_output);
+      moveMotor(LEFT, head_output);
+    }
+    else {
+      stopMotor();
+      g_move_rotate = !g_move_rotate;
+      count_left = count_right = 0;
+    }
+  }
+  else {
+    float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
+    moveMotor(LEFT, output_l);
+    float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
+//    Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
+    moveMotor(RIGHT, output_r);
+    //moveDistance(home_distance);
+  }
+  //  rotateDegrees(-30);
+  //    moveDistance(1500);
 }
 
 
@@ -466,8 +431,12 @@ void loop()
   unsigned long elapsed_time, current_time;
   current_time = millis();
   elapsed_time = current_time - last_time;
+  //  kinematics.update(count_left, count_right);
+  //float head_output = head_pid.update(0,kinematics.m_theta);
+  //  Serial.println(kinematics.m_theta);
   switch (g_state) {
     case pre_line:
+      kinematics.update(count_left, count_right);
       firstFound = getFirstLine();
       if (firstFound) {
         g_state = on_line;
@@ -497,8 +466,8 @@ void loop()
             moveMotor(LEFT, 30);
           }
           else {
-            moveMotor(LEFT, 20);
-            moveMotor(RIGHT, 20);
+            moveMotor(LEFT, 25);
+            moveMotor(RIGHT, 25);
           }
           last_time = millis();
         }
@@ -511,6 +480,7 @@ void loop()
         kinematics.update(count_left, count_right);
       } break;
     case found_end_of_line:
+      kinematics.update(count_left, count_right);
       stopMotor();
       static int buz_count = 0;
       if (elapsed_time > 500) {
