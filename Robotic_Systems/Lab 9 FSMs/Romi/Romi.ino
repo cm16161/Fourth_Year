@@ -28,8 +28,8 @@ float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
 PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel position
 
-#define kp_left 0.05
-#define ki_left 0.0000000005
+#define kp_left 0.25
+#define ki_left 0.00000001
 #define kd_left 20
 
 #define kp_line 0.075
@@ -108,10 +108,10 @@ void moveMotor(int pin, float scalar_speed) {
     scalar_speed = 230;
   }
 
-  else if (scalar_speed <= 5) {
+  else if (scalar_speed == 0) {
     scalar_speed = 0;
   }
-  else if (scalar_speed <= 15){
+  else if (scalar_speed <= 15) {
     scalar_speed = 15;
   }
 
@@ -157,8 +157,8 @@ void setup()
   line_centre.calibrate();
   line_right.calibrate();
   delay(1000);
-  moveMotor(RIGHT, 20);
-  moveMotor(LEFT, 20);
+  moveMotor(RIGHT, 40);
+  moveMotor(LEFT, 40);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ bool checkForLine() {
   //  }
   if (left_val < 500 && cent_val < 500 && right_val < 500)
   {
-//    confidence_value = 0; // Kills movement, used for debugging and testing
+    //    confidence_value = 0; // Kills movement, used for debugging and testing
     confidence_value -= 2000;
   }
 
@@ -384,19 +384,19 @@ void goHome(Kinematics kinematics) {
   double home_theta = getHomeAngle(kinematics);
   double home_distance = getHomeDistance(kinematics);
   float home_theta_degrees = home_theta * 180 / PI;
-  if(!g_move_rotate){
+  if (!g_move_rotate) {
     kinematics.update(count_left, count_right);
   }
   float head_output = head_pid.update(home_theta_degrees, kinematics.m_theta);
   //Serial.println(home_distance);
-//  Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
+  //  Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
 
   if (!g_move_rotate) {
-    if (head_output < -10) {
+    if (head_output < 0) {
       moveMotor(LEFT, head_output);
       moveMotor(RIGHT, -head_output);
     }
-    else if (head_output > 10) {
+    else if (head_output > 0) {
       moveMotor(RIGHT, -head_output);
       moveMotor(LEFT, head_output);
     }
@@ -404,16 +404,51 @@ void goHome(Kinematics kinematics) {
       stopMotor();
       g_move_rotate = !g_move_rotate;
       count_left = count_right = 0;
+      kinematics.m_last_left = kinematics.m_last_right = 0;
+      delay(1000);
     }
   }
   else {
+    //    unsigned long elapsed_time, current_time;
+    //    current_time = millis();
+    //    elapsed_time = current_time - last_time;
+    //if (elapsed_time > 250) {
+    //    last_time = millis();
     float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
-    moveMotor(LEFT, output_l);
     float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
-//    Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
-    moveMotor(RIGHT, output_r);
-    //moveDistance(home_distance);
+    if (head_output < 0) {
+      //      output_l += head_output;
+      //      output_r -= head_output;
+    }
+    else {
+      //      output_l -= head_output;
+      //      output_r += head_output;
+    }
+    if (output_l < 0) {
+      //      output_l = -1;
+      delay(10);
+      moveMotor(LEFT, 0);
+    }
+    //    else if (output_l < 20) {
+    //      output_l = 20;
+    //    }
+    else {
+      moveMotor(LEFT, 61);
+    }
+
+    if (output_r < 0) {
+      moveMotor(RIGHT, 0);
+    }
+    else {
+      moveMotor(RIGHT, 60);
+    }
+    //    else if (output_r < 20) {
+    //      output_r = 20;
+    //    }
+
+    //    }
   }
+
   //  rotateDegrees(-30);
   //    moveDistance(1500);
 }
@@ -466,16 +501,16 @@ void loop()
             moveMotor(LEFT, 30);
           }
           else {
-            moveMotor(LEFT, 25);
-            moveMotor(RIGHT, 25);
+            moveMotor(LEFT, 35);
+            moveMotor(RIGHT, 35);
           }
           last_time = millis();
         }
       }
       else {
         stopMotor();
-        digitalWrite(LED_BUILTIN, LOW);
-        digitalWrite(LED_BUILTIN_TX, LOW);
+        //        digitalWrite(LED_BUILTIN, LOW);
+        //        digitalWrite(LED_BUILTIN_TX, LOW);
         g_state = found_end_of_line;
         kinematics.update(count_left, count_right);
       } break;
