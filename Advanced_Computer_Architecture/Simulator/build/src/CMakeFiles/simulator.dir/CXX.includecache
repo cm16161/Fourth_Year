@@ -49,6 +49,8 @@ memory.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/memory.hpp
 vector
 -
+cmath
+-
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/fetch.hpp
 algorithm

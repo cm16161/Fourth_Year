@@ -1,6 +1,7 @@
 #include "execute.hpp"
 #include <iostream>
 extern int executed_instructions;
+extern int g_clock;
 //TODO Move Registers to separate folder!
 void execute(ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
@@ -107,7 +108,8 @@ void execute(ISA instructions, int registers[64], vector<int> register_file, int
 		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
-		cout << " { " << executed_instructions << " } Instructions Executed" << endl;
+		cout << " { " << executed_instructions << " } Instructions Executed " << endl;
+		cout << " { " << ceil(g_clock / 2) << " } Clock Cycles Taken " << endl;
 		exit(EXIT_SUCCESS);
 	case NOP:
 		cout << " [ NOP ]\n";

@@ -16,6 +16,7 @@
 #define N_REGISTERS 64
 int PC;
 int executed_instructions;
+int g_clock;
 extern bool branch_taken;
 
 //TODO CHECK EXECUTE.CPP
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
 	vector<int> registers_to_use;
 	int immediate;
 	fetch.getCode(file_name, &code);
-	int clock = 0;
+	g_clock = 0;
 	string current_line, current_inst;
 	string IFID_command;
 	int IDEX_immediate;
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
 	ISA ID_command;
 	for (;;)
 	{
-		if ((clock % 2) == 0)
+		if ((g_clock % 2) == 0)
 		{
 			IF_instruction_tokens.clear();
 			if (PC < code.size())
@@ -63,13 +64,13 @@ int main(int argc, char *argv[])
 				IF_instruction_tokens = fetch.getInstruction(code[PC]);
 			}
 
-			if (clock > 0)
+			if (g_clock > 0)
 			{
 				ID_registers = decode.getRegisters(IFID_instruction);
 				ID_immediate = decode.getImmediate(IFID_instruction);
 				ID_command = decode.decode(IFID_command);
 			}
-			if (clock > 2)
+			if (g_clock > 2)
 			{
 				execute(IDEX_command, registers, IDEX_registers, IDEX_immediate);
 			}
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
 					branch_taken = !branch_taken;
 				}
 			}
-			if (clock > 1)
+			if (g_clock > 1)
 			{
 				IDEX_registers = ID_registers;
 				IDEX_immediate = ID_immediate;
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		clock++;
+		g_clock++;
 	}
 	return 0;
 }
