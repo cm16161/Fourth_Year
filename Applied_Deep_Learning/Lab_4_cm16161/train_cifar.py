@@ -417,7 +417,7 @@ def class_accuracy(labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.T
     assert len(labels) == len(preds)
     for i in range(0,10):
         idx = labels == i
-        print("Class "+str(i)+": "+str((labels[idx] == preds[idx]).sum()*100 / idx.sum()))
+        print("Class "+str(i)+": "+str((labels[idx] == preds[idx]).sum()*100 / idx.sum())) # multipy by 100 to get a percentage
     
 
 def get_summary_writer_log_dir(args: argparse.Namespace) -> str:
