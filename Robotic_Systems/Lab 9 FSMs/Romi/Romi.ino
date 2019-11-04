@@ -28,9 +28,9 @@ float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
 PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel position
 
-#define kp_left 0.25
-#define ki_left 0.00000001
-#define kd_left 20
+#define kp_left 0.025
+#define ki_left 0.0000000001
+#define kd_left 10
 
 #define kp_line 0.075
 #define ki_line 0
@@ -104,8 +104,8 @@ void moveMotor(int pin, float scalar_speed) {
   }
   else motor_direction = false;
 
-  if (scalar_speed >= 230) {
-    scalar_speed = 230;
+  if (scalar_speed >= 70) {
+    scalar_speed = 70;
   }
 
   else if (scalar_speed == 0) {
@@ -387,16 +387,16 @@ void goHome(Kinematics kinematics) {
   if (!g_move_rotate) {
     kinematics.update(count_left, count_right);
   }
-  float head_output = head_pid.update(home_theta_degrees, kinematics.m_theta);
   //Serial.println(home_distance);
   //  Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
 
   if (!g_move_rotate) {
+    float head_output = head_pid.update(home_theta_degrees, kinematics.m_theta);
     if (head_output < 0) {
       moveMotor(LEFT, head_output);
       moveMotor(RIGHT, -head_output);
     }
-    else if (head_output > 0) {
+    else if (head_output > 1) {
       moveMotor(RIGHT, -head_output);
       moveMotor(LEFT, head_output);
     }
@@ -409,48 +409,22 @@ void goHome(Kinematics kinematics) {
     }
   }
   else {
-    //    unsigned long elapsed_time, current_time;
-    //    current_time = millis();
-    //    elapsed_time = current_time - last_time;
-    //if (elapsed_time > 250) {
-    //    last_time = millis();
     float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
     float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
-    if (head_output < 0) {
-      //      output_l += head_output;
-      //      output_r -= head_output;
-    }
-    else {
-      //      output_l -= head_output;
-      //      output_r += head_output;
-    }
     if (output_l < 0) {
-      //      output_l = -1;
-      delay(10);
       moveMotor(LEFT, 0);
     }
-    //    else if (output_l < 20) {
-    //      output_l = 20;
-    //    }
     else {
-      moveMotor(LEFT, 61);
+      moveMotor(LEFT, 66);
     }
 
     if (output_r < 0) {
       moveMotor(RIGHT, 0);
     }
     else {
-      moveMotor(RIGHT, 60);
+      moveMotor(RIGHT, 65);
     }
-    //    else if (output_r < 20) {
-    //      output_r = 20;
-    //    }
-
-    //    }
   }
-
-  //  rotateDegrees(-30);
-  //    moveDistance(1500);
 }
 
 
@@ -492,17 +466,17 @@ void loop()
           pR = right_val / total_calibrate;
           LineCentre = (1000 * pL + 2000 * pC + 3000 * pR);
           float output_line = line_pid.update(2000, LineCentre);
-          if (output_line > 5) {
+          if (output_line > 7.5) {
             moveMotor(LEFT, -30);
             moveMotor(RIGHT, 30);
           }
-          else if (output_line < -3.5) {
+          else if (output_line < -7.5) {
             moveMotor(RIGHT, -30);
             moveMotor(LEFT, 30);
           }
           else {
-            moveMotor(LEFT, 35);
-            moveMotor(RIGHT, 35);
+            moveMotor(LEFT, 40);
+            moveMotor(RIGHT, 40);
           }
           last_time = millis();
         }

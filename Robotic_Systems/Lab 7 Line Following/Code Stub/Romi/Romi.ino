@@ -7,7 +7,6 @@
 #define L_DIR_PIN 16
 #define R_PWM_PIN  9
 #define R_DIR_PIN 15
-#define BUZZER_PIN 6
 
 #define LEFT 0
 #define RIGHT 1
@@ -48,19 +47,6 @@ float pL, pC, pR, LineCentre;
 
 #define BAUD_RATE = 115200;
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-enum state {
-  pre_line,
-  on_line,
-  found_end_of_line,
-  go_home
-};
-
-state g_state;
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
 void setupMotorPins()
 {
   // Set our motor driver pins as outputs.
@@ -70,15 +56,12 @@ void setupMotorPins()
   pinMode( R_DIR_PIN, OUTPUT );
   pinMode(6, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(LED_BUILTIN_TX, OUTPUT);
 
   // Set initial direction for l and r
   // Which of these is foward, or backward?
   digitalWrite( L_DIR_PIN, LOW  );
   digitalWrite( R_DIR_PIN, LOW );
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 void moveMotor(int pin, float scalar_speed) {
   bool motor_direction;
@@ -90,12 +73,9 @@ void moveMotor(int pin, float scalar_speed) {
   if (scalar_speed >= 230) {
     scalar_speed = 230;
   }
-//  else if (scalar_speed <= 10) {
-//    scalar_speed = 10;
-//  }
-//  else if(scalar_speed == 0){
-//    scalar_speed = 0;
-//  }
+  else if (scalar_speed <= 10) {
+    scalar_speed = 10;
+  }
   int dir, pwm;
   if (pin == LEFT) {
     dir = DIR_PIN(L);
@@ -115,84 +95,6 @@ void stopMotor() {
   moveMotor(RIGHT, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-void moveDistance(float distance) {
-  int dir = 0;
-  distance *= 0.1;
-  if (distance < 0) {
-    dir = 1;
-  }
-  int encoder_count = (distance / CIRCUMFERENCE) * ONE_REVOLUTION;
-  if (dir == 1) {
-    if (count_left >= encoder_count) {
-      moveMotor(LEFT, -SPEED);
-    }
-    if (count_right >= encoder_count) {
-      moveMotor(RIGHT, -SPEED);
-    }
-    if (count_left <= encoder_count && count_right <= encoder_count) {
-      moveMotor(LEFT, 0);
-      moveMotor(RIGHT, 0);
-    }
-  }
-  else {
-    if (count_left <= encoder_count) {
-      moveMotor(LEFT, SPEED);
-    }
-    if (count_right <= encoder_count) {
-      moveMotor(RIGHT, SPEED);
-    }
-
-    if (count_left >= encoder_count && count_right >= encoder_count) {
-      moveMotor(LEFT, 0);
-      moveMotor(RIGHT, 0);
-    }
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-//void rotateDegrees(float degree) {
-//  int dir = 0;
-//  if (degree < 0) {
-//    degree *= -1;
-//    dir = 1;
-//  }
-//  float encoder_count = (degree / 360) * 2 * ONE_REVOLUTION;
-//  if (dir == 0) {
-//    if (count_left <= encoder_count) {
-//      moveMotor(LEFT, SPEED);
-//    }
-//    else {
-//      moveMotor(LEFT, 0);
-//    }
-//    if (count_right >= -encoder_count) {
-//      moveMotor(RIGHT, -SPEED);
-//    }
-//    else {
-//      moveMotor(RIGHT, 0);
-//    }
-//  }
-//  else {
-//    if (count_left >= -encoder_count) {
-//      moveMotor(LEFT, -SPEED);
-//    }
-//    else {
-//      moveMotor(LEFT, 0);
-//    }
-//    if (count_right <= encoder_count) {
-//      moveMotor(RIGHT, SPEED);
-//    }
-//    else {
-//      moveMotor(RIGHT, 0);
-//    }
-//  }
-//
-//}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
 // Remember, setup only runs once.
 void setup()
 {
@@ -201,8 +103,6 @@ void setup()
   // change interrupts for the encoders.
   setupEncoder0();
   setupEncoder1();
-  g_state = pre_line;
-
 
   // Initialise your other globals variables
   // and devices.
@@ -214,39 +114,39 @@ void setup()
   line_centre.calibrate();
   line_right.calibrate();
   delay(1000);
-  moveMotor(RIGHT, 20);
-  moveMotor(LEFT, 20);
+  moveMotor(RIGHT, 12);
+  moveMotor(LEFT, 12);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 void bangBang() {
   int left_val = line_left.read_calibrated();
   int cent_val = line_centre.read_calibrated();
   int right_val = line_right.read_calibrated();
 //  Serial.print(left_val);
-//  Serial.print(", ");
+Serial.print(line_left.read_raw());
+  Serial.print(", ");
 //  Serial.print(cent_val);
-//  Serial.print(", ");
+Serial.print(line_centre.read_raw());
+  Serial.print(", ");
+  Serial.println(line_right.read_raw());
 //  Serial.println(right_val);
   if (left_val >= 200) {
-//    Serial.println(left_val);
+    Serial.println(left_val);
     //moveMotor(RIGHT, 15);
     moveMotor(LEFT, -15);
   }
   else if (cent_val >= 200) {
-//    Serial.println(cent_val);
+    Serial.println(cent_val);
     moveMotor(LEFT, 12);
     moveMotor(RIGHT, 12);
   }
   else if (right_val >= 200) {
-//    Serial.println(right_val);
+    Serial.println(right_val);
     //moveMotor(LEFT, 15);
     moveMotor(RIGHT, -15);
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 bool getFirstLine() {
   int left_val = line_left.read_calibrated();
@@ -259,46 +159,43 @@ bool getFirstLine() {
   else return false;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
 bool checkForLine() {
   int left_val = line_left.read_calibrated();
   int cent_val = line_centre.read_calibrated();
   int right_val = line_right.read_calibrated();
-  static long confidence_value = 10000;
-  const int confidence_threshold = 10000;
-//  Serial.print(left_val);
-//  Serial.print(", ");
-//  Serial.print(cent_val);
-//  Serial.print(", ");
-//  Serial.println(right_val);
-    if (left_val >= 500) {
-      confidence_value += 1;
-    }
-    else if (cent_val >= 500) {
-      confidence_value += 1;
-    }
-    else if (right_val >= 500) {
-      confidence_value += 1;
-    }
-//  if (left_val >= 500 || cent_val >= 500 || right_val >= 500) {
-//    return true;
-//
-//  }
-  if(left_val < 500 && cent_val <500 && right_val <500)
-  {
-        confidence_value -= 100000000000000000000000000000;
+  static int confidence_value = 0;
+  const int confidence_threshold = 0;
+  Serial.print(left_val);
+  Serial.print(", ");
+  Serial.print(cent_val);
+  Serial.print(", ");
+  Serial.println(right_val);
+  //  if (left_val >= 500) {
+  //    confidence_value += 1;
+  //  }
+  //  else if (cent_val >= 500) {
+  //    confidence_value += 1;
+  //  }
+  //  else if (right_val >= 500) {
+  //    confidence_value += 1;
+  //  }
+  if (left_val >= 500 || cent_val >= 500 || right_val >= 500) {
+    return true;
+
+  }
+  else {
+    stopMotor();
+    return false;
+    //    confidence_value -= 1;
   }
 
-    if (confidence_value >= confidence_threshold) {
-      return true;
-    }
-    else {
-      return false;
-    }
+  //  if (confidence_value >= confidence_threshold) {
+  //    return true;
+  //  }
+  //  else {
+  //    return false;
+  //  }
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 void rotateDegrees(float degree) {
   int dir = 0;
@@ -307,8 +204,8 @@ void rotateDegrees(float degree) {
     dir = 1;
   }
   float encoder_count = (degree / 360) * 2 * ONE_REVOLUTION;
-//  Serial.println(encoder_count);
-//  Serial.println(0.25 * 2 * ONE_REVOLUTION);
+  Serial.println(encoder_count);
+  Serial.println(0.25 * 2 * ONE_REVOLUTION);
   if (dir == 0) {
     if (count_left <= encoder_count) {
       moveMotor(LEFT, SPEED);
@@ -340,89 +237,83 @@ void rotateDegrees(float degree) {
 
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-int toggleBuzzer() {
-  static bool toggle = false;
-  toggle = !toggle;
-  if (toggle) {
-    digitalWrite(BUZZER_PIN, 1);
-    return 0;
-  }
-  else {
-    digitalWrite(BUZZER_PIN, 0);
-    return 1;
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-
 // Remmeber, loop is called again and again.
 void loop()
 {
-  delay(5);
-  static bool onLine;
-  static bool firstFound = false;
-  static bool block = false;
-  unsigned long elapsed_time, current_time;
-  current_time = millis();
-  elapsed_time = current_time - last_time;
-  switch (g_state) {
-    case pre_line: firstFound = getFirstLine(); if (firstFound) {
-        g_state = on_line;
-      }
-      break;
-    case on_line: onLine = checkForLine();
-      if (onLine) {
-        if (elapsed_time > DELAY_DURATION) {
-          int left_val = line_left.read_calibrated();
-          int cent_val = line_centre.read_calibrated();
-          int right_val = line_right.read_calibrated();
-          float total_calibrate = left_val + cent_val + right_val;
-          pL = left_val / total_calibrate;
-          pC = cent_val / total_calibrate;
-          pR = right_val / total_calibrate;
-          LineCentre = (1000 * pL + 2000 * pC + 3000 * pR);
-          float output_line = line_pid.update(2000, LineCentre);
-          if (output_line > 5) {
-            moveMotor(LEFT, -30);
-            moveMotor(RIGHT, 30);
-          }
-          else if (output_line < -3.5) {
-            moveMotor(RIGHT, -30);
-            moveMotor(LEFT, 30);
-          }
-          else {
-            moveMotor(LEFT, 20);
-            moveMotor(RIGHT, 20);
-          }
-          last_time = millis();
-        }
-      }
-      else {
-        stopMotor();
-        digitalWrite(LED_BUILTIN, LOW);
-        digitalWrite(LED_BUILTIN_TX, LOW);
-        g_state = found_end_of_line;
-      } break;
-    case found_end_of_line: 
-      stopMotor();
-      static int buz_count = 0;
-      if (elapsed_time > 500) {
-        if (buz_count < 10) {
-          toggleBuzzer();
-          buz_count++;
-        }
-        else {
-          g_state = go_home;
-        }
-        last_time = millis();
-      }
-      stopMotor();
-      break;
-  }
+//  static bool onLine;
+//  static bool firstFound = false;
+//  static bool block = false;
+//  unsigned long elapsed_time, current_time;
+//  current_time = millis();
+//  elapsed_time = current_time - last_time;
+//  if (!firstFound) {
+//    firstFound = getFirstLine();
+//  }
+//  else {
+//    onLine = checkForLine();
+//    if (onLine && !block) {
+//      digitalWrite(LED_BUILTIN, HIGH);
+//      firstFound = true;
+//
+//      if (elapsed_time > DELAY_DURATION) {
+//        int left_val = line_left.read_calibrated();
+//        int cent_val = line_centre.read_calibrated();
+//        int right_val = line_right.read_calibrated();
+//        float total_calibrate = left_val + cent_val + right_val;
+//        pL = left_val / total_calibrate;
+//        pC = cent_val / total_calibrate;
+//        pR = right_val / total_calibrate;
+//        LineCentre = (1000 * pL + 2000 * pC + 3000 * pR);
+//        float output_line = line_pid.update(2000, LineCentre);
+//        if (output_line > 5) {
+//          moveMotor(LEFT, -30);
+//          moveMotor(RIGHT, 30);
+//        }
+//        else if (output_line < -3.5) {
+//          moveMotor(RIGHT, -30);
+//          moveMotor(LEFT, 30);
+//        }
+//        else {
+//          moveMotor(LEFT, 11);
+//          moveMotor(RIGHT, 11);
+//        }
+//        //    Serial.print(LineCentre);
+//        //    Serial.print(", ");
+//        //    Serial.println(output_line);
+//        last_time = millis();
+//
+//      }
+//    }
+//    else {
+//      stopMotor();
+//      digitalWrite(LED_BUILTIN, LOW);
+//      if (firstFound) {
+//        stopMotor();
+//        digitalWrite(6, HIGH);
+//        int random_v = random(3);
+//        if (elapsed_time > 1000) {
+//          block = !block;
+//          if (random_v == 0) {
+//            rotateDegrees(30);
+//          }
+//          else if (random_v == 1) {
+//            rotateDegrees(-30);
+//          }
+//          else if (random_v == 2) {
+//            moveMotor(LEFT, -12);
+//            moveMotor(RIGHT, -12);
+//
+//          }
+//          last_time = millis();
+//        }
+//      }
+//      stopMotor();
+//    }
+//  }
+
+
 
   // build your main code here.
+  bangBang();
 
 }
