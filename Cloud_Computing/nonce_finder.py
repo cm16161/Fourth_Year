@@ -11,15 +11,17 @@ def get_args():
     parser.add_argument("-n", "--n_threads", help="Input the number of threads desired",
                         type=int, default="1")
     parser.add_argument("-d", "--difficulty", help="Input the difficulty value",
-                        type=int, default="32")
+                        type=int, default="1")
+    parser.add_argument("--start",type=int, default="0", help="Input the start value to search")
+    parser.add_argument("--step",type=int, default="1", help="Input the step size to iterate through")
     args = parser.parse_args()
     return args
 
-def find_nonce(difficulty_level, start_val=0, end_val=2**32, block="COMSM0010cloud"):
+def find_nonce(difficulty_level, start_val=0, step=1, block="COMSM0010cloud"):
     """This function will continually generate nonces and see if they
     are golden"""
     while True:
-        for i in range(start_val, end_val):
+        for i in range(start_val, 2**32, step):
             global STOP_THREADS
             sha_f = hashlib.sha256()
             block += str(i)
@@ -40,17 +42,21 @@ def find_nonce(difficulty_level, start_val=0, end_val=2**32, block="COMSM0010clo
 def main():
     """Main Function"""
     args = get_args()
-    threads = list()
-    for _t in range(args.n_threads):
-        start_val = (2**32 / args.n_threads)*_t
-        end_val = (2**32 / args.n_threads)*(_t+1)
-        _x = threading.Thread(target=find_nonce, args=(args.difficulty,
-                                                       int(start_val), int(end_val),))
-        threads.append(_x)
-        _x.start()
+    #threads = list()
+    start_val = args.start
+    step_size = args.step
+    difficulty= args.difficulty
+    find_nonce(difficulty, start_val, step_size)
+    # for _t in range(args.n_threads):
+    #     start_val = (2**32 / args.n_threads)*_t
+    #     end_val = (2**32 / args.n_threads)*(_t+1)
+    #     _x = threading.Thread(target=find_nonce, args=(args.difficulty,
+    #                                                    int(start_val), int(end_val),))
+    #     threads.append(_x)
+    #     _x.start()
 
-    for _t in threads:
-        _t.join()
+    # for _t in threads:
+    #     _t.join()
 
 if __name__ == '__main__':
     main()
