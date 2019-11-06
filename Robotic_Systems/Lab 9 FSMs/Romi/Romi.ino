@@ -403,7 +403,7 @@ double getHomeDistance(Kinematics kinematics) {
 
 void goHome(Kinematics kinematics) {
   double home_theta = getHomeAngle(kinematics);
-  double home_distance = getHomeDistance(kinematics);
+  static double home_distance;// = getHomeDistance(kinematics);
   float home_theta_degrees = home_theta * 180 / PI;
   static float speed_l;
   static float speed_r;
@@ -426,6 +426,7 @@ void goHome(Kinematics kinematics) {
     else {
       stopMotor();
       g_move_rotate = !g_move_rotate;
+      home_distance = getHomeDistance(kinematics);
       count_left = count_right = 0;
       kinematics.m_last_left = kinematics.m_last_right = 0;
       delay(1000);
@@ -439,20 +440,20 @@ void goHome(Kinematics kinematics) {
       moveMotor(LEFT, 0);
     }
     else {
-      //      float output_vel_l = left_vel_pid.update(1500, timer3_speed_left);
-      //    speed_l += output_vel_l;
-      //    moveMotor(LEFT, speed_l);
-      moveMotor(LEFT, 66);
+            float output_vel_l = left_vel_pid.update(1400, timer3_speed_left);
+          speed_l += output_vel_l;
+          moveMotor(LEFT, speed_l);
+//      moveMotor(LEFT, 65);
     }
 
     if (output_r < -6) {
       moveMotor(RIGHT, 0);
     }
     else {
-      //      float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
-      //    speed_r += output_vel_r;
-      //    moveMotor(RIGHT, speed_r);
-      moveMotor(RIGHT, 65);
+            float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
+          speed_r += output_vel_r;
+          moveMotor(RIGHT, speed_r);
+//      moveMotor(RIGHT, 65);
     }
   }
 }
