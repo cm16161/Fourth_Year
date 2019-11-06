@@ -28,8 +28,8 @@ float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
 PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel position
 
-#define kp_left 0.025
-#define ki_left 0.0000000001
+#define kp_left 0.0275
+#define ki_left 0.000000001
 #define kd_left 10
 
 #define kp_line 0.075
@@ -37,8 +37,12 @@ PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel po
 #define kd_line 00
 
 #define kp_head 1
-#define ki_head 0
+#define ki_head 0.000
 #define kd_head 0
+
+#define kp_left_vel 0.0005
+#define ki_left_vel 0.0000005
+#define kd_left_vel 0
 
 #define DELAY_DURATION 1
 unsigned long last_time;
@@ -47,6 +51,10 @@ PID line_pid( kp_line, ki_line, kd_line );
 PID left_pid( kp_left, ki_left, kd_left );
 PID right_pid(kp_left, ki_left, kd_left );
 PID head_pid(kp_head, ki_head, kd_head);
+
+PID left_vel_pid( kp_left, ki_left, kd_left );
+PID right_vel_pid( kp_left, ki_left, kd_left );
+
 
 // You may need to change these depending on how you wire
 // in your line sensor.
@@ -61,6 +69,16 @@ LineSensor line_right(LINE_RIGHT_PIN); //Create a line sensor object for the rig
 float pL, pC, pR, LineCentre;
 Kinematics kinematics(count_left, count_right);  // New kinematics class instance.
 bool g_move_rotate;
+
+
+volatile unsigned long timer3_count;
+volatile long last_left = 0;
+volatile long last_timer3 = 0;
+volatile long timer3_speed_left = 0;
+volatile long last_right = 0;
+volatile long timer3_speed_right = 0;
+unsigned long target_count = 1435;
+
 
 #define BAUD_RATE = 115200;
 
@@ -143,6 +161,7 @@ void setup()
   // change interrupts for the encoders.
   setupEncoder0();
   setupEncoder1();
+  setupTimer3(1);
   g_state = pre_line;
   g_move_rotate = false;
 
@@ -157,8 +176,8 @@ void setup()
   line_centre.calibrate();
   line_right.calibrate();
   delay(1000);
-  moveMotor(RIGHT, 40);
-  moveMotor(LEFT, 40);
+  moveMotor(RIGHT, 30);
+  moveMotor(LEFT, 30);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +227,7 @@ bool checkForLine() {
   int left_val = line_left.read_calibrated();
   int cent_val = line_centre.read_calibrated();
   int right_val = line_right.read_calibrated();
-  static long confidence_value = 100000;
+  static long confidence_value = 10000;
   const int confidence_threshold = 0;
   //  Serial.print(left_val);
   //  Serial.print(", ");
@@ -384,6 +403,8 @@ void goHome(Kinematics kinematics) {
   double home_theta = getHomeAngle(kinematics);
   double home_distance = getHomeDistance(kinematics);
   float home_theta_degrees = home_theta * 180 / PI;
+  static float speed_l;
+  static float speed_r;
   if (!g_move_rotate) {
     kinematics.update(count_left, count_right);
   }
@@ -392,7 +413,7 @@ void goHome(Kinematics kinematics) {
 
   if (!g_move_rotate) {
     float head_output = head_pid.update(home_theta_degrees, kinematics.m_theta);
-    if (head_output < 0) {
+    if (head_output < -1) {
       moveMotor(LEFT, head_output);
       moveMotor(RIGHT, -head_output);
     }
@@ -411,17 +432,24 @@ void goHome(Kinematics kinematics) {
   else {
     float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
     float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
-    if (output_l < 0) {
+    
+    if (output_l < -10) {
       moveMotor(LEFT, 0);
     }
     else {
+//      float output_vel_l = left_vel_pid.update(1500, timer3_speed_left);
+//    speed_l += output_vel_l;
+//    moveMotor(LEFT, speed_l);
       moveMotor(LEFT, 66);
     }
 
-    if (output_r < 0) {
+    if (output_r < -6) {
       moveMotor(RIGHT, 0);
     }
     else {
+//      float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
+//    speed_r += output_vel_r;
+//    moveMotor(RIGHT, speed_r);
       moveMotor(RIGHT, 65);
     }
   }
@@ -475,8 +503,8 @@ void loop()
             moveMotor(LEFT, 30);
           }
           else {
-            moveMotor(LEFT, 40);
-            moveMotor(RIGHT, 40);
+            moveMotor(LEFT, 25);
+            moveMotor(RIGHT, 25);
           }
           last_time = millis();
         }
@@ -512,5 +540,51 @@ void loop()
 
 
   // build your main code here.
+
+}
+
+void setupTimer3( int hertz ) {
+
+  // disable global interrupts
+  cli();
+
+  // Reset timer3 to a blank condition.
+  // TCCR = Timer/Counter Control Register
+  TCCR3A = 0;     // set entire TCCR3A register to 0
+  TCCR3B = 0;     // set entire TCCR3B register to 0
+
+  // First, turn on CTC mode.  Timer3 will count up
+  // and create an interrupt on a match to a value.
+  // See table 14.4 in manual, it is mode 4.
+  TCCR3B = TCCR3B | (1 << WGM32);
+
+  // Set prescaler value.
+  TCCR3B = TCCR3B | (1 << CS32);
+
+  // Set Compare Match counter value
+  OCR3A =  62500 / hertz;
+
+
+  // enable timer compare interrupt:
+  TIMSK3 = TIMSK3 | (1 << OCIE3A);
+
+  // enable global interrupts:
+  sei();
+}
+
+// The ISR routine.
+// The name TIMER3_COMPA_vect is a special flag to the
+// compiler.  It automatically associates with Timer3 in
+// CTC mode.
+ISR( TIMER3_COMPA_vect ) {
+  timer3_count++;
+  float time_diff = timer3_count - last_timer3;
+  float delta_cl = count_left - last_left;
+  timer3_speed_left = delta_cl / time_diff;
+  float delta_cr = count_right - last_right;
+  timer3_speed_right = delta_cr / time_diff;
+  last_right = count_right;
+  last_left = count_left;
+  last_timer3 = timer3_count;
 
 }
