@@ -1,3 +1,5 @@
+//////////////////////////// Assesment Code \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\    
+
 #include "encoders.h"
 #include "pid.h"
 #include "line_sensors.h"
@@ -432,14 +434,14 @@ void goHome(Kinematics kinematics) {
   else {
     float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
     float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
-    
+
     if (output_l < -10) {
       moveMotor(LEFT, 0);
     }
     else {
-//      float output_vel_l = left_vel_pid.update(1500, timer3_speed_left);
-//    speed_l += output_vel_l;
-//    moveMotor(LEFT, speed_l);
+      //      float output_vel_l = left_vel_pid.update(1500, timer3_speed_left);
+      //    speed_l += output_vel_l;
+      //    moveMotor(LEFT, speed_l);
       moveMotor(LEFT, 66);
     }
 
@@ -447,9 +449,9 @@ void goHome(Kinematics kinematics) {
       moveMotor(RIGHT, 0);
     }
     else {
-//      float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
-//    speed_r += output_vel_r;
-//    moveMotor(RIGHT, speed_r);
+      //      float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
+      //    speed_r += output_vel_r;
+      //    moveMotor(RIGHT, speed_r);
       moveMotor(RIGHT, 65);
     }
   }
