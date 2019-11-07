@@ -446,9 +446,9 @@ void goHome(Kinematics kinematics) {
       moveMotor(LEFT, 0);
     }
     else {
-      float output_vel_l = left_vel_pid.update(1400, timer3_speed_left);
-      speed_l += output_vel_l;
-      moveMotor(LEFT, speed_l);
+      //      float output_vel_l = left_vel_pid.update(1400, timer3_speed_left);
+      //      speed_l += output_vel_l;
+      moveMotor(LEFT, output_l);
       //      moveMotor(LEFT, 65);
     }
 
@@ -456,9 +456,9 @@ void goHome(Kinematics kinematics) {
       moveMotor(RIGHT, 0);
     }
     else {
-      float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
-      speed_r += output_vel_r;
-      moveMotor(RIGHT, speed_r);
+      //      float output_vel_r = right_vel_pid.update(1400, timer3_speed_right);
+      //      speed_r += output_vel_r;
+      moveMotor(RIGHT, output_r);
       //      moveMotor(RIGHT, 65);
     }
   }
