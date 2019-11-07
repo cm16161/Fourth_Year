@@ -6,6 +6,7 @@ import os
 import kill_instances
 import argparse
 import threading
+import multithreading
 
 
 STOP_THREADS = False
@@ -82,16 +83,17 @@ def main():
     for _t in range(args.n_threads):
         start_val = _t
         step = args.n_threads
-        _x = threading.Thread(target=send_to_cloud,
+        _x = multiprocessing.Process(target=send_to_cloud,
                               args=(args.difficulty, int(start_val), int(step)))
-        _x.setDaemon(True)
+        # _x.setDaemon(True)
         threads.append(_x)
         _x.start()
     while not STOP_THREADS:
         pass
     
-    # for _t in threads:
-    #     _t.join()
+    for _t in threads:
+        _t.join()
+
     kill_instances.kill()
 
 if __name__ == '__main__':
