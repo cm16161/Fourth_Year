@@ -110,6 +110,7 @@ void execute(ISA instructions, int registers[64], vector<int> register_file, int
 		cout << " [ EOP ] Program terminated successfully " << endl;
 		cout << " { " << executed_instructions << " } Instructions Executed " << endl;
 		cout << " { " << ceil(g_clock / 2) << " } Clock Cycles Taken " << endl;
+		cout << " { " << executed_instructions / (ceil(g_clock / 2)) << " } Instructions per Cycle" << endl;
 		exit(EXIT_SUCCESS);
 	case NOP:
 		cout << " [ NOP ]\n";
