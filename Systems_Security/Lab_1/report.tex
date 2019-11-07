@@ -1,4 +1,4 @@
-% Created 2019-10-31 Thu 13:09
+% Created 2019-11-07 Thu 12:41
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -31,53 +31,53 @@
 
 
 \section{Abstract}
-\label{sec:orgc210d99}
+\label{sec:org39fae9d}
 
 A string format attack works by exploiting vulnerabilities in source
 code to examine and/or modify the values stored in variables.
 
 
 \section{String Formatting in C}
-\label{sec:org0f1d18c}
+\label{sec:org9ec0dda}
 
 Some String manipulation functions in C have vulnerabilities which can
 be exploited by an attacker. An example of this is the function
-"scanf" which allows the user to provide an arbitrary input.
+\texttt{scanf()} which allows the user to provide an arbitrary input.
 
-\subsection{scanf()}
-\label{sec:org65356e6}
+\subsection{\texttt{scanf()}}
+\label{sec:org6b6c3f6}
 
-"scanf()" is a function which reads from stdin and stores it into a
+\texttt{scanf()} is a function which reads from stdin and stores it into a
 variable. This input can be anything (strings, numbers, etc), and can
 have any length.
 
-\subsection{printf()}
-\label{sec:org8ab0242}
+\subsection{\texttt{printf()}}
+\label{sec:org2b33583}
 
-"printf()" is a function which takes in a string and any parameters to
+\texttt{printf()} is a function which takes in a string and any parameters to
 that string (e.g variables) and will output to stdout. The variables
 can be printed by using special tokens in the string which will map to
-specific output formats, for example "\%d" outputs a number in denary
-format, whereas "\%x" outputs in hex. The way this works is that the
+specific output formats, for example \texttt{\%d} outputs a number in denary
+format, whereas \texttt{\%x} outputs in hex. The way this works is that the
 variables to be printed are placed into the function stack, and then
 whenever a token is encountered, it simply replaces it with whatever
 is at the current stack pointer, and then moving the stack pointer so
 that it is now at the next variable.
 
-\subsection{"\%n"}
-\label{sec:org8ba7e0d}
+\subsection{\texttt{\%n}}
+\label{sec:org2d92dc5}
 
-"\%n" is a special formatting character which, instead reading the
+\texttt{\%n} is a special formatting character which, instead reading the
 value stored at the stack pointer, will instead overwrite it with the
 number of bytes read in so far.
 
 \section{Attacks}
-\label{sec:orgdff4b40}
+\label{sec:org9ee0fa2}
 
 \subsection{Denial of Service (DoS)}
-\label{sec:org5581dcf}
+\label{sec:org4e51a0c}
 
-"\%s" is interpreted by printf() as a command which will use the
+\texttt{\%s} is interpreted by \texttt{printf()} as a command which will use the
 current value in function stack as a pointer to a null-terminated
 string. This means that the program will unconditionally dereference a
 value, this leads to 2 different situations:
@@ -86,50 +86,50 @@ value, this leads to 2 different situations:
 \item The address is valid and accessible to the program, in which
 \end{enumerate}
 case it will continually print the characters found at that address
-until the null-character ($\backslash$0) is met.
+until the null-character (\texttt{\textbackslash{}0}) is met.
 \begin{enumerate}
 \item The address is invalid/out-of-bounds to the current program,
 \end{enumerate}
 resulting in a segmentation-fault (seg-fault), which causes the OS to
 terminate execution.
 
-Denial of Service works by entering enough "\%s" characters until the
+Denial of Service works by entering enough \texttt{\%s} characters until the
 value in the stack is interpreted as an invalid pointer.
 
-An example input to cause the second situation is "\%s\%s\%s\%s\%s\%s\%s\%s\%s"
+An example input to cause the second situation is \texttt{\%s\%s\%s\%s\%s\%s\%s\%s\%s}
 This continually moves the stack pointer, dereferencing the values and
 printing what is stored in those addresses.
 
 Another DoS attack can be done by what is known as "Stack Smashing"
 which is when a large number of formatting characters are input
-(eg. \%d, \%x, \%c, etc.), if enough of these formatting characters are
+(eg. \texttt{\%d}, \texttt{\%x}, \texttt{\%c}, etc.), if enough of these formatting characters are
 entered, the stack pointer will move out of the function call stack.
 
 \subsection{Reading Values on the Stack}
-\label{sec:orgbbcfd68}
+\label{sec:orgfc65fb7}
 
-When printf() is called, it loads the values to be printed into its
+When \texttt{printf()} is called, it loads the values to be printed into its
 call stack. These values are then read off every time the string
 formatting characters are met. It is possible to read values which
-aren't in the printf() call stack by moving the stack pointer outside
+aren't in the \texttt{printf()} call stack by moving the stack pointer outside
 of the scope of the function by continually entering the format
 characters. This then allows access to variables stored by the
 program.
 
 \subsubsection{Variables vs Pointers}
-\label{sec:org66c4b54}
+\label{sec:org861a0a3}
 
 Some variables are statically allocated in the program stack at
-compile time (eg char[6]), these values can be directly
-output by using specific formatting characters (\%x).
+compile time (eg \texttt{char[6]}), these values can be directly
+output by using specific formatting characters (\texttt{\%x}).
 
-Other variables are dynamically allocated (char*) in the program heap, and
+Other variables are dynamically allocated (\texttt{char*}) in the program heap, and
 can only be accessed by dereferencing a pointer to them. To print
-them, specific formatting characters (\%s) must be used as they interpret
+them, specific formatting characters (\texttt{\%s}) must be used as they interpret
 the value on the stack as an address rather than a value.
 
 \subsubsection{Data Structures}
-\label{sec:orga0f0116}
+\label{sec:org21da245}
 
 Data Structures are typically dynamically allocated, as a result the
 pointer to them will only point to the first value stored. In order to
@@ -141,10 +141,150 @@ structure (eg int, char, bool, etc) and using the size of the type as
 the size to step through in memory.
 
 \subsection{Writing Values to the Stack}
-\label{sec:org0988e51}
+\label{sec:orge4c0fd5}
 
-This attack utilises the "\%n" operator described earlier. If an
+This attack utilises the \texttt{\%n} operator described earlier. If an
 attacker wants to change the value stored in a particular location in
 memory, then the address must first be found in the program stack,
-then "\%n" can be used to change the value.
+then \texttt{\%n} can be used to change the value to be the number of bytes
+read by \texttt{printf()} so far. This attack requires the address of the
+variable to be changed.
+
+\section{Lab 1: String Format Attack}
+\label{sec:org3a0e064}
+
+\subsection{Task 1.i: Crash the Program}
+\label{sec:orgd3794b2}
+
+The program can be crashed by entering the string \texttt{\%s\%s\%s\%s\%s\%s\%s\%s\%s}
+
+
+\subsection{Task 1.ii: Print out the Value of \texttt{secret[1]}}
+\label{sec:org8341271}
+
+The address of \texttt{secret[1]} is printed out by the source program. As a
+result we know the exact address to access. The program allows for 2
+values to be input, one is a number, the other is a string. By putting
+the decimal encoded address of \texttt{secret[1]} as the number to be input, it
+gets placed in the stack in some location. This value can then be
+found and accessed by entering special \texttt{printf()} formatting
+characters, e.g. \texttt{\%x} which prints out values as a hex-encoded
+number. Once the address that was placed earlier has been found in the
+resulting output string, the attacker can then replace the
+corresponding \texttt{\%x} character with \texttt{\%s} which then prints out the value
+stored in that address (which in this case is \texttt{secret[1]}).
+
+
+\subsection{Task 1.iii: Modify the value of \texttt{secret[1]}}
+\label{sec:org5fe8e5b}
+
+By accessing the value of \texttt{secret[1]} as explained in \textbf{Task 1.ii},
+instead of simply printing the value of \texttt{secret[1]} with \texttt{\%s}, it is
+possible to change the value stored by instead using \texttt{\%n} which
+replaced the value stored by the number of bytes printed by \texttt{printf()} so
+far.
+
+
+\subsection{Task 1.iv: Modify the value of \texttt{secret[1]} to a chosen value}
+\label{sec:orgfed217e}
+
+From the previous task, it is possible for the attacker to modify the
+value of \texttt{secret[1]}. From this point, it is possible to modify
+\texttt{secret[1]} by using the same method of attack from \textbf{Task 1.iii}, but
+before utilising \texttt{\%n} to change the value, an arbitrary number of
+characters (e.g. \emph{1}) can be entered which will increment the value
+updated by \texttt{\%n} by 1 for each character printed.
+
+\subsection{Task 2.i: Cause the program to Crash}
+\label{sec:org76e8d41}
+
+This can be done in exactly the same way as \textbf{Task 1.i}, by entering
+the string \texttt{\%s\%s\%s\%s\%s\%s\%s\%s\%s}.
+
+
+\subsection{Task 2.ii: Print out the Value of \texttt{secret[1]}}
+\label{sec:org4c681ae}
+
+The modified program no longer allows the attacker to enter the
+address of \texttt{secret[1]} directly. As a result, the attacker needs to
+enter the address and access that address in a single string.
+
+Due to the fact that Virtual Address Randomisation has been turned
+off, it means that during every instance of the attack, the address of
+\texttt{secret[1]} remains the same. Using this knowledge, it is possible to
+input that address as a ascii-encoded bytes which can be passed into
+the program from a file. This address can then be accessed in a
+similar way to the previous attack by repeatedly entering \texttt{\%x} in the
+ascii-encoded file until that address is located. Finally, the
+attacker can replace the \texttt{\%x} corresponding to the address of
+\texttt{secret[1]} with a \texttt{\%s} which will print out the value stored there.
+
+
+\subsection{Task 2.iii: Modify the Value of \texttt{secret[1]}}
+\label{sec:org5c874f2}
+
+By utilising the steps taken in \textbf{Task 2.ii}, it is possible to modify
+the value stored in \texttt{secret[1]} by replacing the \texttt{\%s} which prints the
+value stored in \texttt{secret[1]} with \texttt{\%n} which will modify the value.
+
+
+\subsection{Task 2.iv: Modify the Value of \texttt{secret[1]} to a chosen value}
+\label{sec:org726fbf2}
+
+Similarly to tasks: \textbf{2.iii} and \textbf{1.iv}, it is possible to modify the
+value in \texttt{secret[1]} to a chosen value by first being able to modify
+the value in general, and then utilising the fact that \texttt{\%n} increases
+for every byte printed so far. From this, it means that it is possible
+for an attacker to generate an ascii-encoded file with the number of
+bytes desired to result in modifying \texttt{secret[1]} to the desired value.
+
+\section{Possibilities and Limitations}
+\label{sec:org0b97fc7}
+
+Using this attack, attackers can do the following:
+
+\begin{itemize}
+\item Overwrite important program flags that control access privileges: if
+\end{itemize}
+the program  you're running has Set-UID privilages, you can leverage
+the permissions  of the privilaged program to write higher privilages
+to a malicious program.
+
+\begin{itemize}
+\item Overwrite return addresses on the stack, function pointers, etc
+Writing any value, as demonstrated above, is possible through the
+use of dummy output characters. To write a value of 1000, a simple
+padding of 1000 dummy characters would do for example.
+\end{itemize}
+
+\section{History}
+\label{sec:org6f9fb25}
+
+String formatting to change behaviour has been known since 1989, but
+as an attack vector, celebrates it's 20th year anniversary this
+year. The attack itself was uncovered while running a security audit
+on the "ProFTPD" program: essentially a feature rich FTP server,
+during which it was shown that by passing certain values into an
+unguarded \texttt{printf()} function, privilage escalation could be
+achieved. Since this was uncovered, a number of prevention mechanisms
+have been devised to assist programmer's in detecting the vulnerability.
+
+\section{Prevention}
+\label{sec:orgcc44a07}
+
+\begin{itemize}
+\item Compiler Support
+\end{itemize}
+\begin{itemize}
+\item Address randomization:  just like the countermeasures used to protect
+against buffer-overflow attacks, address randomization makes it
+difficult for the attackers to find out what address they want to read/write
+\end{itemize}
+
+\section{Detection}
+\label{sec:orge26ed67}
+
+\begin{itemize}
+\item x86 compiled binary analysis
+\end{itemize}
 \end{document}
