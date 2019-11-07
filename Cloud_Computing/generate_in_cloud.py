@@ -92,8 +92,7 @@ def main():
         pass
     
     for _t in threads:
-        _t.join()
-
+         _t.join()
     kill_instances.kill()
 
 if __name__ == '__main__':
