@@ -5,6 +5,7 @@ extern int g_clock;
 //TODO Move Registers to separate folder!
 void execute(ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
+	static int nop_count = 0;
 	static ALU &alu = ALU::getInstance();
 	static MEM &mem = MEM::getInstance();
 	switch (instructions)
@@ -111,9 +112,11 @@ void execute(ISA instructions, int registers[64], vector<int> register_file, int
 		cout << " { " << executed_instructions << " } Instructions Executed " << endl;
 		cout << " { " << ceil(g_clock / 2) << " } Clock Cycles Taken " << endl;
 		cout << " { " << executed_instructions / (ceil(g_clock / 2)) << " } Instructions per Cycle" << endl;
+		cout << " { " << nop_count << " } NOP Instructions" << endl;
 		exit(EXIT_SUCCESS);
 	case NOP:
 		cout << " [ NOP ]\n";
+		nop_count++;
 		break;
 	}
 	executed_instructions++;

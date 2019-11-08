@@ -45,45 +45,60 @@ int main(int argc, char *argv[])
 	fetch.getCode(file_name, &code);
 	g_clock = 0;
 	string current_line, current_inst;
-	string IFID_command;
-	int IDEX_immediate;
-	ISA IDEX_command;
-	vector<int> IDEX_registers;
-	string IFID_instruction_keyword, IFID_instruction;
-	vector<string> IF_instruction_tokens;
-	vector<int> ID_registers;
-	int ID_immediate;
-	ISA ID_command;
+
+	string IFID_command[2];
+	int IDEX_immediate[2];
+	ISA IDEX_command[2];
+	vector<int> IDEX_registers[2];
+	string IFID_instruction_keyword[2], IFID_instruction[2];
+	vector<string> IF_instruction_tokens[2];
+	vector<int> ID_registers[2];
+	int ID_immediate[2];
+	ISA ID_command[2];
+
 	for (;;)
 	{
 		if ((g_clock % 2) == 0)
 		{
-			IF_instruction_tokens.clear();
+			IF_instruction_tokens[0].clear();
+			IF_instruction_tokens[1].clear();
+
 			if (PC < code.size())
 			{
-				IF_instruction_tokens = fetch.getInstruction(code[PC]);
+				IF_instruction_tokens[0] = fetch.getInstruction(code[PC]);
+				IF_instruction_tokens[1] = fetch.getInstruction(code[PC + 1]);
 			}
 
 			if (g_clock > 0)
 			{
-				ID_registers = decode.getRegisters(IFID_instruction);
-				ID_immediate = decode.getImmediate(IFID_instruction);
-				ID_command = decode.decode(IFID_command);
+				ID_registers[0] = decode.getRegisters(IFID_instruction[0]);
+				ID_immediate[0] = decode.getImmediate(IFID_instruction[0]);
+				ID_command[0] = decode.decode(IFID_command[0]);
+
+				ID_registers[1] = decode.getRegisters(IFID_instruction[1]);
+				ID_immediate[1] = decode.getImmediate(IFID_instruction[1]);
+				ID_command[1] = decode.decode(IFID_command[1]);
 			}
 			if (g_clock > 2)
 			{
-				execute(IDEX_command, registers, IDEX_registers, IDEX_immediate);
+				execute(IDEX_command[0], registers, IDEX_registers[0], IDEX_immediate[0]);
+
+				execute(IDEX_command[1], registers, IDEX_registers[1], IDEX_immediate[1]);
 			}
 		}
 		else
 		{
-			if (!IF_instruction_tokens.empty())
+			if (!IF_instruction_tokens[0].empty() && !IF_instruction_tokens[1].empty())
 			{
-				IFID_command = IF_instruction_tokens[0];
-				IFID_instruction = code[PC];
+				IFID_command[0] = IF_instruction_tokens[0][0];
+				IFID_instruction[0] = code[PC];
+
+				IFID_command[1] = IF_instruction_tokens[1][0];
+				IFID_instruction[1] = code[PC + 1];
+
 				if (!branch_taken)
 				{
-					PC++;
+					PC+=2;
 				}
 				else
 				{
@@ -92,9 +107,13 @@ int main(int argc, char *argv[])
 			}
 			if (g_clock > 1)
 			{
-				IDEX_registers = ID_registers;
-				IDEX_immediate = ID_immediate;
-				IDEX_command = ID_command;
+				IDEX_registers[0] = ID_registers[0];
+				IDEX_immediate[0] = ID_immediate[0];
+				IDEX_command[0] = ID_command[0];
+
+                                IDEX_registers[1] = ID_registers[1];
+				IDEX_immediate[1] = ID_immediate[1];
+				IDEX_command[1] = ID_command[1];
 			}
 		}
 
