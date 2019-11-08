@@ -30,7 +30,7 @@ float Kd_left = 0; //Derivative gain for position controller
 float Ki_left = 0; //Integral gain for position controller
 PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel position
 
-#define kp_left 0.0275
+#define kp_left 0.03
 #define ki_left 0.000000001
 #define kd_left 10
 
@@ -39,7 +39,7 @@ PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel po
 #define kd_line 00
 
 #define kp_head 1
-#define ki_head 0.000
+#define ki_head 0.00000001
 #define kd_head 0
 
 #define kp_left_vel 0.05
@@ -442,17 +442,19 @@ void goHome(Kinematics kinematics) {
     float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
     float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
 
-    if (output_l < -5) {
+    if (output_l <= 0.1) {
       moveMotor(LEFT, 0);
+//      stopMotor();
     }
     else {
       //      float output_vel_l = left_vel_pid.update(1400, timer3_speed_left);
       //      speed_l += output_vel_l;
-      moveMotor(LEFT, output_l);
-      //      moveMotor(LEFT, 65);
+      moveMotor(LEFT, output_l+3);
+//      moveMotor(RIGHT, output_l+0.5);
+//            moveMotor(LEFT, 50);
     }
 
-    if (output_r < -5) {
+    if (output_r <= 0.1) {
       moveMotor(RIGHT, 0);
     }
     else {
@@ -512,8 +514,8 @@ void loop()
             moveMotor(LEFT, 30);
           }
           else {
-            moveMotor(LEFT, 25);
-            moveMotor(RIGHT, 25);
+            moveMotor(LEFT, 40);
+            moveMotor(RIGHT, 40);
           }
           last_time = millis();
         }
