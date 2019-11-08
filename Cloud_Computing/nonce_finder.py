@@ -21,7 +21,7 @@ def find_nonce(difficulty_level, start_val=0, step=1, block="COMSM0010cloud"):
     """This function will continually generate nonces and see if they
     are golden"""
     while True:
-        for i in range(start_val, 2**32, step):
+        for i in range(start_val, 2**32+1, step):
             global STOP_THREADS
             sha_f = hashlib.sha256()
             block += str(i)
@@ -29,7 +29,7 @@ def find_nonce(difficulty_level, start_val=0, step=1, block="COMSM0010cloud"):
             sha_f.update(block_bytes)
             sha_f.update(sha_f.digest())
             result = sha_f.digest()
-            bit_shift = 257-difficulty_level
+            bit_shift = 256-difficulty_level
             if STOP_THREADS:
                 return
             if (int.from_bytes(result, byteorder='little', signed=False) >> bit_shift) == 0:
