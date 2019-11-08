@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+#define N_WAY_SS 4
+
 #define N_REGISTERS 64
 int PC;
 int executed_instructions;
@@ -46,74 +48,91 @@ int main(int argc, char *argv[])
 	g_clock = 0;
 	string current_line, current_inst;
 
-	string IFID_command[2];
-	int IDEX_immediate[2];
-	ISA IDEX_command[2];
-	vector<int> IDEX_registers[2];
-	string IFID_instruction_keyword[2], IFID_instruction[2];
-	vector<string> IF_instruction_tokens[2];
-	vector<int> ID_registers[2];
-	int ID_immediate[2];
-	ISA ID_command[2];
+	string IFID_command[N_WAY_SS];
+	int IDEX_immediate[N_WAY_SS];
+	ISA IDEX_command[N_WAY_SS];
+	vector<int> IDEX_registers[N_WAY_SS];
+	string IFID_instruction_keyword[N_WAY_SS], IFID_instruction[N_WAY_SS];
+	vector<string> IF_instruction_tokens[N_WAY_SS];
+	vector<int> ID_registers[N_WAY_SS];
+	int ID_immediate[N_WAY_SS];
+	ISA ID_command[N_WAY_SS];
 
 	for (;;)
 	{
 		if ((g_clock % 2) == 0)
 		{
-			IF_instruction_tokens[0].clear();
-			IF_instruction_tokens[1].clear();
-
+			for (int i = 0; i < N_WAY_SS; i++)
+			{
+				IF_instruction_tokens[i].clear();
+			}
 			if (PC < code.size())
 			{
-				IF_instruction_tokens[0] = fetch.getInstruction(code[PC]);
-				IF_instruction_tokens[1] = fetch.getInstruction(code[PC + 1]);
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+					IF_instruction_tokens[i] = fetch.getInstruction(code[PC + i]);
+				}
 			}
 
 			if (g_clock > 0)
 			{
-				ID_registers[0] = decode.getRegisters(IFID_instruction[0]);
-				ID_immediate[0] = decode.getImmediate(IFID_instruction[0]);
-				ID_command[0] = decode.decode(IFID_command[0]);
-
-				ID_registers[1] = decode.getRegisters(IFID_instruction[1]);
-				ID_immediate[1] = decode.getImmediate(IFID_instruction[1]);
-				ID_command[1] = decode.decode(IFID_command[1]);
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+					ID_registers[i] = decode.getRegisters(IFID_instruction[i]);
+					ID_immediate[i] = decode.getImmediate(IFID_instruction[i]);
+					ID_command[i] = decode.decode(IFID_command[i]);
+				}
 			}
 			if (g_clock > 2)
 			{
-				execute(IDEX_command[0], registers, IDEX_registers[0], IDEX_immediate[0]);
-
-				execute(IDEX_command[1], registers, IDEX_registers[1], IDEX_immediate[1]);
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+					execute(IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
+				}
 			}
 		}
 		else
 		{
-			if (!IF_instruction_tokens[0].empty() && !IF_instruction_tokens[1].empty())
+			bool last = false;
+			for (int i = 0; i < N_WAY_SS; i++)
 			{
-				IFID_command[0] = IF_instruction_tokens[0][0];
-				IFID_instruction[0] = code[PC];
-
-				IFID_command[1] = IF_instruction_tokens[1][0];
-				IFID_instruction[1] = code[PC + 1];
-
+				if (IF_instruction_tokens[i].empty())
+				{
+					last = true;
+				}
+			}
+			if (!last)
+			{
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+					IFID_command[i] = IF_instruction_tokens[i][0];
+					IFID_instruction[i] = code[PC + i];
+				}
 				if (!branch_taken)
 				{
-					PC+=2;
+					PC += N_WAY_SS;
 				}
 				else
 				{
 					branch_taken = !branch_taken;
+					if (N_WAY_SS > 1)
+					{
+						for (int i = 0; i < N_WAY_SS; i++)
+						{
+							IFID_command[i] = NOP;
+						}
+					}
 				}
 			}
+
 			if (g_clock > 1)
 			{
-				IDEX_registers[0] = ID_registers[0];
-				IDEX_immediate[0] = ID_immediate[0];
-				IDEX_command[0] = ID_command[0];
-
-                                IDEX_registers[1] = ID_registers[1];
-				IDEX_immediate[1] = ID_immediate[1];
-				IDEX_command[1] = ID_command[1];
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+					IDEX_registers[i] = ID_registers[i];
+					IDEX_immediate[i] = ID_immediate[i];
+					IDEX_command[i] = ID_command[i];
+				}
 			}
 		}
 
