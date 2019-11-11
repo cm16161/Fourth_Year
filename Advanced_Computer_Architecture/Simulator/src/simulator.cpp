@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 4
+#define N_WAY_SS 2
 
 #define N_REGISTERS 64
 int PC;
