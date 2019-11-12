@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
 					execute(IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
-					if (branch_taken)
+					if (branch_taken && i != N_WAY_SS - 1)
 					{
 						for (int j = i + 1; j < N_WAY_SS; j++)
 						{
