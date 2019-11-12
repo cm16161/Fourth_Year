@@ -20,7 +20,7 @@
 #define DIR_PIN(pin) CAT(pin ,_DIR_PIN)
 #define PWM_PIN(pin) CAT(pin ,_PWM_PIN)
 
-#define ONE_REVOLUTION 1435
+#define ONE_REVOLUTION 1440
 #define CIRCUMFERENCE 220
 #define SPEED 30
 
@@ -42,8 +42,8 @@ PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel po
 #define ki_line 0
 #define kd_line 00
 
-#define kp_head 2
-#define ki_head 0.00000001
+#define kp_head 3
+#define ki_head 0.00000007
 #define kd_head 20
 
 #define kp_left_vel 0.05
@@ -424,13 +424,13 @@ void goHome(Kinematics kinematics) {
   //  Serial.println(home_distance * ONE_REVOLUTION / CIRCUMFERENCE);
 
   if (!g_move_rotate) {
-    float head_output = head_pid.update(home_theta_degrees+180, kinematics.m_theta);
+    float head_output = head_pid.update(home_theta_degrees + 180, kinematics.m_theta);
     if (head_output < -0.1) {
-      moveMotor(LEFT, head_output + 10);
+      moveMotor(LEFT, head_output + 6);
       moveMotor(RIGHT, -head_output);
     }
     else if (head_output > 0.1) {
-      moveMotor(RIGHT, -head_output - 10);
+      moveMotor(RIGHT, -head_output - 1);
       moveMotor(LEFT, head_output);
     }
     else {
@@ -439,35 +439,39 @@ void goHome(Kinematics kinematics) {
       home_distance = getHomeDistance(kinematics);
       count_left = count_right = 0;
       kinematics.m_last_left = kinematics.m_last_right = 0;
+      last_left = last_right = 0;
+      kinematics.m_theta = 0;
       delay(1000);
     }
   }
   else {
-//    float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
-        float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
+    //    float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
+    float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
 
-    if (output_r <= -2.5) {
-//      moveMotor(LEFT, 0);
+    if (output_r <= -2) {
+      //      moveMotor(LEFT, 0);
       stopMotor();
     }
     else {
-      //      float diff = count_right - count_left;
+      float head_output = head_pid.update(2, kinematics.m_theta);
+
+      float diff = count_right - count_left;
       float output_vel_l = left_vel_pid.update(2000, timer3_speed_left);
-      float output_vel_r = right_vel_pid.update(2000, timer3_speed_right);
-      speed_l += output_vel_l;//+diff;
-      speed_r += output_vel_r;//-diff;
+      //      float output_vel_r = right_vel_pid.update(1000, timer3_speed_right);
+      //      speed_l += output_vel_l;//+diff;
+      //      speed_r += output_vel_r;//-diff;
       //      if (diff > 0) {
       //        speed_l += diff;
       //        speed_r -= diff;
       //      }
-      moveMotor(LEFT, speed_l);
-      moveMotor(RIGHT, speed_r);
-      //      moveMotor(LEFT, 70);
-      //      moveMotor(RIGHT, 69);
+      //      moveMotor(LEFT, speed_l);
+      //      moveMotor(RIGHT, speed_r);
+      moveMotor(LEFT, 50 + head_output);
+      moveMotor(RIGHT, 50 - head_output);
       //            moveMotor(LEFT, output_l + 10);
       //      moveMotor(RIGHT, output_l);
-      //                  moveMotor(LEFT, 51.5);
-      //                  moveMotor(RIGHT,49);
+      //      moveMotor(LEFT, 51.5);
+      //      moveMotor(RIGHT, 49);
 
 
     }
@@ -497,6 +501,8 @@ void loop()
   unsigned long elapsed_time, current_time;
   current_time = millis();
   elapsed_time = current_time - last_time;
+  kinematics.update(count_left, count_right);
+
   //  kinematics.update(count_left, count_right);
   //float head_output = head_pid.update(0,kinematics.m_theta);
   //  Serial.println(kinematics.m_theta);
@@ -609,9 +615,9 @@ ISR( TIMER3_COMPA_vect ) {
   timer3_count++;
   float time_diff = timer3_count - last_timer3;
   float delta_cl = count_left - last_left;
-  timer3_speed_left = delta_cl / time_diff;
+  timer3_speed_left = delta_cl;// / time_diff;
   float delta_cr = count_right - last_right;
-  timer3_speed_right = delta_cr / time_diff;
+  timer3_speed_right = delta_cr;// / time_diff;
   last_right = count_right;
   last_left = count_left;
   last_timer3 = timer3_count;

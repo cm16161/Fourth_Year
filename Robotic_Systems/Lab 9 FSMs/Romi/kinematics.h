@@ -9,7 +9,7 @@ const float WHEEL_SEPERATION  = 140;
 const float GEAR_RATIO        = 12;
 const float WHEEL_CIRCUMFERENCE = 220;
 //const float COUNTS_PER_SHAFT_REVOLUTION = ??;
-const float COUNTS_PER_WHEEL_REVOLUTION =  1435;
+const float COUNTS_PER_WHEEL_REVOLUTION =  1440;
 //const float COUNTS_PER_MM               = ??;
 
 class Kinematics
@@ -55,8 +55,8 @@ void Kinematics::update(int count_left, int count_right) {
   float mean_distance_mm = mean_distance * WHEEL_CIRCUMFERENCE / COUNTS_PER_WHEEL_REVOLUTION;
   m_x += mean_distance_mm * cos(m_theta * PI / 180);
   m_y += mean_distance_mm * sin(m_theta * PI / 180);
-  float mm_distance = (mean_distance * WHEEL_CIRCUMFERENCE) / COUNTS_PER_WHEEL_REVOLUTION;
-  m_distance_travelled += mm_distance;
+//  float mm_distance = (mean_distance * WHEEL_CIRCUMFERENCE) / COUNTS_PER_WHEEL_REVOLUTION;
+//  m_distance_travelled += mm_distance;
   //  Serial.print(m_distance_travelled);
   //  Serial.print(", ");
   //  Serial.println(m_theta);
