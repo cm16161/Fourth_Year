@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 2
+#define N_WAY_SS 4
 
 #define N_REGISTERS 64
 int PC;
@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 
 	for (;;)
 	{
+		int remaining_commands = 0;
 		if ((g_clock % 2) == 0)
 		{
 			for (int i = 0; i < N_WAY_SS; i++)
@@ -88,6 +89,13 @@ int main(int argc, char *argv[])
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
 					execute(IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
+					if (branch_taken)
+					{
+						for (int j = i + 1; j < N_WAY_SS; j++)
+						{
+							IDEX_command[j] = NOP;
+						}
+					}
 				}
 			}
 		}
@@ -99,6 +107,10 @@ int main(int argc, char *argv[])
 				if (IF_instruction_tokens[i].empty())
 				{
 					last = true;
+				}
+				else
+				{
+					remaining_commands++;
 				}
 			}
 			if (!last)
@@ -112,16 +124,26 @@ int main(int argc, char *argv[])
 				{
 					PC += N_WAY_SS;
 				}
-				else
+			}
+			else
+			{
+				for (int i = 0; i < remaining_commands; i++)
 				{
-					branch_taken = !branch_taken;
-					if (N_WAY_SS > 1)
 					{
-						for (int i = 0; i < N_WAY_SS; i++)
-						{
-							IFID_command[i] = NOP;
-						}
+						IFID_command[i] = IF_instruction_tokens[i][0];
+						IFID_instruction[i] = code[PC + i];
 					}
+				}
+			}
+			if (branch_taken)
+			{
+
+				branch_taken = !branch_taken;
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+
+					IFID_command[i] = NOP;
+					ID_command[i] = NOP;
 				}
 			}
 
