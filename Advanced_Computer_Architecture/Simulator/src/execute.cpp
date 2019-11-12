@@ -3,7 +3,7 @@
 extern int executed_instructions;
 extern int g_clock;
 //TODO Move Registers to separate folder!
-void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
 	static int nop_count = 0;
 	static MEM &mem = MEM::getInstance();
@@ -119,4 +119,5 @@ void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_
 		break;
 	}
 	executed_instructions++;
+        return alu.m_lock;
 }

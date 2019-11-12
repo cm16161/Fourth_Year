@@ -6,4 +6,4 @@
 #include <cmath>
 using namespace std;
 
-void execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate);
+int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate);

@@ -58,11 +58,15 @@ int main(int argc, char *argv[])
 	vector<int> ID_registers[N_WAY_SS];
 	int ID_immediate[N_WAY_SS];
 	ISA ID_command[N_WAY_SS];
-	bool complete[N_WAY_SS];
+	int durations[N_WAY_SS];
 
 	for (;;)
 	{
 		int remaining_commands = 0;
+		for (int i = 0; i < N_WAY_SS; i++)
+		{
+			durations[i] = 0;
+		}
 		if ((g_clock % 2) == 0)
 		{
 			for (int i = 0; i < N_WAY_SS; i++)
@@ -90,7 +94,7 @@ int main(int argc, char *argv[])
 			{
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
-					execute(alu[i], IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
+					durations[i] = execute(alu[i], IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
 					if (branch_taken && i != N_WAY_SS - 1)
 					{
 						for (int j = i + 1; j < N_WAY_SS; j++)
@@ -99,6 +103,15 @@ int main(int argc, char *argv[])
 						}
 					}
 				}
+				int max = -1;
+				for (int i = 0; i < N_WAY_SS; i++)
+				{
+					if (durations[i] >= max)
+					{
+						max = durations[i];
+					}
+				}
+				g_clock += 2 * max;
 			}
 		}
 		else

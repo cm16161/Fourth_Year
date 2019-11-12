@@ -150,10 +150,6 @@ public:
 	int run()
 	{
 		*m_rd = *m_rs / *m_rt;
-                m_duration--;
-                if(m_duration == 0){
-                  m_complete = true;
-                }
 		return *m_rd;
 	}
 };

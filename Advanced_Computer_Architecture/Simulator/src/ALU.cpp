@@ -29,7 +29,7 @@ int ALU::mul(int *rs, int *rt, int *rd)
 int ALU::div(int *rs, int *rt, int *rd)
 {
 	DIV division(rs, rt, rd);
-
+	m_lock = division.m_duration;
 	return division.run();
 }
 
