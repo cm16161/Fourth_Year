@@ -24,56 +24,54 @@ def get_args():
 #     Filters=[{'Name': 'instance-state-name', 'Values': ['running',
 #                                                         'terminated']}])
 def send_to_cloud(difficulty=1, start_val=0, step=1):
-    while True:
-        global STOP_THREADS
-        ec2 = boto3.resource('ec2', region_name='us-east-2')
-        response = ec2.create_instances(InstanceInitiatedShutdownBehavior='terminate',
-                                        ImageId='ami-00c03f7f7f2ec15c3',
-                                        MinCount=1,
-                                        MaxCount=1,
-                                        InstanceType='t2.micro',
-                                        KeyName="ChetsKey",
-                                        SecurityGroupIds=["sg-220b9640"]
-        )
-        
-        i = response[0]
-        i.wait_until_running()
-        i.load()
-        time.sleep(40)
-
-        instances = ec2.instances.filter(
-            Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-
-        ip = i.public_dns_name
-        print(ip)
-        for instance in instances:
-            print("Waiting for connection...")
-            while instance.public_ip_address is None:
-                pass
+    global STOP_THREADS
+    ec2 = boto3.resource('ec2', region_name='us-east-1')
+    response = ec2.create_instances(InstanceInitiatedShutdownBehavior='terminate',
+                                    ImageId='ami-00dc79254d0461090',
+                                    MinCount=1,
+                                    MaxCount=1,
+                                    InstanceType='t2.micro',
+                                    KeyName="Cloud_Computing",
+                                    SecurityGroupIds=["sg-0519526ab7b541838"]
+    )
     
+    i = response[0]
+    i.wait_until_running()
+    i.load()
+    time.sleep(40)
 
-            key = paramiko.RSAKey.from_private_key_file("ChetsKey.pem")
-            ssh = paramiko.SSHClient()
-
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(hostname=ip, username='ec2-user', pkey=key)
-            sftp = ssh.open_sftp()
-
-            sftp.put("nonce_finder.py", "/home/ec2-user/nonce_finder.py")
+    instances = ec2.instances.filter(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+    
+    ip = i.public_dns_name
+    print(ip)
+    for instance in instances:
+        print("Waiting for connection...")
+        while instance.public_ip_address is None:
+            pass
             
-            command_to_run = "sudo yum install python3 -y > /dev/null && python3 nonce_finder.py -d " + str(difficulty) + " --start " + str(start_val) + " --step " + str(step)
+
+        key = paramiko.RSAKey.from_private_key_file("Cloud_Computing.pem")
+        ssh = paramiko.SSHClient()
+        
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=ip, username='ec2-user', pkey=key)
+        sftp = ssh.open_sftp()
+
+        sftp.put("nonce_finder.py", "/home/ec2-user/nonce_finder.py")
             
-            stdin, stdout, stderr = ssh.exec_command(command_to_run)
-            if STOP_THREADS:
-                sftp.close()
-                ssh.close()
-                return
-            print(stdout.readlines())
-            STOP_THREADS= True
+        command_to_run = "sudo yum install python3 -y > /dev/null && python3 nonce_finder.py -d " + str(difficulty) + " --start " + str(start_val) + " --step " + str(step)
+            
+        stdin, stdout, stderr = ssh.exec_command(command_to_run)
+        if STOP_THREADS:
             sftp.close()
             ssh.close()
-            kill_instances.kill()
             return
+        print(stdout.readlines())
+        STOP_THREADS= True
+        sftp.close()
+        ssh.close()
+        return
 
 
 def main():
@@ -86,15 +84,22 @@ def main():
         step = args.n_threads
         _x = multiprocessing.Process(target=send_to_cloud, daemon=True,
                               args=(args.difficulty, int(start_val), int(step)))
-        # _x.setDaemon(True)
         threads.append(_x)
         _x.start()
+    wait = True
 
-    while not STOP_THREADS:
-        pass
-    
-    # for _t in threads:
-    #      _t.join()
+    while wait:
+        for _t in threads:
+            if _t.is_alive():
+                pass
+            else:
+                wait = False
+                # _t.terminate()
+                # kill_instances.kill()
+
+    for _t in threads:
+        # _t.join(0)
+        _t.terminate()
 
     kill_instances.kill()
 
