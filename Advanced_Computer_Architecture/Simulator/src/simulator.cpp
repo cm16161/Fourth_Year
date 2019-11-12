@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 	PC = 0;
 	Fetch &fetch = Fetch::getInstance();
 	Decode &decode = Decode::getInstance();
+	ALU alu[N_WAY_SS];
 	int registers[N_REGISTERS] = { 0 };
 	vector<string> tokens, code;
 	vector<int> registers_to_use;
@@ -57,6 +58,7 @@ int main(int argc, char *argv[])
 	vector<int> ID_registers[N_WAY_SS];
 	int ID_immediate[N_WAY_SS];
 	ISA ID_command[N_WAY_SS];
+	bool complete[N_WAY_SS];
 
 	for (;;)
 	{
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
 			{
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
-					execute(IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
+					execute(alu[i], IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
 					if (branch_taken && i != N_WAY_SS - 1)
 					{
 						for (int j = i + 1; j < N_WAY_SS; j++)

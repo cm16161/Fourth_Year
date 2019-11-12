@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.cpp
+ALU.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
+
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ALU.hpp
 ISA.hpp
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/ISA.hpp
@@ -30,6 +34,12 @@ cstring
 string
 -
 vector
+-
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.cpp
+execute.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp
+iostream
 -
 
 /home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator/src/execute.hpp

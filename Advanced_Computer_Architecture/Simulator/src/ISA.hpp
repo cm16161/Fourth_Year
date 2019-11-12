@@ -9,12 +9,13 @@ class Instruction
 {
 public:
 	virtual int run() = 0;
+	bool m_complete = false;
 };
 
 class R : public Instruction
 {
 public:
-	int *m_rs, *m_rt, *m_rd, m_shamt;
+	int *m_rs, *m_rt, *m_rd, m_shamt, m_duration;
 	R(int *rs, int *rt, int *rd, int shamt, int funct)
 	{
 
@@ -143,11 +144,16 @@ public:
 		m_rs = rs;
 		m_rt = rt;
 		m_rd = rd;
+		m_duration = 4;
 	}
 
 	int run()
 	{
 		*m_rd = *m_rs / *m_rt;
+                m_duration--;
+                if(m_duration == 0){
+                  m_complete = true;
+                }
 		return *m_rd;
 	}
 };
@@ -511,50 +517,6 @@ public:
 		return PC;
 	}
 };
-
-// class BEQ : public I
-// {
-// public:
-// 	BEQ()
-// 	{
-// 	}
-// 	BEQ(int *rs, int *rd, int immediate)
-// 	{
-// 		m_rs = rs;
-// 		m_rd = rd;
-// 		m_immediate = immediate;
-// 	}
-// 	int run()
-// 	{
-// 		if (*m_rs == *m_rd)
-// 		{
-// 			PC = m_immediate;
-// 		}
-// 		return PC;
-// 	}
-// };
-
-// class BNE : public I
-// {
-// public:
-// 	BNE()
-// 	{
-// 	}
-// 	BNE(int *rs, int *rd, int immediate)
-// 	{
-// 		m_rs = rs;
-// 		m_rd = rd;
-// 		m_immediate = immediate;
-// 	}
-// 	int run()
-// 	{
-// 		if (*m_rs != *m_rd)
-// 		{
-// 			PC = m_immediate;
-// 		}
-// 		return PC;
-// 	}
-// };
 
 class LDI : public I
 {
