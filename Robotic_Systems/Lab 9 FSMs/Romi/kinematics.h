@@ -5,7 +5,7 @@
 //You may want to use some/all of these variables
 const float WHEEL_DIAMETER    = 70;
 const float WHEEL_RADIUS      = 35;
-const float WHEEL_SEPERATION  = 140;
+const float WHEEL_SEPERATION  = 142.5;
 const float GEAR_RATIO        = 12;
 const float WHEEL_CIRCUMFERENCE = 220;
 //const float COUNTS_PER_SHAFT_REVOLUTION = ??;

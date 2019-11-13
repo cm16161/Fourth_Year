@@ -42,8 +42,8 @@ PID left_PID(Kp_left, Ki_left, Kd_left); //Position controller for left wheel po
 #define ki_line 0
 #define kd_line 00
 
-#define kp_head 3
-#define ki_head 0.00000007
+#define kp_head 5
+#define ki_head 0.00000001
 #define kd_head 20
 
 #define kp_left_vel 0.05
@@ -94,7 +94,8 @@ enum state {
   pre_line,
   on_line,
   found_end_of_line,
-  go_home
+  go_home,
+  at_home,
 };
 
 state g_state;
@@ -425,12 +426,22 @@ void goHome(Kinematics kinematics) {
 
   if (!g_move_rotate) {
     float head_output = head_pid.update(home_theta_degrees + 180, kinematics.m_theta);
+    if (home_theta_degrees + 180 - kinematics.m_theta <= 0.0001) {
+      stopMotor();
+      g_move_rotate = !g_move_rotate;
+      home_distance = getHomeDistance(kinematics);
+      count_left = count_right = 0;
+      kinematics.m_last_left = kinematics.m_last_right = 0;
+      last_left = last_right = 0;
+      kinematics.m_theta = 0;
+      delay(1000);
+    }
     if (head_output < -0.1) {
-      moveMotor(LEFT, head_output + 6);
+      moveMotor(LEFT, head_output + 1);
       moveMotor(RIGHT, -head_output);
     }
     else if (head_output > 0.1) {
-      moveMotor(RIGHT, -head_output - 1);
+      moveMotor(RIGHT, -head_output);
       moveMotor(LEFT, head_output);
     }
     else {
@@ -447,16 +458,23 @@ void goHome(Kinematics kinematics) {
   else {
     //    float output_l = left_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_left);
     float output_r = right_pid.update(home_distance * ONE_REVOLUTION / CIRCUMFERENCE, count_right);
-
-    if (output_r <= -2) {
+    
+    if (home_distance * ONE_REVOLUTION / CIRCUMFERENCE - count_right <= 15) {
+      stopMotor();
+      g_state = at_home;
+    }
+    
+    if (output_r <= 15) {
       //      moveMotor(LEFT, 0);
       stopMotor();
+      g_state = at_home;
     }
-    else {
-      float head_output = head_pid.update(2, kinematics.m_theta);
 
-      float diff = count_right - count_left;
-      float output_vel_l = left_vel_pid.update(2000, timer3_speed_left);
+    else {
+      float head_output = head_pid.update(0, kinematics.m_theta);
+
+      //      float diff = count_right - count_left;
+      //      float output_vel_l = left_vel_pid.update(2000, timer3_speed_left);
       //      float output_vel_r = right_vel_pid.update(1000, timer3_speed_right);
       //      speed_l += output_vel_l;//+diff;
       //      speed_r += output_vel_r;//-diff;
@@ -466,8 +484,8 @@ void goHome(Kinematics kinematics) {
       //      }
       //      moveMotor(LEFT, speed_l);
       //      moveMotor(RIGHT, speed_r);
-      moveMotor(LEFT, 50 + head_output);
-      moveMotor(RIGHT, 50 - head_output);
+      moveMotor(LEFT, 30 + 2.2 * head_output);
+      moveMotor(RIGHT, 30 - 2 * head_output);
       //            moveMotor(LEFT, output_l + 10);
       //      moveMotor(RIGHT, output_l);
       //      moveMotor(LEFT, 51.5);
@@ -570,6 +588,15 @@ void loop()
     case go_home:
       goHome(kinematics);
       break;
+    case at_home:
+      static int f_buz_count = 0;
+      if (elapsed_time > 500) {
+        if (f_buz_count < 4) {
+          toggleBuzzer();
+          f_buz_count++;
+        }
+        last_time = millis();
+      }
   }
 
 
