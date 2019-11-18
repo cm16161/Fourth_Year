@@ -42,6 +42,12 @@ int main(int argc, char *argv[])
 	Decode &decode = Decode::getInstance();
 	ALU alu[N_WAY_SS];
 	int registers[N_REGISTERS] = { 0 };
+	bool registers_in_use[N_REGISTERS] = { false };
+	int register_rename[N_REGISTERS];
+	for (int i = 0; i < N_REGISTERS; i++)
+	{
+		register_rename[i] = i;
+	}
 	vector<string> tokens, code;
 	vector<int> registers_to_use;
 	int immediate;
@@ -62,7 +68,6 @@ int main(int argc, char *argv[])
 
 	for (;;)
 	{
-		int remaining_commands = 0;
 		for (int i = 0; i < N_WAY_SS; i++)
 		{
 			durations[i] = 0;
@@ -92,9 +97,16 @@ int main(int argc, char *argv[])
 			}
 			if (g_clock > 2)
 			{
+				int targets[N_WAY_SS];
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
 					durations[i] = execute(alu[i], IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
+					if (IDEX_command[i] != NOP && IDEX_command[i] != BNE && IDEX_command[i] != BEQ &&
+					    IDEX_command[i] != ST)
+					{
+						registers_in_use[IDEX_registers[i][0]] = false;
+					}
+
 					if (branch_taken && i != N_WAY_SS - 1)
 					{
 						for (int j = i + 1; j < N_WAY_SS; j++)
@@ -117,6 +129,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			bool last = false;
+			int remaining_commands = 0;
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
 				if (IF_instruction_tokens[i].empty())
@@ -164,8 +177,36 @@ int main(int argc, char *argv[])
 
 			if (g_clock > 1)
 			{
+
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
+					if (ID_command[i] != NOP && ID_command[i] != BNE && ID_command[i] != BEQ && ID_command[i] != ST)
+					{
+						if (!ID_registers[i].empty())
+						{
+							int target = ID_registers[i][0];
+							if (registers_in_use[target])
+							{
+								for (int j = 0; j < N_REGISTERS; j++)
+								{
+									if (!registers_in_use[j])
+									{
+										registers_in_use[j] = true;
+										register_rename[target] = j;
+										ID_registers[i][0] = j;
+									}
+								}
+							}
+							else
+							{
+								registers_in_use[target] = true;
+							}
+						}
+					}
+					for (int j = 0 ; j < ID_registers[i].size(); j++)
+					{
+                                                ID_registers[i][j] = register_rename[ID_registers[i][j]];
+					}
 					IDEX_registers[i] = ID_registers[i];
 					IDEX_immediate[i] = ID_immediate[i];
 					IDEX_command[i] = ID_command[i];
