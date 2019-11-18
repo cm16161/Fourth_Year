@@ -97,10 +97,23 @@ int main(int argc, char *argv[])
 			}
 			if (g_clock > 2)
 			{
-				int targets[N_WAY_SS];
+				int targets[N_WAY_SS] = { 0 };
+				int delay = 0;
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
+					targets[i] = IDEX_registers[i][0];
 					durations[i] = execute(alu[i], IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
+					for (int j = 1; j < IDEX_registers[i].size(); j++)
+					{
+						for (int k = i-1; k >=0; k--)
+						{
+							if (IDEX_registers[i][j] == targets[k])
+							{
+								delay += durations[i];
+                                                                break;
+							}
+						}
+					}
 					if (IDEX_command[i] != NOP && IDEX_command[i] != BNE && IDEX_command[i] != BEQ &&
 					    IDEX_command[i] != ST)
 					{
@@ -123,7 +136,14 @@ int main(int argc, char *argv[])
 						max = durations[i];
 					}
 				}
-				g_clock += 2 * max;
+				if (delay < max)
+				{
+					g_clock += 2 * max;
+				}
+				else
+				{
+					g_clock += 2 * delay;
+				}
 			}
 		}
 		else
@@ -203,9 +223,9 @@ int main(int argc, char *argv[])
 							}
 						}
 					}
-					for (int j = 0 ; j < ID_registers[i].size(); j++)
+					for (int j = 0; j < ID_registers[i].size(); j++)
 					{
-                                                ID_registers[i][j] = register_rename[ID_registers[i][j]];
+						ID_registers[i][j] = register_rename[ID_registers[i][j]];
 					}
 					IDEX_registers[i] = ID_registers[i];
 					IDEX_immediate[i] = ID_immediate[i];
