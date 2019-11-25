@@ -57,7 +57,7 @@ def send_to_cloud(difficulty=1, start_val=0, step=1):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=ip, username='ec2-user', pkey=key)
         sftp = ssh.open_sftp()
-
+        print("Executing on: ec2-user@"+ip)
         sftp.put("nonce_finder.py", "/home/ec2-user/nonce_finder.py")
             
         command_to_run = "sudo yum install python3 -y > /dev/null && python3 nonce_finder.py -d " + str(difficulty) + " --start " + str(start_val) + " --step " + str(step)
@@ -100,7 +100,7 @@ def main():
     for _t in threads:
         # _t.join(0)
         _t.terminate()
-
+    
     kill_instances.kill()
 
 if __name__ == '__main__':
