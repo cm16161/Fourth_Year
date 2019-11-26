@@ -98,4 +98,224 @@ Time for D=20
 real	2m25.383s
 user	1m16.328s
 sys	0m24.926s
-Time for D=21
+Time for N=7 D=21
+
+real	20m49.747s
+user	15m35.694s
+sys	5m8.183s
+Time for N=7 D=22
+Process Process-1:
+Traceback (most recent call last):
+  File "/usr/lib/python3.7/multiprocessing/process.py", line 297, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.7/multiprocessing/process.py", line 99, in run
+    self._target(*self._args, **self._kwargs)
+  File "generate_in_cloud.py", line 58, in send_to_cloud
+    ssh.connect(hostname=ip, username='ec2-user', pkey=key)
+  File "/usr/lib/python3.7/site-packages/paramiko/client.py", line 368, in connect
+    raise NoValidConnectionsError(errors)
+paramiko.ssh_exception.NoValidConnectionsError: [Errno None] Unable to connect to port 22 on 54.91.131.132
+
+real	1m21.116s
+user	0m58.166s
+sys	0m17.546s
+Time for N=7 D=23
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 107, in <module>
+    main()
+  File "generate_in_cloud.py", line 93, in main
+    if _t.is_alive():
+  File "/usr/lib/python3.7/multiprocessing/process.py", line 156, in is_alive
+    returncode = self._popen.poll()
+  File "/usr/lib/python3.7/multiprocessing/popen_fork.py", line 26, in poll
+    if self.returncode is None:
+KeyboardInterrupt
+
+real	0m45.512s
+user	0m36.403s
+sys	0m10.635s
+Time for N=7 D=24
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 2, in <module>
+    import boto3
+  File "/usr/lib/python3.7/site-packages/boto3/__init__.py", line 16, in <module>
+    from boto3.session import Session
+  File "/usr/lib/python3.7/site-packages/boto3/session.py", line 25, in <module>
+    from .resources.factory import ResourceFactory
+  File "/usr/lib/python3.7/site-packages/boto3/resources/factory.py", line 17, in <module>
+    from .action import ServiceAction
+  File "/usr/lib/python3.7/site-packages/boto3/resources/action.py", line 22, in <module>
+    from boto3.docs.docstring import ActionDocstring
+  File "/usr/lib/python3.7/site-packages/boto3/docs/__init__.py", line 15, in <module>
+    from boto3.docs.service import ServiceDocumenter
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 963, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 906, in _find_spec
+  File "<frozen importlib._bootstrap_external>", line 1280, in find_spec
+  File "<frozen importlib._bootstrap_external>", line 1252, in _get_spec
+  File "<frozen importlib._bootstrap_external>", line 1368, in find_spec
+  File "<frozen importlib._bootstrap_external>", line 1408, in _fill_cache
+KeyboardInterrupt
+
+real	0m0.196s
+user	0m0.185s
+sys	0m0.007s
+Time for N=7 D=25
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 2, in <module>
+    import boto3
+  File "/usr/lib/python3.7/site-packages/boto3/__init__.py", line 16, in <module>
+    from boto3.session import Session
+  File "/usr/lib/python3.7/site-packages/boto3/session.py", line 17, in <module>
+    import botocore.session
+  File "/usr/lib/python3.7/site-packages/botocore/session.py", line 39, in <module>
+    from botocore import handlers
+  File "/usr/lib/python3.7/site-packages/botocore/handlers.py", line 25, in <module>
+    import uuid
+  File "/usr/lib/python3.7/uuid.py", line 556, in <module>
+    import _uuid
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 963, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 906, in _find_spec
+  File "<frozen importlib._bootstrap_external>", line 1280, in find_spec
+  File "<frozen importlib._bootstrap_external>", line 1252, in _get_spec
+  File "<frozen importlib._bootstrap_external>", line 1396, in find_spec
+  File "<frozen importlib._bootstrap_external>", line 1352, in _get_spec
+  File "<frozen importlib._bootstrap_external>", line 1031, in __init__
+KeyboardInterrupt
+
+real	0m0.156s
+user	0m0.145s
+sys	0m0.010s
+Time for N=7 D=26
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 2, in <module>
+    import boto3
+  File "/usr/lib/python3.7/site-packages/boto3/__init__.py", line 16, in <module>
+    from boto3.session import Session
+  File "/usr/lib/python3.7/site-packages/boto3/session.py", line 17, in <module>
+    import botocore.session
+  File "/usr/lib/python3.7/site-packages/botocore/session.py", line 38, in <module>
+    from botocore.errorfactory import ClientExceptionsFactory
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 724, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 818, in get_code
+  File "<frozen importlib._bootstrap_external>", line 916, in get_data
+KeyboardInterrupt
+
+real	0m0.141s
+user	0m0.133s
+sys	0m0.007s
+Time for N=7 D=27
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 2, in <module>
+    import boto3
+  File "/usr/lib/python3.7/site-packages/boto3/__init__.py", line 16, in <module>
+    from boto3.session import Session
+  File "/usr/lib/python3.7/site-packages/boto3/session.py", line 17, in <module>
+    import botocore.session
+  File "/usr/lib/python3.7/site-packages/botocore/session.py", line 30, in <module>
+    import botocore.credentials
+  File "/usr/lib/python3.7/site-packages/botocore/credentials.py", line 26, in <module>
+    from dateutil.parser import parse
+  File "/usr/lib/python3.7/site-packages/dateutil/parser/__init__.py", line 2, in <module>
+    from ._parser import parse, parser, parserinfo, ParserError
+  File "/usr/lib/python3.7/site-packages/dateutil/parser/_parser.py", line 49, in <module>
+    from .. import relativedelta
+  File "/usr/lib/python3.7/site-packages/dateutil/relativedelta.py", line 11, in <module>
+    from ._common import weekday
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 724, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 857, in get_code
+  File "<frozen importlib._bootstrap_external>", line 529, in _compile_bytecode
+KeyboardInterrupt
+
+real	0m0.146s
+user	0m0.136s
+sys	0m0.007s
+Time for N=7 D=28
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 2, in <module>
+    import boto3
+  File "/usr/lib/python3.7/site-packages/boto3/__init__.py", line 16, in <module>
+    from boto3.session import Session
+  File "/usr/lib/python3.7/site-packages/boto3/session.py", line 17, in <module>
+    import botocore.session
+  File "/usr/lib/python3.7/site-packages/botocore/session.py", line 30, in <module>
+    import botocore.credentials
+  File "/usr/lib/python3.7/site-packages/botocore/credentials.py", line 34, in <module>
+    from botocore.config import Config
+  File "/usr/lib/python3.7/site-packages/botocore/config.py", line 16, in <module>
+    from botocore.endpoint import DEFAULT_TIMEOUT, MAX_POOL_CONNECTIONS
+  File "/usr/lib/python3.7/site-packages/botocore/endpoint.py", line 22, in <module>
+    from botocore.awsrequest import create_request_object
+  File "/usr/lib/python3.7/site-packages/botocore/awsrequest.py", line 26, in <module>
+    import botocore.utils
+  File "/usr/lib/python3.7/site-packages/botocore/utils.py", line 24, in <module>
+    import cgi
+  File "/usr/lib/python3.7/cgi.py", line 42, in <module>
+    import html
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 963, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 906, in _find_spec
+  File "<frozen importlib._bootstrap_external>", line 1280, in find_spec
+  File "<frozen importlib._bootstrap_external>", line 1252, in _get_spec
+  File "<frozen importlib._bootstrap_external>", line 1391, in find_spec
+  File "<frozen importlib._bootstrap_external>", line 59, in _path_join
+KeyboardInterrupt
+
+real	0m0.131s
+user	0m0.115s
+sys	0m0.009s
+Time for N=7 D=29
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 107, in <module>
+    main()
+  File "generate_in_cloud.py", line 93, in main
+    if _t.is_alive():
+  File "/usr/lib/python3.7/multiprocessing/process.py", line 151, in is_alive
+    assert self._parent_pid == os.getpid(), 'can only test a child process'
+KeyboardInterrupt
+Time for N=7 D=30
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 2, in <module>
+    import boto3
+  File "/usr/lib/python3.7/site-packages/boto3/__init__.py", line 14, in <module>
+    import logging
+  File "/usr/lib/python3.7/logging/__init__.py", line 26, in <module>
+    import sys, os, time, io, traceback, warnings, weakref, collections.abc
+  File "/usr/lib/python3.7/traceback.py", line 5, in <module>
+    import linecache
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 724, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 857, in get_code
+  File "<frozen importlib._bootstrap_external>", line 525, in _compile_bytecode
+KeyboardInterrupt
+
+real	0m0.026s
+user	0m0.023s
+sys	0m0.003s
+Time for N=7 D=31
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 1, in <module>
+    import sys
+KeyboardInterrupt
+
+real	0m0.021s
+user	0m0.021s
+sys	0m0.000s
+Time for N=7 D=32
+Traceback (most recent call last):
+  File "generate_in_cloud.py", line 1, in <module>
+    import sys
+KeyboardInterrupt
+
+real	0m0.028s
+user	0m0.017s
+sys	0m0.011s
