@@ -1,0 +1,101 @@
+Time for D=1
+
+real	1m33.715s
+user	1m1.977s
+sys	0m18.399s
+Time for D=2
+
+real	1m33.816s
+user	1m1.848s
+sys	0m19.325s
+Time for D=3
+
+real	1m34.384s
+user	1m1.838s
+sys	0m19.461s
+Time for D=4
+
+real	1m34.330s
+user	1m0.657s
+sys	0m19.427s
+Time for D=5
+
+real	1m37.104s
+user	1m0.794s
+sys	0m19.616s
+Time for D=6
+
+real	1m39.251s
+user	1m1.469s
+sys	0m19.453s
+Time for D=7
+
+real	1m39.508s
+user	1m1.138s
+sys	0m19.294s
+Time for D=8
+
+real	1m42.212s
+user	1m1.081s
+sys	0m19.509s
+Time for D=9
+
+real	1m43.208s
+user	1m1.026s
+sys	0m19.805s
+Time for D=10
+
+real	1m43.145s
+user	1m0.259s
+sys	0m20.497s
+Time for D=11
+
+real	1m45.759s
+user	1m1.947s
+sys	0m19.241s
+Time for D=12
+
+real	1m46.502s
+user	1m1.575s
+sys	0m18.843s
+Time for D=13
+
+real	1m46.094s
+user	1m1.098s
+sys	0m19.770s
+Time for D=14
+
+real	1m49.820s
+user	1m1.565s
+sys	0m19.737s
+Time for D=15
+
+real	1m48.509s
+user	1m1.662s
+sys	0m19.463s
+Time for D=16
+
+real	2m1.640s
+user	1m9.856s
+sys	0m22.271s
+Time for D=17
+
+real	2m5.915s
+user	1m9.622s
+sys	0m22.659s
+Time for D=18
+
+real	2m5.305s
+user	1m9.293s
+sys	0m22.920s
+Time for D=19
+
+real	2m16.778s
+user	1m12.578s
+sys	0m29.116s
+Time for D=20
+
+real	2m25.383s
+user	1m16.328s
+sys	0m24.926s
+Time for D=21
