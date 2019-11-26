@@ -36,6 +36,7 @@ enum ISA
 	LD,
 	LDI,
 	ST,
+        SEQ,
 
 };
 

@@ -106,6 +106,9 @@ int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_f
 	case LDI:
 		cout << " [ LDI ] " << alu.ldi(&registers[register_file[0]], immediate) << endl;
 		break;
+	case SEQ:
+		cout << " [ SEQ ] " << alu.seq(&registers[register_file[1]], &registers[register_file[0]], immediate) << endl;
+		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
 		cout << " { " << executed_instructions << " } Instructions Executed " << endl;
@@ -119,5 +122,5 @@ int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_f
 		break;
 	}
 	executed_instructions++;
-        return alu.m_lock;
+	return alu.m_lock;
 }

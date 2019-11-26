@@ -472,6 +472,25 @@ public:
 	}
 };
 
+class SEQ : public I
+{
+public:
+	SEQ()
+	{
+	}
+	SEQ(int *rs, int *rd, int immediate)
+	{
+		m_rs = rs;
+		m_rd = rd;
+		m_immediate = immediate;
+	}
+	int run()
+	{
+		*m_rd = *m_rs == m_immediate ? 1 : 0;
+		return *m_rd;
+	}
+};
+
 /*
 ///////////////////////////////////////////////////////////////////////////
 

@@ -124,6 +124,12 @@ int ALU::slti(int *rs, int *rd, int immediate)
 	return slti.run();
 }
 
+int ALU::seq(int *rs, int *rd, int immediate)
+{
+  SEQ seq(rs, rd, immediate);
+  return seq.run();
+}
+
 int ALU::ji(int immediate)
 {
 	JI ji(immediate);

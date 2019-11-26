@@ -5,11 +5,11 @@
 
 class ALU
 {
-  //ALU(){};
+	//ALU(){};
 
 public:
 	static ALU &getInstance();
-  ALU(){};
+	ALU(){};
 	int m_lock = 0;
 	int add(int *rs, int *rt, int *rd);
 	int sub(int *rs, int *rt, int *rd);
@@ -31,6 +31,8 @@ public:
 	int divi(int *rs, int *rd, int immediate);
 	int modi(int *rs, int *rd, int immediate);
 	int slti(int *rs, int *rd, int immediate);
+
+	int seq(int *rs, int *rd, int immediate);
 
 	int ji(int address);
 	int jr(int *rs);
