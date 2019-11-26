@@ -2,6 +2,7 @@
 import hashlib
 import threading
 import argparse
+import time
 
 STOP_THREADS = False
 
@@ -42,21 +43,10 @@ def find_nonce(difficulty_level, start_val=0, step=1, block="COMSM0010cloud"):
 def main():
     """Main Function"""
     args = get_args()
-    #threads = list()
     start_val = args.start
     step_size = args.step
     difficulty= args.difficulty
     find_nonce(difficulty, start_val, step_size)
-    # for _t in range(args.n_threads):
-    #     start_val = (2**32 / args.n_threads)*_t
-    #     end_val = (2**32 / args.n_threads)*(_t+1)
-    #     _x = threading.Thread(target=find_nonce, args=(args.difficulty,
-    #                                                    int(start_val), int(end_val),))
-    #     threads.append(_x)
-    #     _x.start()
-
-    # for _t in threads:
-    #     _t.join()
 
 if __name__ == '__main__':
     main()
