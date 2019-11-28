@@ -1,0 +1,26 @@
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  "CXX"
+  )
+# The set of files for implicit dependencies of each language:
+set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ALU.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/ALU.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/branch.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/branch.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/decode.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/decode.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/execute.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/execute.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/fetch.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/fetch.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/memory.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/memory.cpp.o"
+  "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/simulator.cpp" "/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/build/src/CMakeFiles/simulator.dir/simulator.cpp.o"
+  )
+set(CMAKE_CXX_COMPILER_ID "GNU")
+
+# The include file search paths:
+set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  )
+
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

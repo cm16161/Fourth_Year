@@ -1,0 +1,130 @@
+#include "execute.hpp"
+#include <iostream>
+extern int executed_instructions;
+extern int g_clock;
+//TODO Move Registers to separate folder!
+int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+{
+	static int nop_count = 0;
+	static MEM &mem = MEM::getInstance();
+	int result;
+	switch (instructions)
+	{
+	case ADD:
+		result = alu.add(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ ADD ] " << alu.add(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case SUB:
+		result = alu.sub(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ SUB ] " << alu.sub(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case MUL:
+		result = alu.mul(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ MUL ] " << alu.mul(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case DIV:
+		result = alu.div(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ DIV ] " << alu.div(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case MOD:
+		result = alu.mod(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ MOD ] " << alu.mod(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case SLL:
+		result = alu.sll(&registers[register_file[1]], immediate);
+		cout << " [ SLL ] " << alu.sll(&registers[register_file[1]], immediate) << endl;
+		break;
+	case SRL:
+		result = alu.srl(&registers[register_file[1]], immediate);
+		cout << " [ SRL ] " << alu.srl(&registers[register_file[1]], immediate) << endl;
+		break;
+	case AND:
+		result = alu.and_op(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ AND ] " << alu.and_op(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case ORR:
+		result = alu.orr(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ ORR ] " << alu.orr(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case NOR:
+		result = alu.nor(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ NOR ] " << alu.nor(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case SLT:
+		result = alu.slt(&registers[register_file[1]], &registers[register_file[2]]);
+		cout << " [ SLT ] " << alu.slt(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		break;
+	case ADDI:
+		result = alu.addi(&registers[register_file[1]], immediate);
+		cout << " [ ADDI ] " << alu.addi(&registers[register_file[1]], immediate) << endl;
+		break;
+	case SUBI:
+		result = alu.subi(&registers[register_file[1]], immediate);
+		cout << " [ SUBI ] " << alu.subi(&registers[register_file[1]], immediate) << endl;
+		break;
+	case MULI:
+		result = alu.muli(&registers[register_file[1]], immediate);
+		cout << " [ MULI ] " << alu.muli(&registers[register_file[1]], immediate) << endl;
+		break;
+	case DIVI:
+		result = alu.divi(&registers[register_file[1]], immediate);
+		cout << " [ DIVI ] " << alu.divi(&registers[register_file[1]], immediate) << endl;
+		break;
+	case ANDI:
+		result = alu.andi(&registers[register_file[1]], immediate);
+		cout << " [ ANDI ] " << alu.andi(&registers[register_file[1]], immediate) << endl;
+		break;
+	case ORI:
+		result = alu.ori(&registers[register_file[1]], immediate);
+		cout << " [ ORI ] " << alu.ori(&registers[register_file[1]], immediate) << endl;
+		break;
+	case MODI:
+		result = alu.modi(&registers[register_file[1]], immediate);
+		cout << " [ MODI ] " << alu.modi(&registers[register_file[1]], immediate) << endl;
+		break;
+	case SLTI:
+		result = alu.slti(&registers[register_file[1]], immediate);
+		cout << " [ SLTI ] " << alu.slti(&registers[register_file[1]], immediate) << endl;
+		break;
+	case JI:
+		cout << " [ JI ] " << alu.ji(immediate) << endl;
+		break;
+	case JR:
+		cout << " [ JR ] " << alu.jr(&registers[register_file[0]]) << endl;
+		break;
+	case BEQ:
+		cout << " [ BEQ ] " << alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		break;
+	case BNE:
+		cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		break;
+	case LD:
+		cout << " [ LD ] " << mem.ld(&registers[register_file[0]], immediate) << endl;
+		break;
+	case ST:
+		mem.st(&registers[register_file[0]], immediate);
+		cout << " [ ST ] " << endl;
+		break;
+	case LDI:
+		cout << " [ LDI ] " << alu.ldi(&registers[register_file[0]], immediate) << endl;
+		break;
+	case SEQ:
+		result = alu.seq(&registers[register_file[1]], immediate);
+		cout << " [ SEQ ] " << alu.seq(&registers[register_file[1]], immediate) << endl;
+		break;
+	case EOP:
+		cout << " [ EOP ] Program terminated successfully " << endl;
+		cout << " { " << executed_instructions << " } Instructions Executed " << endl;
+		cout << " { " << ceil(g_clock / 2) << " } Clock Cycles Taken " << endl;
+		cout << " { " << executed_instructions / (ceil(g_clock / 2)) << " } Instructions per Cycle" << endl;
+		cout << " { " << nop_count << " } NOP Instructions" << endl;
+		exit(EXIT_SUCCESS);
+	case NOP:
+		cout << " [ NOP ]\n";
+		nop_count++;
+		break;
+	}
+	executed_instructions++;
+	//return alu.m_lock;
+	return result;
+}

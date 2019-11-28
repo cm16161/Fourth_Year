@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ALU.cpp
+ALU.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ALU.hpp
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ALU.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ISA.hpp
+branch.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/branch.hpp
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ISA.hpp
+cstring
+-
+iostream
+-
+string
+-
+
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/branch.hpp
+ISA.hpp
+/home/chetan/Documents/Fourth_Year/Advanced_Computer_Architecture/Simulator_V2/src/ISA.hpp
+
