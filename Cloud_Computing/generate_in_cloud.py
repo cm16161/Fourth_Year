@@ -8,8 +8,10 @@ import argparse
 import threading
 import multiprocessing
 import time
+import math
 
 STOP_THREADS = False
+TIME_FOR_ALL = 21524
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -80,8 +82,13 @@ def main():
     global STOP_THREADS
     threads = list()
     n_threads = args.n_threads
-    end = ((args.confidence/100) * 2**32) + 1
+    confidence = args.confidence/100
+    end = (confidence * 2**32) + 1
     duration = args.timeout
+    n_threads = math.ceil((confidence * TIME_FOR_ALL) / duration)
+    if duration == 86400 and confidence == 1:
+        n_threads = args.n_threads
+
     for _t in range(args.n_threads):
         start_val = _t
         step = args.n_threads

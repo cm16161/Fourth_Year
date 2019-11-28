@@ -25,8 +25,9 @@ def find_nonce(difficulty_level, start_val=0, step=1, end_val=2**32+1, block="CO
         for i in range(start_val, end_val, step):
             global STOP_THREADS
             sha_f = hashlib.sha256()
-            block += str(i)
-            block_bytes = bytes(block, 'ascii')
+            block_to_use = block
+            block_to_use += str(i)
+            block_bytes = bytes(block_to_use, 'ascii')
             sha_f.update(block_bytes)
             sha_f.update(sha_f.digest())
             result = sha_f.digest()
