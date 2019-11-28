@@ -105,12 +105,12 @@ int main(int argc, char *argv[])
 					durations[i] = execute(alu[i], IDEX_command[i], registers, IDEX_registers[i], IDEX_immediate[i]);
 					for (int j = 1; j < IDEX_registers[i].size(); j++)
 					{
-						for (int k = i-1; k >=0; k--)
+						for (int k = i - 1; k >= 0; k--)
 						{
 							if (IDEX_registers[i][j] == targets[k])
 							{
 								delay += durations[i];
-                                                                break;
+								break;
 							}
 						}
 					}
@@ -187,11 +187,14 @@ int main(int argc, char *argv[])
 			{
 
 				branch_taken = !branch_taken;
-				for (int i = 0; i < N_WAY_SS; i++)
+				if (N_WAY_SS > 1)
 				{
+					for (int i = 0; i < N_WAY_SS; i++)
+					{
 
-					IFID_command[i] = NOP;
-					ID_command[i] = NOP;
+						IFID_command[i] = NOP;
+						ID_command[i] = NOP;
+					}
 				}
 			}
 

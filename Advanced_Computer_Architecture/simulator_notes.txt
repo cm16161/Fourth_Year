@@ -105,3 +105,15 @@ as MIPS which is described below:
 #+BEGIN_SRC asm
 ADD s0 s1 s2
 #+END_SRC
+
+* Benchmarking
+** Hypothesis 1
+
+
+*** Experiment
+    I wrote [INSERT PROGRAM NAME HERE] to check whether or not a
+    number less than 100 is prime, by continually trying to divide it
+    by all other prime numbers (less than 100) and seeing if there is
+    any remainder.
+
+**

@@ -14,18 +14,20 @@ def get_args():
                         type=int, default="1")
     parser.add_argument("--start",type=int, default="0", help="Input the start value to search")
     parser.add_argument("--step",type=int, default="1", help="Input the step size to iterate through")
+    parser.add_argument("--end", type=int, default=(2**32)+1, help="Input the end value to search up to")
     args = parser.parse_args()
     return args
 
-def find_nonce(difficulty_level, start_val=0, step=1, block="COMSM0010cloud"):
+def find_nonce(difficulty_level, start_val=0, step=1, end_val=2**32+1, block="COMSM0010cloud"):
     """This function will continually generate nonces and see if they
     are golden"""
     while True:
-        for i in range(start_val, 2**32+1, step):
+        for i in range(start_val, end_val, step):
             global STOP_THREADS
             sha_f = hashlib.sha256()
-            block += str(i)
-            block_bytes = bytes(block, 'ascii')
+            block_to_use = block
+            block_to_use += str(i)
+            block_bytes = bytes(block_to_use, 'ascii')
             sha_f.update(block_bytes)
             sha_f.update(sha_f.digest())
             result = sha_f.digest()
@@ -36,27 +38,17 @@ def find_nonce(difficulty_level, start_val=0, step=1, block="COMSM0010cloud"):
                 print("Golden Nonce: "+str(i))
                 STOP_THREADS = True
                 return
-            
+
 
 
 def main():
     """Main Function"""
     args = get_args()
-    #threads = list()
     start_val = args.start
     step_size = args.step
     difficulty= args.difficulty
-    find_nonce(difficulty, start_val, step_size)
-    # for _t in range(args.n_threads):
-    #     start_val = (2**32 / args.n_threads)*_t
-    #     end_val = (2**32 / args.n_threads)*(_t+1)
-    #     _x = threading.Thread(target=find_nonce, args=(args.difficulty,
-    #                                                    int(start_val), int(end_val),))
-    #     threads.append(_x)
-    #     _x.start()
-
-    # for _t in threads:
-    #     _t.join()
+    end_val = args.end
+    find_nonce(difficulty, start_val, step_size, end_val)
 
 if __name__ == '__main__':
     main()

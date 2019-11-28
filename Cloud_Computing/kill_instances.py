@@ -8,6 +8,7 @@ def kill():
     instances = boto3.resource('ec2').instances.filter(
     Filters=[{'Name': 'instance-state-name', 'Values': ['running', 'terminated']}])
     for instance in instances:
+        print("Terminating: "+instance.id)
         ec2.terminate_instances(InstanceIds = [instance.id], DryRun = False)
 
 if __name__ == '__main__':

@@ -110,6 +110,10 @@ ISA Decode::decode(std::string inst)
 	{
 		return EOP;
 	}
+        else if (inst.compare("SEQ") == 0)
+          {
+            return SEQ;
+          }
 	else
 		return NOP;
 }
