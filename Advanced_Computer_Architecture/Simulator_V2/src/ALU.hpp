@@ -11,7 +11,7 @@ public:
 	static ALU &getInstance();
 	ALU(){};
 	bool m_lock = false;
-  int m_delay = 0;
+	int m_delay = 0;
 	int add(int *rs, int *rt);
 	int sub(int *rs, int *rt);
 	int mul(int *rs, int *rt);

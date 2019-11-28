@@ -43,6 +43,21 @@ public:
 	int rd;
 };
 
+class Dispatch
+{
+public:
+	Dispatch(vector<int> registers, int immediate, ISA token, int instruction_number)
+	{
+		m_registers = registers;
+		m_immediate = immediate;
+		m_token = token;
+		m_instruction_number = instruction_number;
+	}
+	vector<int> m_registers;
+	int m_immediate, m_instruction_number;
+	ISA m_token;
+};
+
 #define N_REGISTERS 64
 int PC;
 int executed_instructions;
@@ -97,6 +112,7 @@ int main(int argc, char *argv[])
 	int instruction_number = 0;
 	int next_to_commit = 0;
 	vector<Reorder> reorder_buffer;
+	vector<Dispatch> reservation_station;
 
 	for (;;)
 	{
@@ -131,10 +147,26 @@ int main(int argc, char *argv[])
 				int delay = 0;
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
-					targets[i] = IDEX_registers[i][0];
 
-					results[i] =
-					    execute(alu[i], IDEX_command[i].token, registers, IDEX_registers[i], IDEX_immediate[i]);
+					//targets[i] = IDEX_registers[i][0];
+
+					bool can_execute_last_instruction = true;
+					if (IDEX_command[i].token == EOP)
+					{
+						for (int a = 0; a < N_WAY_SS; a++)
+						{
+							if (alu[a].m_lock)
+							{
+								can_execute_last_instruction = false;
+							}
+						}
+					}
+
+					if (can_execute_last_instruction)
+					{
+						results[i] =
+						    execute(alu[i], IDEX_command[i].token, registers, IDEX_registers[i], IDEX_immediate[i]);
+					}
 					if (IDEX_command[i].token != JI && IDEX_command[i].token != JR && IDEX_command[i].token != BEQ &&
 					    IDEX_command[i].token != BNE && IDEX_command[i].token != LDI)
 					{
@@ -143,11 +175,6 @@ int main(int argc, char *argv[])
 							Reorder tmp(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0]);
 							reorder_buffer.push_back(tmp);
 						}
-					}
-					if (IDEX_command[i].token != NOP && IDEX_command[i].token != BNE && IDEX_command[i].token != BEQ &&
-					    IDEX_command[i].token != ST)
-					{
-						registers_in_use[IDEX_registers[i][0]] = false;
 					}
 
 					if (branch_taken && i != N_WAY_SS - 1)
@@ -166,7 +193,9 @@ int main(int argc, char *argv[])
 					if (reorder_buffer[i].instruction_number == next_to_commit)
 					{
 						registers[reorder_buffer[i].rd] = reorder_buffer[i].result;
+						registers_in_use[reorder_buffer[i].rd] = false;
 						reorder_buffer.erase(reorder_buffer.begin() + i);
+
 						next_to_commit++;
 					}
 				}
@@ -261,10 +290,40 @@ int main(int argc, char *argv[])
 					{
 						ID_registers[i][j] = register_rename[ID_registers[i][j]];
 					}
-					IDEX_registers[i] = ID_registers[i];
-					IDEX_immediate[i] = ID_immediate[i];
-					IDEX_command[i].token = ID_command[i].token;
-					IDEX_command[i].instruction_number = ID_command[i].instruction_number;
+					if (g_clock > 2)
+					{
+						Dispatch tmp(ID_registers[i], ID_immediate[i], ID_command[i].token,
+						             ID_command[i].instruction_number);
+						reservation_station.push_back(tmp);
+					}
+					{
+						if (alu[i].m_lock == false)
+						{
+							IDEX_registers[i] = reservation_station[0].m_registers;
+							IDEX_immediate[i] = reservation_station[0].m_immediate;
+							IDEX_command[i].token = reservation_station[0].m_token;
+							IDEX_command[i].instruction_number = reservation_station[0].m_instruction_number;
+							reservation_station.erase(reservation_station.begin());
+						}
+					}
+
+					// for (int a = 0; a < N_WAY_SS; a++)
+					// {
+					// 	if (alu[a].m_lock == false)
+					// 	{
+					// 		IDEX_registers[a] = reservation_station[0].m_registers;
+					// 		IDEX_immediate[a] = reservation_station[0].m_immediate;
+					// 		IDEX_command[a].token = reservation_station[0].m_token;
+					// 		IDEX_command[a].instruction_number = reservation_station[0].m_instruction_number;
+					// 		reservation_station.erase(reservation_station.begin());
+					// 		break;
+					// 	}
+					// }
+
+					// IDEX_registers[i] = ID_registers[i];
+					// IDEX_immediate[i] = ID_immediate[i];
+					// IDEX_command[i].token = ID_command[i].token;
+					// IDEX_command[i].instruction_number = ID_command[i].instruction_number;
 				}
 			}
 		}

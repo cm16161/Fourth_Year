@@ -3,11 +3,12 @@
 extern int executed_instructions;
 extern int g_clock;
 //TODO Move Registers to separate folder!
-int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+int execute(ALU& alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
 	static int nop_count = 0;
 	static MEM &mem = MEM::getInstance();
 	int result;
+	static int delay = 0;
 	switch (instructions)
 	{
 	case ADD:
@@ -55,8 +56,18 @@ int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_f
 		cout << " [ SLT ] " << alu.slt(&registers[register_file[1]], &registers[register_file[2]]) << endl;
 		break;
 	case ADDI:
-		result = alu.addi(&registers[register_file[1]], immediate);
-		cout << " [ ADDI ] " << alu.addi(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			delay = 2;
+		}
+		delay--;
+		if (delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.addi(&registers[register_file[1]], immediate);
+			cout << " [ ADDI ] " << alu.addi(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case SUBI:
 		result = alu.subi(&registers[register_file[1]], immediate);
@@ -124,7 +135,9 @@ int execute(ALU alu, ISA instructions, int registers[64], vector<int> register_f
 		nop_count++;
 		break;
 	}
-	executed_instructions++;
-	//return alu.m_lock;
+	if (!alu.m_lock)
+	{
+		executed_instructions++;
+	}
 	return result;
 }

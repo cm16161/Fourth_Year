@@ -1,6 +1,5 @@
 #include "ALU.hpp"
 
-
 ALU &ALU::getInstance()
 {
 	static ALU alu;
@@ -19,7 +18,7 @@ int ALU::sub(int *rs, int *rt)
 {
 	// SUB subtraction(rs, rt, rd);
 	// return subtraction.run();
-	return *rs + *rt;
+	return *rs - *rt;
 }
 
 int ALU::mul(int *rs, int *rt)
@@ -146,7 +145,7 @@ int ALU::seq(int *rs, int immediate)
 {
 	// SEQ seq(rs, rd, immediate);
 	// return seq.run();
-  return (*rs == immediate ? 1 : 0);
+	return (*rs == immediate ? 1 : 0);
 }
 
 int ALU::ji(int immediate)

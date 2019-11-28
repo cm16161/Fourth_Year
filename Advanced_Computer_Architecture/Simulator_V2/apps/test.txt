@@ -1,5 +1,7 @@
 ADDI $1 $1 #1
 ADDI $2 $2 #2
-ADD $3 $1 $2
-SUB $3 $2 $1
+ADDI $3 $3 #3
+ADDI $4 $4 #4
+ADD $5 $1 $2
+SUB $6 $2 $1
 EOP
