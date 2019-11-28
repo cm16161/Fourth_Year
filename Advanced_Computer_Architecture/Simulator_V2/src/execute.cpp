@@ -3,21 +3,42 @@
 extern int executed_instructions;
 extern int g_clock;
 //TODO Move Registers to separate folder!
-int execute(ALU& alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
+int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
 	static int nop_count = 0;
 	static MEM &mem = MEM::getInstance();
 	int result;
-	static int delay = 0;
 	switch (instructions)
 	{
 	case ADD:
-		result = alu.add(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ ADD ] " << alu.add(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.add(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ ADD ] " << alu.add(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
+
 		break;
 	case SUB:
-		result = alu.sub(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ SUB ] " << alu.sub(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.sub(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ SUB ] " << alu.sub(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
+
 		break;
 	case MUL:
 		result = alu.mul(&registers[register_file[1]], &registers[register_file[2]]);
@@ -59,10 +80,10 @@ int execute(ALU& alu, ISA instructions, int registers[64], vector<int> register_
 		if (alu.m_lock == false)
 		{
 			alu.m_lock = true;
-			delay = 2;
+			alu.m_delay = 2;
 		}
-		delay--;
-		if (delay == 0)
+		alu.m_delay--;
+		if (alu.m_delay == 0)
 		{
 			alu.m_lock = false;
 			result = alu.addi(&registers[register_file[1]], immediate);
@@ -130,6 +151,7 @@ int execute(ALU& alu, ISA instructions, int registers[64], vector<int> register_
 		cout << " { " << executed_instructions / (ceil(g_clock / 2)) << " } Instructions per Cycle" << endl;
 		cout << " { " << nop_count << " } NOP Instructions" << endl;
 		exit(EXIT_SUCCESS);
+
 	case NOP:
 		cout << " [ NOP ]\n";
 		nop_count++;

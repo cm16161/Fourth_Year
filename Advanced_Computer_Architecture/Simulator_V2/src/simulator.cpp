@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 1
+#define N_WAY_SS 2
 
 class Instruction_Order
 {
@@ -113,7 +113,8 @@ int main(int argc, char *argv[])
 	int next_to_commit = 0;
 	vector<Reorder> reorder_buffer;
 	vector<Dispatch> reservation_station;
-
+	bool last = false;
+	bool stop = false;
 	for (;;)
 	{
 
@@ -143,25 +144,23 @@ int main(int argc, char *argv[])
 			}
 			if (g_clock > 2)
 			{
-				int targets[N_WAY_SS] = { 0 };
 				int delay = 0;
+
 				for (int i = 0; i < N_WAY_SS; i++)
 				{
-
-					//targets[i] = IDEX_registers[i][0];
 
 					bool can_execute_last_instruction = true;
 					if (IDEX_command[i].token == EOP)
 					{
 						for (int a = 0; a < N_WAY_SS; a++)
 						{
+							int to_complete = a;
 							if (alu[a].m_lock)
 							{
 								can_execute_last_instruction = false;
 							}
 						}
 					}
-
 					if (can_execute_last_instruction)
 					{
 						results[i] =
@@ -203,7 +202,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			bool last = false;
+
 			int remaining_commands = 0;
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
@@ -234,11 +233,20 @@ int main(int argc, char *argv[])
 			{
 				for (int i = 0; i < remaining_commands; i++)
 				{
+					if (!stop)
 					{
+						stop = true;
 						IFID_command[i].instruction = IF_instruction_tokens[i][0];
 						IFID_command[i].instruction_number = instruction_number;
 						IFID_instruction[i] = code[PC + i];
 						instruction_number++;
+						PC += remaining_commands;
+					}
+					else
+					{
+						IFID_command[i].instruction = NOP;
+						IFID_command[i].instruction_number = -1;
+						IFID_instruction[i] = NOP;
 					}
 				}
 			}
@@ -292,18 +300,20 @@ int main(int argc, char *argv[])
 					}
 					if (g_clock > 2)
 					{
+
 						Dispatch tmp(ID_registers[i], ID_immediate[i], ID_command[i].token,
 						             ID_command[i].instruction_number);
 						reservation_station.push_back(tmp);
-					}
-					{
-						if (alu[i].m_lock == false)
+						if (!alu[i].m_lock)
 						{
-							IDEX_registers[i] = reservation_station[0].m_registers;
-							IDEX_immediate[i] = reservation_station[0].m_immediate;
-							IDEX_command[i].token = reservation_station[0].m_token;
-							IDEX_command[i].instruction_number = reservation_station[0].m_instruction_number;
-							reservation_station.erase(reservation_station.begin());
+							if (reservation_station.size() > 0)
+							{
+								IDEX_registers[i] = reservation_station[0].m_registers;
+								IDEX_immediate[i] = reservation_station[0].m_immediate;
+								IDEX_command[i].token = reservation_station[0].m_token;
+								IDEX_command[i].instruction_number = reservation_station[0].m_instruction_number;
+								reservation_station.erase(reservation_station.begin());
+							}
 						}
 					}
 
