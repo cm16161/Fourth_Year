@@ -241,7 +241,6 @@ int main(int argc, char *argv[])
 						{
 							if (registers_in_use[ID_registers[i][j]] && ID_registers[i][j] != ID_registers[i][0])
 							{
-                                                          cout<< ID_command[i].token << " blocked on " << ID_registers[i][j] << endl;
 								dependency_not_met = true;
 							}
 						}
@@ -349,6 +348,7 @@ int main(int argc, char *argv[])
 										registers_in_use[j] = true;
 										register_rename[target] = j;
 										ID_registers[i][0] = j;
+										break;
 									}
 								}
 							}
@@ -356,12 +356,13 @@ int main(int argc, char *argv[])
 							{
 								registers_in_use[target] = true;
 							}
+							ID_registers[i][0] = register_rename[ID_registers[i][0]];
 						}
 					}
-					for (int j = 0; j < ID_registers[i].size(); j++) // Rename the registers
-					{
-						ID_registers[i][j] = register_rename[ID_registers[i][j]];
-					}
+					// for (int j = 0; j < ID_registers[i].size(); j++) // Rename the registers
+					// {
+					// 	ID_registers[i][j] = register_rename[ID_registers[i][j]];
+					// }
 
 					ID_immediate[i] = decode.getImmediate(IFID_instruction[i]);
 					ID_command[i].token = decode.decode(IFID_command[i].instruction);
