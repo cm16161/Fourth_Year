@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 1
+#define N_WAY_SS 2
 
 class Instruction_Order
 {
@@ -50,15 +50,17 @@ public:
 class Reorder
 {
 public:
-	Reorder(int res, int num, int dest)
+	Reorder(int res, int num, int dest, ISA token)
 	{
 		result = res;
 		instruction_number = num;
 		rd = dest;
+		m_token = token;
 	}
 	int result;
 	int instruction_number;
 	int rd;
+	ISA m_token;
 };
 
 class Dispatch
@@ -88,6 +90,8 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+	int issue_entries = 0;
+	int dispatch_entries = 0;
 	string file_name;
 	executed_instructions = 0;
 	if (argc > 1)
@@ -96,7 +100,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		file_name = "../apps/all_ops.txt";
+		file_name = "../apps/test.txt";
 	}
 	PC = 0;
 	Fetch &fetch = Fetch::getInstance();
@@ -167,17 +171,12 @@ int main(int argc, char *argv[])
 				{
 					if (!alu[i].m_lock)
 					{
-						Reorder *tmp =
-						    new Reorder(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0]);
-						reorder_buffer.push_back(tmp);
-					}
-				}
-
-				if (branch_taken && i != N_WAY_SS - 1)
-				{
-					for (int j = i + 1; j < N_WAY_SS; j++)
-					{
-						IDEX_command[j].token = NOP;
+						if (IDEX_command[i].token != NOP)
+						{
+							Reorder *tmp = new Reorder(results[i], IDEX_command[i].instruction_number,
+							                           IDEX_registers[i][0], IDEX_command[i].token);
+							reorder_buffer.push_back(tmp);
+						}
 					}
 				}
 			}
@@ -185,6 +184,7 @@ int main(int argc, char *argv[])
 
 		if (g_clock > 2) // Dispatch Stage
 		{
+			vector<int> index_to_remove;
 			for (int i = 0; i < issue_station.size(); i++)
 			{
 				if (issue_station[i]->m_token == EOP)
@@ -199,8 +199,14 @@ int main(int argc, char *argv[])
 					Dispatch *tmp = new Dispatch(issue_station[i]->m_registers, issue_station[i]->m_immediate,
 					                             issue_station[i]->m_token, issue_station[i]->m_instruction_number);
 					reservation_station.push_back(tmp);
-					issue_station.erase(issue_station.begin() + i);
+					dispatch_entries++;
+					//issue_station.erase(issue_station.begin() + i);
+					index_to_remove.push_back(i);
 				}
+			}
+			for (int i = 0; i < index_to_remove.size(); i++)
+			{
+				issue_station.erase(issue_station.begin() + index_to_remove[i] - i);
 			}
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
@@ -214,24 +220,12 @@ int main(int argc, char *argv[])
 						IDEX_command[i].instruction_number = reservation_station[0]->m_instruction_number;
 						reservation_station.erase(reservation_station.begin());
 					}
+					else
+					{
+						IDEX_command[i].token = NOP;
+					}
 				}
 			}
-			// for (int i = 0; i < N_WAY_SS; i++)
-			// {
-			// 	Dispatch tmp(ID_registers[i], ID_immediate[i], ID_command[i].token, ID_command[i].instruction_number);
-			// 	reservation_station.push_back(tmp); //Allow instruction to be dispatched to execute
-			// 	if (!alu[i].m_lock)
-			// 	{
-			// 		if (reservation_station.size() > 0)
-			// 		{
-			// 			IDEX_registers[i] = reservation_station[0].m_registers;
-			// 			IDEX_immediate[i] = reservation_station[0].m_immediate;
-			// 			IDEX_command[i].token = reservation_station[0].m_token;
-			// 			IDEX_command[i].instruction_number = reservation_station[0].m_instruction_number;
-			// 			reservation_station.erase(reservation_station.begin());
-			// 		}
-			// 	}
-			// }
 		} // End of Dispatch Stage
 
 		if (g_clock > 1) // Issue Stage - Wait for Registers
@@ -247,18 +241,21 @@ int main(int argc, char *argv[])
 						{
 							if (registers_in_use[ID_registers[i][j]] && ID_registers[i][j] != ID_registers[i][0])
 							{
+                                                          cout<< ID_command[i].token << " blocked on " << ID_registers[i][j] << endl;
 								dependency_not_met = true;
 							}
 						}
 						Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
 						                       ID_command[i].instruction_number, dependency_not_met);
 						issue_station.push_back(tmp);
+						issue_entries++;
 					}
 					else if (ID_command[i].token == EOP)
 					{
 						Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
 						                       ID_command[i].instruction_number, false);
 						issue_station.push_back(tmp);
+						issue_entries++;
 					}
 				}
 			}
@@ -282,12 +279,14 @@ int main(int argc, char *argv[])
 							Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
 							                       ID_command[i].instruction_number, dependency_not_met);
 							issue_station.push_back(tmp);
+							issue_entries++;
 						}
 						else if (ID_command[i].token == EOP)
 						{
 							Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
 							                       ID_command[i].instruction_number, true);
 							issue_station.push_back(tmp);
+							issue_entries++;
 						}
 					}
 				}
