@@ -130,9 +130,9 @@ int main(int argc, char *argv[])
 	int instruction_number = 0;
 	int next_to_commit = 0;
 
-	vector<Reorder> reorder_buffer;
-	vector<Dispatch> reservation_station;
-	vector<Issue> issue_station;
+	vector<Reorder *> reorder_buffer;
+	vector<Dispatch *> reservation_station;
+	vector<Issue *> issue_station;
 
 	bool last = false;
 	bool fetch_stop = false;
@@ -145,10 +145,10 @@ int main(int argc, char *argv[])
 		{
 			for (int i = 0; i < reorder_buffer.size(); i++)
 			{
-				if (reorder_buffer[i].instruction_number == next_to_commit)
+				if (reorder_buffer[i]->instruction_number == next_to_commit)
 				{
-					registers[reorder_buffer[i].rd] = reorder_buffer[i].result;
-					registers_in_use[reorder_buffer[i].rd] = false;
+					registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
+					registers_in_use[reorder_buffer[i]->rd] = false;
 					;
 					reorder_buffer.erase(reorder_buffer.begin() + i);
 
@@ -167,7 +167,8 @@ int main(int argc, char *argv[])
 				{
 					if (!alu[i].m_lock)
 					{
-						Reorder tmp(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0]);
+						Reorder *tmp =
+						    new Reorder(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0]);
 						reorder_buffer.push_back(tmp);
 					}
 				}
@@ -186,17 +187,17 @@ int main(int argc, char *argv[])
 		{
 			for (int i = 0; i < issue_station.size(); i++)
 			{
-				if (issue_station[i].m_token == EOP)
+				if (issue_station[i]->m_token == EOP)
 				{
 					if (issue_station.size() != 1)
 					{
 						continue;
 					}
 				}
-				if (issue_station[i].m_dependency == false)
+				if (issue_station[i]->m_dependency == false)
 				{
-					Dispatch tmp(issue_station[i].m_registers, issue_station[i].m_immediate, issue_station[i].m_token,
-					             issue_station[i].m_instruction_number);
+					Dispatch *tmp = new Dispatch(issue_station[i]->m_registers, issue_station[i]->m_immediate,
+					                             issue_station[i]->m_token, issue_station[i]->m_instruction_number);
 					reservation_station.push_back(tmp);
 					issue_station.erase(issue_station.begin() + i);
 				}
@@ -207,10 +208,10 @@ int main(int argc, char *argv[])
 				{
 					if (reservation_station.size() > 0)
 					{
-						IDEX_registers[i] = reservation_station[0].m_registers;
-						IDEX_immediate[i] = reservation_station[0].m_immediate;
-						IDEX_command[i].token = reservation_station[0].m_token;
-						IDEX_command[i].instruction_number = reservation_station[0].m_instruction_number;
+						IDEX_registers[i] = reservation_station[0]->m_registers;
+						IDEX_immediate[i] = reservation_station[0]->m_immediate;
+						IDEX_command[i].token = reservation_station[0]->m_token;
+						IDEX_command[i].instruction_number = reservation_station[0]->m_instruction_number;
 						reservation_station.erase(reservation_station.begin());
 					}
 				}
@@ -249,14 +250,14 @@ int main(int argc, char *argv[])
 								dependency_not_met = true;
 							}
 						}
-						Issue tmp(ID_registers[i], ID_immediate[i], ID_command[i].token,
-						          ID_command[i].instruction_number, dependency_not_met);
+						Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
+						                       ID_command[i].instruction_number, dependency_not_met);
 						issue_station.push_back(tmp);
 					}
 					else if (ID_command[i].token == EOP)
 					{
-						Issue tmp(ID_registers[i], ID_immediate[i], ID_command[i].token,
-						          ID_command[i].instruction_number, false);
+						Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
+						                       ID_command[i].instruction_number, false);
 						issue_station.push_back(tmp);
 					}
 				}
@@ -278,14 +279,14 @@ int main(int argc, char *argv[])
 									dependency_not_met = true;
 								}
 							}
-							Issue tmp(ID_registers[i], ID_immediate[i], ID_command[i].token,
-							          ID_command[i].instruction_number, dependency_not_met);
+							Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
+							                       ID_command[i].instruction_number, dependency_not_met);
 							issue_station.push_back(tmp);
 						}
 						else if (ID_command[i].token == EOP)
 						{
-							Issue tmp(ID_registers[i], ID_immediate[i], ID_command[i].token,
-							          ID_command[i].instruction_number, true);
+							Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
+							                       ID_command[i].instruction_number, true);
 							issue_station.push_back(tmp);
 						}
 					}
@@ -294,15 +295,15 @@ int main(int argc, char *argv[])
 			for (int i = 0; i < issue_station.size(); i++)
 			{
 				bool dependency_not_met = false;
-				for (int j = 1; j < issue_station[i].m_registers.size(); j++)
+				for (int j = 1; j < issue_station[i]->m_registers.size(); j++)
 				{
-					if (registers_in_use[issue_station[i].m_registers[j]] &&
-					    issue_station[i].m_registers[j] != issue_station[i].m_registers[0])
+					if (registers_in_use[issue_station[i]->m_registers[j]] &&
+					    issue_station[i]->m_registers[j] != issue_station[i]->m_registers[0])
 					{
 						dependency_not_met = true;
 					}
 				}
-				issue_station[i].m_dependency = dependency_not_met;
+				issue_station[i]->m_dependency = dependency_not_met;
 			}
 			// for (auto i : issue_station)
 			// {

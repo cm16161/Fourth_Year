@@ -147,8 +147,8 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
 		cout << " { " << executed_instructions << " } Instructions Executed " << endl;
-		cout << " { " << ceil(g_clock / 2) << " } Clock Cycles Taken " << endl;
-		cout << " { " << executed_instructions / (ceil(g_clock / 2)) << " } Instructions per Cycle" << endl;
+		cout << " { " << ceil(g_clock) << " } Clock Cycles Taken " << endl;
+		cout << " { " << executed_instructions / (ceil(g_clock)) << " } Instructions per Cycle" << endl;
 		cout << " { " << nop_count << " } NOP Instructions" << endl;
 		exit(EXIT_SUCCESS);
 
