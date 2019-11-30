@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 2
+#define N_WAY_SS 1
 
 class Instruction_Order
 {
@@ -145,6 +145,7 @@ int main(int argc, char *argv[])
 	int final_last_instructions = 0;
 	for (;;)
 	{
+
 		if (g_clock > 4) // Commit Stage
 		{
 			for (int i = 0; i < reorder_buffer.size(); i++)
@@ -153,10 +154,10 @@ int main(int argc, char *argv[])
 				{
 					registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
 					registers_in_use[reorder_buffer[i]->rd] = false;
-					;
 					reorder_buffer.erase(reorder_buffer.begin() + i);
 
 					next_to_commit++;
+					break;
 				}
 			}
 		} // End of Commit Stage
@@ -179,18 +180,83 @@ int main(int argc, char *argv[])
 						}
 					}
 				}
+				else
+				{
+					if (branch_taken)
+					{
+						for (int i = 0; i < reservation_station.size(); i++)
+						{
+							reservation_station[i]->m_token = NOP;
+							if (!reservation_station[i]->m_registers.empty())
+							{
+								registers_in_use[reservation_station[i]->m_registers[0]] = false;
+							}
+						}
+						for (int i = 0; i < issue_station.size(); i++)
+						{
+							issue_station[i]->m_token = NOP;
+							if (!issue_station[i]->m_registers.empty())
+							{
+								registers_in_use[issue_station[i]->m_registers[0]] = false;
+							}
+						}
+						for (int i = 0; i < N_WAY_SS; i++)
+						{
+							ID_command[i].token = NOP;
+							if (!ID_registers[i].empty())
+							{
+								registers_in_use[ID_registers[i][0]] = false;
+							}
+							IFID_command[i].instruction = "NOP";
+						}
+					}
+					else
+					{
+						next_to_commit++;
+					}
+				}
 			}
 		} // End of Execute Stage
 
 		if (g_clock > 2) // Dispatch Stage
 		{
 			vector<int> index_to_remove;
+			vector<int> remove_for_eop;
+			//cout << "issue_station size = " << issue_station.size() << endl;
+			for (int i = 0; i < issue_station.size();
+			     i++) // Make sure that EOP can execute even if there are NOP's from blank execution
+			{
+				if (issue_station[i]->m_token == EOP)
+				{
+					for (int j = 0; j < issue_station.size(); j++)
+					{
+						if (issue_station[j]->m_token == EOP || issue_station[j]->m_token == NOP)
+						{
+							if (i != j)
+							{
+								if (i == j)
+								{
+									exit(-1);
+								}
+								remove_for_eop.push_back(j);
+							}
+						}
+					}
+				}
+			}
+
+			for (int i = 0; i < remove_for_eop.size(); i++)
+			{
+				issue_station.erase(issue_station.begin() + remove_for_eop[i] - i); // remove excess instructions
+			}
+
 			for (int i = 0; i < issue_station.size(); i++)
 			{
 				if (issue_station[i]->m_token == EOP)
 				{
 					if (issue_station.size() != 1)
 					{
+
 						continue;
 					}
 				}
@@ -204,10 +270,12 @@ int main(int argc, char *argv[])
 					index_to_remove.push_back(i);
 				}
 			}
+
 			for (int i = 0; i < index_to_remove.size(); i++)
 			{
 				issue_station.erase(issue_station.begin() + index_to_remove[i] - i);
 			}
+
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
 				if (!alu[i].m_lock)
@@ -289,40 +357,38 @@ int main(int argc, char *argv[])
 						}
 					}
 				}
+				else
+				{
+					//cout << "skipping issue\n";
+				}
 			}
 			for (int i = 0; i < issue_station.size(); i++)
 			{
 				bool dependency_not_met = false;
 				for (int j = 1; j < issue_station[i]->m_registers.size(); j++)
 				{
-					if (registers_in_use[issue_station[i]->m_registers[j]] &&
-					    issue_station[i]->m_registers[j] != issue_station[i]->m_registers[0])
+
+					if (issue_station[i]->m_token != NOP && issue_station[i]->m_token != EOP &&
+					    issue_station[i]->m_token != BEQ)
+					{
+						if (registers_in_use[issue_station[i]->m_registers[j]] &&
+						    issue_station[i]->m_registers[j] != issue_station[i]->m_registers[0])
+						{
+							dependency_not_met = true;
+						}
+					}
+				}
+				if (issue_station[i]->m_token == BEQ)
+				{
+					if (registers_in_use[issue_station[i]->m_registers[0]] ||
+					    registers_in_use[issue_station[i]->m_registers[1]])
 					{
 						dependency_not_met = true;
 					}
 				}
 				issue_station[i]->m_dependency = dependency_not_met;
 			}
-			// for (auto i : issue_station)
-			// {
-			// 	bool dependency_not_met = false;
-			// 	for (int j = 1; j < i.m_registers.size(); j++)
-			// 	{
-			// 		if (registers_in_use[i.m_registers[j]] && i.m_registers[j] != i.m_registers[0])
-			// 		{
-			// 			cout << i.m_token << " bloked on " << i.m_registers[j] << endl;
-			// 			dependency_not_met = true;
-			// 		}
-			// 	}
-			// 	i.m_dependency = dependency_not_met;
-			// 	cout << "token is: " << i.m_token;
-			// 	cout << "setting dependency to: " << dependency_not_met << endl;
-			// 	cout << "new dependency is: " << i.m_dependency << endl;
-			// }
-			// for (auto i : issue_station)
-			// {
-			// 	cout << "end of issue " << i.m_dependency << endl;
-			// }
+
 		} // End of Issue Stage
 
 		if (g_clock > 0) // Decode Stage
@@ -332,7 +398,25 @@ int main(int argc, char *argv[])
 				for (int i = 0; i < N_WAY_SS; i++) // Normal Execution
 				{
 
-					ID_registers[i] = decode.getRegisters(IFID_instruction[i]);
+					ID_registers[i] = decode.getRegisters(IFID_instruction[i]); // Get the registers to be used
+					ID_command[i].token = decode.decode(IFID_command[i].instruction);
+					ID_command[i].instruction_number = IFID_command[i].instruction_number;
+					// cout << "Command Number = " << ID_command[i].instruction_number
+					//      << " token = " << ID_command[i].token << endl;
+					if (!ID_registers[i].empty())
+					{
+						for (int j = 0; j < ID_registers[i].size(); j++)
+						{
+
+							while (register_rename[ID_registers[i][j]] != register_rename[ID_registers[i][j]])
+							{
+								// cout << " renaming: " << ID_registers[i][j] << " to "
+								//      << register_rename[ID_registers[i][j]] << endl;
+								ID_registers[i][j] = register_rename[ID_registers[i][j]];
+							}
+						}
+					}
+
 					if (ID_command[i].token != NOP && ID_command[i].token != BNE && ID_command[i].token != BEQ &&
 					    ID_command[i].token != ST)
 					{
@@ -341,7 +425,7 @@ int main(int argc, char *argv[])
 							int target = ID_registers[i][0];
 							if (registers_in_use[target]) // See if register is in use
 							{
-								for (int j = 0; j < N_REGISTERS; j++)
+								for (int j = N_REGISTERS / 2; j < N_REGISTERS; j++)
 								{
 									if (!registers_in_use[j])
 									{
@@ -355,7 +439,9 @@ int main(int argc, char *argv[])
 							else
 							{
 								registers_in_use[target] = true;
+								register_rename[target] = target;
 							}
+
 							ID_registers[i][0] = register_rename[ID_registers[i][0]];
 						}
 					}
@@ -365,8 +451,6 @@ int main(int argc, char *argv[])
 					// }
 
 					ID_immediate[i] = decode.getImmediate(IFID_instruction[i]);
-					ID_command[i].token = decode.decode(IFID_command[i].instruction);
-					ID_command[i].instruction_number = IFID_command[i].instruction_number;
 				}
 			}
 			else
@@ -381,6 +465,10 @@ int main(int argc, char *argv[])
 						ID_command[i].token = decode.decode(IFID_command[i].instruction);
 						ID_command[i].instruction_number = IFID_command[i].instruction_number;
 					}
+				}
+				else
+				{
+					//cout << "skipping decode\n";
 				}
 			}
 		} // End of Decode Stage
@@ -437,7 +525,14 @@ int main(int argc, char *argv[])
 					instruction_number++;
 					final_last_instructions = remaining_commands;
 				}
-				PC += remaining_commands;
+				if (!branch_taken)
+				{
+					PC += remaining_commands;
+				}
+			}
+			else
+			{
+				//cout << "skipping fetch\n";
 			}
 		}
 

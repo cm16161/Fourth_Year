@@ -12,8 +12,8 @@ int BEQ::run()
 {
 	if (*m_rs == *m_rd)
 	{
-		PC = m_immediate - 1;
-		branch_taken = true;
+			PC = m_immediate - 1;
+			branch_taken = true;
 	}
 	return PC;
 }
