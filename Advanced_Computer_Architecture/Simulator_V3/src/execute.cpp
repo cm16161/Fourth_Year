@@ -153,7 +153,7 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		exit(EXIT_SUCCESS);
 
 	case NOP:
-          //cout << " [ NOP ]\n";
+		//cout << " [ NOP ]\n";
 		nop_count++;
 		break;
 	}
