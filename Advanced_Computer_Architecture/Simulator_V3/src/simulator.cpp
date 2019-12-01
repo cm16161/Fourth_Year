@@ -39,51 +39,57 @@ public:
 class Issue
 {
 public:
-	Issue(vector<int> registers, int immediate, ISA token, int inst_num, bool dependency)
+	Issue(vector<int> registers, int immediate, ISA token, int inst_num, bool dependency, vector<int> branch_waits)
 	{
 		m_registers = registers;
 		m_immediate = immediate;
 		m_token = token;
 		m_instruction_number = inst_num;
 		m_dependency = dependency;
+		m_branch_waits = branch_waits;
 	}
 	vector<int> m_registers;
 	int m_immediate;
 	ISA m_token;
 	int m_instruction_number;
 	bool m_dependency;
+	vector<int> m_branch_waits;
 };
 
 class Reorder
 {
 public:
-	Reorder(int res, int num, int dest, ISA token)
+	Reorder(int res, int num, int dest, ISA token, vector<int> branch_waits)
 	{
 		result = res;
 		instruction_number = num;
 		rd = dest;
 		m_token = token;
+		m_branch_waits = branch_waits;
 	}
 	int result;
 	int instruction_number;
 	int rd;
 	ISA m_token;
+	vector<int> m_branch_waits;
 };
 
 class Dispatch
 {
 public:
-	Dispatch(vector<int> registers, int immediate, ISA token, int instruction_number)
+	Dispatch(vector<int> registers, int immediate, ISA token, int instruction_number, vector<int> branch_waits)
 	{
 		m_registers = registers;
 		m_immediate = immediate;
 		m_token = token;
 		m_instruction_number = instruction_number;
+		m_branch_waits = branch_waits;
 	}
 	vector<int> m_registers;
 	vector<int> m_values;
 	int m_immediate, m_instruction_number;
 	ISA m_token;
+	vector<int> m_branch_waits;
 };
 
 #define N_REGISTERS 64
@@ -130,23 +136,32 @@ int main(int argc, char *argv[])
 	g_clock = 0;
 	string current_line, current_inst;
 
-	Instruction_Order IFID_command[N_WAY_SS];
 	int IDEX_immediate[N_WAY_SS];
 	Token_Order IDEX_command[N_WAY_SS];
 	vector<int> IDEX_registers[N_WAY_SS];
+	vector<int> IDEX_branch_waits[N_WAY_SS];
+
+	Instruction_Order IFID_command[N_WAY_SS];
 	string IFID_instruction_keyword[N_WAY_SS];
 	string IFID_instruction[N_WAY_SS];
 	vector<string> IF_instruction_tokens[N_WAY_SS];
+
 	vector<int> ID_registers[N_WAY_SS];
 	int ID_immediate[N_WAY_SS];
 	Token_Order ID_command[N_WAY_SS];
+	vector<int> ID_branch_waits[N_WAY_SS];
+
 	int results[N_WAY_SS];
+
 	int instruction_number = 0;
 	int next_to_commit = 0;
 
 	vector<Reorder *> reorder_buffer;
 	vector<Dispatch *> reservation_station;
 	vector<Issue *> issue_station;
+
+	bool depends_on_branch = false;
+	vector<int> dependent_branch;
 
 	bool last = false;
 	bool fetch_stop = false;
@@ -164,9 +179,7 @@ int main(int argc, char *argv[])
 					if (reorder_buffer[i]->m_token != BEQ)
 					{
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
-						//cout << "freeing: " << reorder_buffer[i]->rd << endl;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
-						//register_rename[reorder_buffer[i]->rd] = reorder_buffer[i]->rd;
 						reorder_buffer.erase(reorder_buffer.begin() + i);
 						next_to_commit++;
 						break;
@@ -193,8 +206,9 @@ int main(int argc, char *argv[])
 					{
 						if (IDEX_command[i].token != NOP)
 						{
-							Reorder *tmp = new Reorder(results[i], IDEX_command[i].instruction_number,
-							                           IDEX_registers[i][0], IDEX_command[i].token);
+							Reorder *tmp =
+							    new Reorder(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0],
+							                IDEX_command[i].token, IDEX_branch_waits[i]);
 							reorder_buffer.push_back(tmp);
 						}
 					}
@@ -203,37 +217,108 @@ int main(int argc, char *argv[])
 				{
 					if (branch_taken)
 					{
-                                          //cout << "BRANCH TAKEN!\n";
-						for (int i = 0; i < reservation_station.size(); i++)
+						for (int j = 0; j < reservation_station.size(); j++)
 						{
-							reservation_station[i]->m_token = NOP;
-							if (!reservation_station[i]->m_registers.empty())
+							reservation_station[j]->m_token = NOP;
+							if (!reservation_station[j]->m_registers.empty())
 							{
-								registers_in_use[reservation_station[i]->m_registers[0]].in_use = false;
+								registers_in_use[reservation_station[j]->m_registers[0]].in_use = false;
 							}
 						}
-						for (int i = 0; i < issue_station.size(); i++)
+						for (int j = 0; j < issue_station.size(); j++)
 						{
-							issue_station[i]->m_token = NOP;
-							if (!issue_station[i]->m_registers.empty())
+							issue_station[j]->m_token = NOP;
+							if (!issue_station[j]->m_registers.empty())
 							{
-								registers_in_use[issue_station[i]->m_registers[0]].in_use = false;
+								registers_in_use[issue_station[j]->m_registers[0]].in_use = false;
 							}
 						}
-						for (int i = 0; i < N_WAY_SS; i++)
+						for (int j = 0; j < N_WAY_SS; j++)
 						{
-							ID_command[i].token = NOP;
-							if (!ID_registers[i].empty())
+							ID_command[j].token = NOP;
+							if (!ID_registers[j].empty())
 							{
-								registers_in_use[ID_registers[i][0]].in_use = false;
+								registers_in_use[ID_registers[j][0]].in_use = false;
 							}
-							IFID_command[i].instruction = "NOP";
+							IFID_command[j].instruction = "NOP";
 						}
+
+						vector<int> index_to_remove;
+						for (int j = 0; j < reorder_buffer.size(); j++)
+						{
+							for (auto k : reorder_buffer[j]->m_branch_waits)
+							{
+								if (k == IDEX_command[i].instruction_number)
+								{
+									index_to_remove.push_back(j);
+								}
+							}
+						}
+						for (int j = 0; j < index_to_remove.size(); j++)
+						{
+							reorder_buffer.erase(reorder_buffer.begin() + index_to_remove[j] - j);
+						}
+
+						next_to_commit = instruction_number;
+						fetch_stop = false;
+						decode_stop = false;
+						issue_stop = false;
 					}
 					else
 					{
-						next_to_commit++;
-						//cout << "branch not taken, next to commit = " << next_to_commit << endl;
+						if (!dependent_branch.empty())
+						{
+							if (IDEX_command[i].instruction_number == dependent_branch[0])
+							{
+								next_to_commit++;
+								dependent_branch.erase(dependent_branch.begin());
+								for (auto p : reorder_buffer)
+								{
+									vector<int> tmp;
+									for (int q = 0; q < p->m_branch_waits.size(); q++)
+									{
+										if (p->m_branch_waits[q] == IDEX_command[i].instruction_number)
+										{
+											tmp.push_back(q);
+										}
+									}
+									for (int q = 0; q < tmp.size(); q++)
+									{
+										p->m_branch_waits.erase(p->m_branch_waits.begin() + tmp[q] - q);
+									}
+								}
+								for (auto p : issue_station)
+								{
+									vector<int> tmp;
+									for (int q = 0; q < p->m_branch_waits.size(); q++)
+									{
+										if (p->m_branch_waits[q] == IDEX_command[i].instruction_number)
+										{
+											tmp.push_back(q);
+										}
+									}
+									for (int q = 0; q < tmp.size(); q++)
+									{
+										p->m_branch_waits.erase(p->m_branch_waits.begin() + tmp[q] - q);
+									}
+								}
+								for (auto p : reservation_station)
+								{
+									vector<int> tmp;
+									for (int q = 0; q < p->m_branch_waits.size(); q++)
+									{
+										if (p->m_branch_waits[q] == IDEX_command[i].instruction_number)
+										{
+											tmp.push_back(q);
+										}
+									}
+									for (int q = 0; q < tmp.size(); q++)
+									{
+										p->m_branch_waits.erase(p->m_branch_waits.begin() + tmp[q] - q);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -283,7 +368,8 @@ int main(int argc, char *argv[])
 				if (issue_station[i]->m_dependency == false)
 				{
 					Dispatch *tmp = new Dispatch(issue_station[i]->m_registers, issue_station[i]->m_immediate,
-					                             issue_station[i]->m_token, issue_station[i]->m_instruction_number);
+					                             issue_station[i]->m_token, issue_station[i]->m_instruction_number,
+					                             issue_station[i]->m_branch_waits);
 					reservation_station.push_back(tmp);
 					dispatch_entries++;
 					//issue_station.erase(issue_station.begin() + i);
@@ -306,12 +392,7 @@ int main(int argc, char *argv[])
 						IDEX_immediate[i] = reservation_station[0]->m_immediate;
 						IDEX_command[i].token = reservation_station[0]->m_token;
 						IDEX_command[i].instruction_number = reservation_station[0]->m_instruction_number;
-						// for (auto j : IDEX_registers[i])
-						// {
-						// 	cout << "register " << j << " has value: " << registers[j] << endl;
-						// }
-						// cout << "for instruction: " << IDEX_command[i].instruction_number
-						//      << " token: " << IDEX_command[i].token << endl;
+						IDEX_branch_waits[i] = reservation_station[0]->m_branch_waits;
 						reservation_station.erase(reservation_station.begin());
 					}
 					else
@@ -338,15 +419,16 @@ int main(int argc, char *argv[])
 								dependency_not_met = true;
 							}
 						}
-						Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
-						                       ID_command[i].instruction_number, dependency_not_met);
+						Issue *tmp =
+						    new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
+						              ID_command[i].instruction_number, dependency_not_met, ID_branch_waits[i]);
 						issue_station.push_back(tmp);
 						issue_entries++;
 					}
 					else if (ID_command[i].token == EOP)
 					{
 						Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
-						                       ID_command[i].instruction_number, false);
+						                       ID_command[i].instruction_number, false, ID_branch_waits[i]);
 						issue_station.push_back(tmp);
 						issue_entries++;
 					}
@@ -370,15 +452,16 @@ int main(int argc, char *argv[])
 									dependency_not_met = true;
 								}
 							}
-							Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
-							                       ID_command[i].instruction_number, dependency_not_met);
+							Issue *tmp =
+							    new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
+							              ID_command[i].instruction_number, dependency_not_met, ID_branch_waits[i]);
 							issue_station.push_back(tmp);
 							issue_entries++;
 						}
 						else if (ID_command[i].token == EOP)
 						{
 							Issue *tmp = new Issue(ID_registers[i], ID_immediate[i], ID_command[i].token,
-							                       ID_command[i].instruction_number, true);
+							                       ID_command[i].instruction_number, true, ID_branch_waits[i]);
 							issue_station.push_back(tmp);
 							issue_entries++;
 						}
@@ -405,7 +488,7 @@ int main(int argc, char *argv[])
 						}
 					}
 				}
-				if (issue_station[i]->m_token == BEQ)
+				if (issue_station[i]->m_token == BEQ || issue_station[i]->m_token == BNE)
 				{
 					if (registers_in_use[issue_station[i]->m_registers[0]].in_use ||
 					    registers_in_use[issue_station[i]->m_registers[1]].in_use)
@@ -417,6 +500,13 @@ int main(int argc, char *argv[])
 						{
 							dependency_not_met = true;
 						}
+					}
+				}
+				if (issue_station[i]->m_token == ST)
+				{
+					if (registers_in_use[issue_station[i]->m_registers[0]].in_use)
+					{
+						dependency_not_met = true;
 					}
 				}
 				issue_station[i]->m_dependency = dependency_not_met;
@@ -434,10 +524,15 @@ int main(int argc, char *argv[])
 					ID_registers[i] = decode.getRegisters(IFID_instruction[i]); // Get the registers to be used
 					ID_command[i].token = decode.decode(IFID_command[i].instruction);
 					ID_command[i].instruction_number = IFID_command[i].instruction_number;
+					if (ID_command[i].token == BEQ || ID_command[i].token == BNE)
+					{
+						depends_on_branch = true;
+						dependent_branch.push_back(ID_command[i].instruction_number);
+					}
 
 					if (!ID_registers[i].empty())
 					{
-						if (ID_command[i].token == BEQ)
+						if (ID_command[i].token == BEQ || ID_command[i].token == ST || ID_command[i].token == BNE)
 						{
 							for (int j = 0; j < ID_registers[i].size(); j++)
 							{
@@ -495,6 +590,7 @@ int main(int argc, char *argv[])
 						ID_immediate[i] = decode.getImmediate(IFID_instruction[i]);
 						ID_command[i].token = decode.decode(IFID_command[i].instruction);
 						ID_command[i].instruction_number = IFID_command[i].instruction_number;
+						ID_branch_waits[i] = dependent_branch;
 					}
 				}
 				else
