@@ -92,7 +92,7 @@ public:
 	vector<int> m_branch_waits;
 };
 
-#define N_REGISTERS 64
+#define N_REGISTERS 256
 int PC;
 int executed_instructions;
 int g_clock;
@@ -541,6 +541,13 @@ int main(int argc, char *argv[])
 						if (ID_command[i].token == BEQ || ID_command[i].token == ST || ID_command[i].token == BNE)
 						{
 							for (int j = 0; j < ID_registers[i].size(); j++)
+							{
+								ID_registers[i][j] = register_rename[ID_registers[i][j]];
+							}
+						}
+						else
+						{
+							for (int j = 1; j < ID_registers[i].size(); j++)
 							{
 								ID_registers[i][j] = register_rename[ID_registers[i][j]];
 							}
