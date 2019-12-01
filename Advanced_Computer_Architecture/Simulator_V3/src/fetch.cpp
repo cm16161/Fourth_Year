@@ -8,11 +8,10 @@ Fetch &Fetch::getInstance()
 
 vector<string> Fetch::getInstruction(string line)
 {
-        vector<string> my_tokens;
+	vector<string> my_tokens;
 	istringstream iss(line);
-	copy(istream_iterator<string>(iss),
-        istream_iterator<string>(), back_inserter(my_tokens));
-        return my_tokens;
+	copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(my_tokens));
+	return my_tokens;
 }
 
 void Fetch::getCode(string file_name, vector<string> *instructions)

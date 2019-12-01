@@ -215,10 +215,11 @@ int main(int argc, char *argv[])
 						}
 					}
 				}
-				else
+				//else
 				{
 					if (branch_taken)
 					{
+						branch_taken = false;
 						for (int j = 0; j < reservation_station.size(); j++)
 						{
 							reservation_station[j]->m_token = NOP;
@@ -265,6 +266,7 @@ int main(int argc, char *argv[])
 						fetch_stop = false;
 						decode_stop = false;
 						issue_stop = false;
+						last = false;
 					}
 					else
 					{
@@ -613,7 +615,10 @@ int main(int argc, char *argv[])
 		{
 			for (int i = 0; i < N_WAY_SS; i++) // Get the instructions
 			{
-				IF_instruction_tokens[i] = fetch.getInstruction(code[PC + i]);
+				if (PC + i < code.size())
+				{
+					IF_instruction_tokens[i] = fetch.getInstruction(code[PC + i]);
+				}
 			}
 		}
 
