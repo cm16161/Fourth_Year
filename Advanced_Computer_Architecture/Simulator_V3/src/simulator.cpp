@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 2
+#define N_WAY_SS 4
 
 class Instruction_Order
 {
@@ -81,6 +81,7 @@ public:
 		m_instruction_number = instruction_number;
 	}
 	vector<int> m_registers;
+	vector<int> m_values;
 	int m_immediate, m_instruction_number;
 	ISA m_token;
 };
@@ -154,7 +155,6 @@ int main(int argc, char *argv[])
 	int final_last_instructions = 0;
 	for (;;)
 	{
-		//cout << "next_to commit = " << next_to_commit << endl;
 		if (g_clock > 4) // Commit Stage
 		{
 			for (int i = 0; i < reorder_buffer.size(); i++)
@@ -164,7 +164,9 @@ int main(int argc, char *argv[])
 					if (reorder_buffer[i]->m_token != BEQ)
 					{
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
+						//cout << "freeing: " << reorder_buffer[i]->rd << endl;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
+						//register_rename[reorder_buffer[i]->rd] = reorder_buffer[i]->rd;
 						reorder_buffer.erase(reorder_buffer.begin() + i);
 						next_to_commit++;
 						break;
@@ -197,11 +199,11 @@ int main(int argc, char *argv[])
 						}
 					}
 				}
-				//else
+				else
 				{
 					if (branch_taken)
 					{
-						cout << "BRANCH TAKEN!\n";
+                                          //cout << "BRANCH TAKEN!\n";
 						for (int i = 0; i < reservation_station.size(); i++)
 						{
 							reservation_station[i]->m_token = NOP;
@@ -230,7 +232,8 @@ int main(int argc, char *argv[])
 					}
 					else
 					{
-                                          //cout << "branch not taken, next to commit = " << next_to_commit << endl;
+						next_to_commit++;
+						//cout << "branch not taken, next to commit = " << next_to_commit << endl;
 					}
 				}
 			}
@@ -303,6 +306,12 @@ int main(int argc, char *argv[])
 						IDEX_immediate[i] = reservation_station[0]->m_immediate;
 						IDEX_command[i].token = reservation_station[0]->m_token;
 						IDEX_command[i].instruction_number = reservation_station[0]->m_instruction_number;
+						// for (auto j : IDEX_registers[i])
+						// {
+						// 	cout << "register " << j << " has value: " << registers[j] << endl;
+						// }
+						// cout << "for instruction: " << IDEX_command[i].instruction_number
+						//      << " token: " << IDEX_command[i].token << endl;
 						reservation_station.erase(reservation_station.begin());
 					}
 					else
@@ -428,10 +437,9 @@ int main(int argc, char *argv[])
 
 					if (!ID_registers[i].empty())
 					{
-						for (int j = 0; j < ID_registers[i].size(); j++)
+						if (ID_command[i].token == BEQ)
 						{
-
-							while (register_rename[ID_registers[i][j]] != register_rename[ID_registers[i][j]])
+							for (int j = 0; j < ID_registers[i].size(); j++)
 							{
 								ID_registers[i][j] = register_rename[ID_registers[i][j]];
 							}

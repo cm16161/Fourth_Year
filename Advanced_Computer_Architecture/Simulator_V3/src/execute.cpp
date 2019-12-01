@@ -2,6 +2,7 @@
 #include <iostream>
 extern int executed_instructions;
 extern int g_clock;
+extern bool branch_taken;
 //TODO Move Registers to separate folder!
 int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
@@ -125,7 +126,18 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		cout << " [ JR ] " << alu.jr(&registers[register_file[0]]) << endl;
 		break;
 	case BEQ:
-		cout << " [ BEQ ] " << alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		result = alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate);
+		cout << " [ BEQ ] ";
+		if (branch_taken)
+		{
+			cout << " Taken: ";
+		}
+		else
+		{
+			cout << " Not Taken ";
+		}
+		cout << result << endl;
+		// cout << " [ BEQ ] " << alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
 		break;
 	case BNE:
 		cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
