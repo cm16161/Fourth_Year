@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
 					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE)
 					{
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
+						//cout << "freeing " << reorder_buffer[i]->rd << endl;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
 						reorder_buffer.erase(reorder_buffer.begin() + i);
 						next_to_commit++;
@@ -480,11 +481,13 @@ int main(int argc, char *argv[])
 				{
 
 					if (issue_station[i]->m_token != NOP && issue_station[i]->m_token != EOP &&
-					    issue_station[i]->m_token != BEQ)
+					    issue_station[i]->m_token != BEQ && issue_station[i]->m_token != BNE)
 					{
 						if (registers_in_use[issue_station[i]->m_registers[j]].in_use &&
 						    issue_station[i]->m_registers[j] != issue_station[i]->m_registers[0])
 						{
+							// cout << issue_station[i]->m_instruction_number << " has token " << issue_station[i]->m_token
+							//      << "  is blocked on " << issue_station[i]->m_registers[j] << endl;
 							dependency_not_met = true;
 						}
 					}

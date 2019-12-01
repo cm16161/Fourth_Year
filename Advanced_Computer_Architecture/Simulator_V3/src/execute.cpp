@@ -140,7 +140,18 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		// cout << " [ BEQ ] " << alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
 		break;
 	case BNE:
-		cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
+		result = alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate);
+		cout << " [ BNE ] ";
+		if (branch_taken)
+		{
+			cout << " Taken: ";
+		}
+		else
+		{
+			cout << " Not Taken ";
+		}
+		cout << result << endl;
+		//cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
 		break;
 	case LD:
 		cout << " [ LD ] " << mem.ld(&registers[register_file[0]], immediate) << endl;
