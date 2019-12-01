@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 4
+#define N_WAY_SS 2
 
 class Instruction_Order
 {
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 			{
 				if (reorder_buffer[i]->instruction_number == next_to_commit)
 				{
-					if (reorder_buffer[i]->m_token != BEQ)
+					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE)
 					{
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
@@ -200,7 +200,8 @@ int main(int argc, char *argv[])
 			{
 				results[i] = execute(alu[i], IDEX_command[i].token, registers, IDEX_registers[i], IDEX_immediate[i]);
 				if (IDEX_command[i].token != JI && IDEX_command[i].token != JR && // IDEX_command[i].token != BEQ &&
-				    IDEX_command[i].token != BNE && IDEX_command[i].token != LDI)
+				    // IDEX_command[i].token != BNE &&
+				    IDEX_command[i].token != LDI)
 				{
 					if (!alu[i].m_lock)
 					{
