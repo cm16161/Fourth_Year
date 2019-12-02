@@ -7,3 +7,4 @@
 using namespace std;
 
 int execute(ALU& alu, ISA instructions, int registers[64], vector<int> register_file, int immediate);
+void end();

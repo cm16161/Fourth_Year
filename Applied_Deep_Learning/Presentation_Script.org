@@ -1,0 +1,55 @@
+Slide 1:
+Slide 2: Operating Systems are a vital part of any computer system, it
+handles which instructions are to be executed by the CPU, how long
+each process runs for (scheduling), memory management etc
+By improving the operating system, it is possible to improve the
+overall efficiency of the computer and reduce the amount of time
+switching between processes
+Slide 3: The key components to be changed are the OS kernel itself,
+and this is to allow for changes made to the Scheduler to be
+implemented
+Slide 4: Scheduler handles which processes to be run at a given time
+         Improvements to the scheduler can allow for the reduction in
+         the TAT of a process (turn around time)
+         Improvements can take the form of using previous application runtime
+         statistics to determine "CPU bursts" which allow a process to
+         finish sooner, thus reducing the time wasted on context
+         switches
+Slide 5:
+Slide 6: System calls can be added to the OS kernel which allow for
+         the possibility of modifying the Scheduler to improve
+         performance
+         Changing the way processes are created allow for setting a
+         newly implemented variable to force the Scheduler to execute
+         a process for a set amount of CPU cycles
+         Update the scheduler so that these above changes get
+         implemented
+Slide 7: Different features which can be used to classify a process
+         Eg. Text is the size of the executable (text)
+             Data is the size of the uninitialised program
+Slide 8: How does this all fit together?
+         Step 1: Repeatedly run "pre-classified" programs to get the
+         best CPU time allocations
+         Step 2: Build a knowledge base of program characteristics
+         (train the machine learning model) which a test set of
+         pre-classified programs
+         Step 3: Test the program classification with a test-set of
+         processes to see the performance of the classifier
+         Step 4: Validate that the process classification combined
+         with "optimal" CPU burst times improves performance
+Slide 9: The results from the table show that out of 2 different
+         classification methods, the C4.5 Decision tree performs
+         better at classification than the IBK (k-nearest neighbours)
+         algorithm
+Slide 10: The results show using a Matrix Multiplication program
+          with and without the modifications to the scheduler
+          From this we can see that by modifying the scheduler can
+          improve the TAT of a process
+Slide 11: This change to the kernel can allow for a malicious process
+          to monopolise the CPU by setting a large CPU burst time
+          Different CPU architectures behave differently and so this
+          system is not guaranteed to improve performance across
+          different ones.
+          Currently this system has only been implemented on the Linux
+          Kernel and so isn't a full representation of real workloads
+          and use-cases

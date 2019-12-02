@@ -19,11 +19,13 @@ void MEM::STORE(int value, int index)
 int MEM::ld(int *rs, int address)
 {
 	*rs = LOAD(address);
+	std::cout << " [ LD ] " << *rs << std::endl;
 	return *rs;
 }
 void MEM::st(int *rs, int address)
 {
 	STORE(*rs, address);
+	std::cout << " [ ST ] " << std::endl;
 }
 
 MEM &MEM::getInstance()

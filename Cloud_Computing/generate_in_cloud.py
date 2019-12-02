@@ -9,9 +9,11 @@ import threading
 import multiprocessing
 import time
 import math
+import logging
 
 STOP_THREADS = False
 TIME_FOR_ALL = 21524
+FINISHED = 0
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -21,11 +23,13 @@ def get_args():
                         type=int, default="32")
     parser.add_argument("-c", "--confidence", help="Input a confidence value such that the program will complete successfully with that confidence percentage", type=float, default="100")
     parser.add_argument("-t", "--timeout", type=int, help="Input a time-out value in seconds such that the whole program will terminate in that given time", default="86400")
+    parser.add_argument("-l", "--log", action='store_true',default=False)
     args = parser.parse_args()
     return args
 
 def send_to_cloud(difficulty=1, start_val=0, step=1, end=2**32+1):
     global STOP_THREADS
+    global FINISHED
     ec2 = boto3.resource('ec2', region_name='us-east-1')
     response = ec2.create_instances(InstanceInitiatedShutdownBehavior='terminate',
                                     ImageId='ami-00dc79254d0461090',
@@ -69,6 +73,11 @@ def send_to_cloud(difficulty=1, start_val=0, step=1, end=2**32+1):
             ssh.close()
             return
         print(stdout.readlines())
+        if stdout.readlines() == "[]":
+            FINISHED+=1
+            while True:
+                pass
+
         STOP_THREADS= True
         sftp.close()
         ssh.close()
@@ -77,39 +86,75 @@ def send_to_cloud(difficulty=1, start_val=0, step=1, end=2**32+1):
 
 def main():
     """Main Function"""
-    start = time.time()
     args = get_args()
+    start = time.time()
+    if args.log:
+        logging.basicConfig(filename="generate_in_cloud.log", level=logging.INFO)
+        log_string = "Start time is: " + str(start)
+        logging.info(log_string)
     global STOP_THREADS
-    threads = list()
-    n_threads = args.n_threads
+    global FINISHED
+    processes = list()
+    n_processes = args.n_threads
     confidence = args.confidence/100
+    if args.log:
+        log_string = "Confidence is set to: " +str(args.confidence)
+        logging.info(log_string)
     end = (confidence * 2**32) + 1
+    if args.log:
+        log_string = "End value to search up to is set to: " + str(end)
+        logging.info(log_string)
     duration = args.timeout
-    n_threads = math.ceil((confidence * TIME_FOR_ALL) / duration)
+    if args.log:
+        log_string = "Maximum Program duration is set to: " + str(duration) + "s"
+        logging.info(log_string)
+    n_processes = math.ceil((confidence * TIME_FOR_ALL) / duration)
     if duration == 86400 and confidence == 1:
-        n_threads = args.n_threads
+        n_processes = args.n_threads
 
+    if args.log:
+        log_string = "Spawning: " + str(n_processes) + " VMs"
+        logging.info(log_string)
     for _t in range(args.n_threads):
         start_val = _t
         step = args.n_threads
         _x = multiprocessing.Process(target=send_to_cloud, daemon=True,
                                      args=(args.difficulty, int(start_val), int(step), int(end)))
-        threads.append(_x)
+        processes.append(_x)
         _x.start()
     wait = True
     while wait:
         if time.time() > start + duration:
+            if args.log:
+                log_string = "Timeout Met"
+                logging.info(log_string)
             wait = False
-        for _t in threads:
-            if _t.is_alive():
+        for _p in processes:
+            if _p.is_alive():
                 pass
             else:
+                if args.log:
+                    log_string = "Process Finished"
+                    logging.info(log_string)
                 wait = False
+        if FINISHED == n_processes:
+            if args.log:
+                log_string = "All Processes Finished"
+                logging.info(log_string)
+            wait = False
 
-    for _t in threads:
-        _t.terminate()
+    
+    for _p in processes:
+        if args.log:
+            log_string = "Terminating Process"
+            logging.info(log_string)    
+        _p.terminate()
 
+    if args.log:
+        log_string = "Terminating VMs"
+        logging.info(log_string)
     kill_instances.kill()
+    
 
 if __name__ == '__main__':
     main()
