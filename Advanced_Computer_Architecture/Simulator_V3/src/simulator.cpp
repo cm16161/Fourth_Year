@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 2
+#define N_WAY_SS 1
 
 class Instruction_Order
 {
@@ -196,8 +196,10 @@ int main(int argc, char *argv[])
 	{
 		if (g_clock > 4) // Commit Stage
 		{
+                  //cout << " Next to commit " << next_to_commit << endl;
 			for (int i = 0; i < reorder_buffer.size(); i++)
 			{
+				//		cout << reorder_buffer[i]->instruction_number << endl;
 				if (reorder_buffer[i]->instruction_number == next_to_commit)
 				{
 					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE &&
@@ -244,8 +246,10 @@ int main(int argc, char *argv[])
 
 		if (g_clock > 3) // Execute Stage
 		{
+
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
+
 				if (IDEX_command[i].token != LD && IDEX_command[i].token != ST && IDEX_command[i].token != EOP)
 				{
 					results[i] =
@@ -259,20 +263,14 @@ int main(int argc, char *argv[])
 				}
 				if (!alu[i].m_lock)
 				{
-					if (IDEX_command[i].token != NOP && IDEX_command[i].token != LD && IDEX_command[i].token != ST)
+					if (IDEX_command[i].token != NOP && IDEX_command[i].token != LD && IDEX_command[i].token != ST &&
+					    IDEX_command[i].token != BEQ)
 					{
 						Reorder *tmp = new Reorder(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0],
 						                           IDEX_command[i].token, IDEX_branch_waits[i], false);
 						reorder_buffer.push_back(tmp);
 					}
-					// else if (IDEX_command[i].token == LD || IDEX_command[i].token == ST)
-					// {
-					// 	Reorder *tmp =
-					// 	    new Reorder(IDEX_immediate[i], IDEX_command[i].instruction_number, IDEX_registers[i][0],
-					// 	                IDEX_command[i].token, IDEX_branch_waits[i], true);
-					// }
 				}
-				//else
 				{
 					if (branch_taken)
 					{
@@ -302,6 +300,10 @@ int main(int argc, char *argv[])
 							}
 							IFID_command[j].instruction = "NOP";
 						}
+						for (int j = i; j < N_WAY_SS; j++)
+						{
+							IDEX_command[j].token = NOP;
+						}
 
 						vector<int> index_to_remove;
 						for (int j = 0; j < reorder_buffer.size(); j++)
@@ -311,6 +313,7 @@ int main(int argc, char *argv[])
 								if (k == IDEX_command[i].instruction_number)
 								{
 									index_to_remove.push_back(j);
+									continue;
 								}
 							}
 						}
@@ -318,6 +321,7 @@ int main(int argc, char *argv[])
 						{
 							reorder_buffer.erase(reorder_buffer.begin() + index_to_remove[j] - j);
 						}
+						dependent_branch.clear();
 
 						next_to_commit = instruction_number;
 						fetch_stop = false;
@@ -327,6 +331,7 @@ int main(int argc, char *argv[])
 					}
 					else
 					{
+
 						if (!dependent_branch.empty())
 						{
 							if (IDEX_command[i].instruction_number == dependent_branch[0])
@@ -418,14 +423,14 @@ int main(int argc, char *argv[])
 
 			for (int i = 0; i < issue_station.size(); i++)
 			{
-				if (issue_station[i]->m_token == EOP)
-				{
-					if (issue_station.size() != 1)
-					{
+				// if (issue_station[i]->m_token == EOP)
+				// {
+				// 	if (issue_station.size() != 1)
+				// 	{
 
-						continue;
-					}
-				}
+				// 		continue;
+				// 	}
+				// }
 				if (issue_station[i]->m_dependency == false)
 				{
 					Dispatch *tmp = new Dispatch(issue_station[i]->m_registers, issue_station[i]->m_immediate,
