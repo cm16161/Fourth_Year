@@ -78,14 +78,6 @@ ISA Decode::decode(std::string inst)
 	{
 		return SLTI;
 	}
-	else if (inst.compare("JI") == 0)
-	{
-		return JI;
-	}
-	else if (inst.compare("JR") == 0)
-	{
-		return JR;
-	}
 	else if (inst.compare("BEQ") == 0)
 	{
 		return BEQ;
@@ -97,10 +89,6 @@ ISA Decode::decode(std::string inst)
 	else if (inst.compare("LD") == 0)
 	{
 		return LD;
-	}
-	else if (inst.compare("LDI") == 0)
-	{
-		return LDI;
 	}
 	else if (inst.compare("ST") == 0)
 	{

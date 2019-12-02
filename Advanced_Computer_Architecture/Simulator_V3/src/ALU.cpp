@@ -148,17 +148,6 @@ int ALU::seq(int *rs, int immediate)
 	return (*rs == immediate ? 1 : 0);
 }
 
-int ALU::ji(int immediate)
-{
-	JI ji(immediate);
-	return ji.run();
-}
-
-int ALU::jr(int *rs)
-{
-	JR jr(rs);
-	return jr.run();
-}
 int ALU::beq(int *rs, int *rt, int address)
 {
 	BEQ beq(rs, rt, address);
@@ -170,8 +159,3 @@ int ALU::bne(int *rs, int *rt, int address)
 	return bne.run();
 }
 
-int ALU::ldi(int *rs, int immediate)
-{
-	LDI ldi(rs, immediate);
-	return ldi.run();
-}

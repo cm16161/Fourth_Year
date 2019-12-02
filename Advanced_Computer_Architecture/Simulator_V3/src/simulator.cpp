@@ -59,19 +59,44 @@ public:
 class Reorder
 {
 public:
-	Reorder(int res, int num, int dest, ISA token, vector<int> branch_waits)
+	Reorder(int res, int num, int dest, ISA token, vector<int> branch_waits, bool mem_flag)
 	{
-		result = res;
-		instruction_number = num;
-		rd = dest;
-		m_token = token;
-		m_branch_waits = branch_waits;
+		if (token != LD && token != ST)
+		{
+			result = res;
+			instruction_number = num;
+			rd = dest;
+			m_token = token;
+			m_branch_waits = branch_waits;
+			m_mem_flag = mem_flag;
+		}
+		else
+		{
+			m_rs = dest;
+			m_immidiate = res;
+			instruction_number = num;
+			m_token = token;
+			m_branch_waits = branch_waits;
+			m_mem_flag = mem_flag;
+		}
 	}
+	// Reorder(int immidiate, int num, int rs, ISA token, vector<int> branch_waits, bool mem_flag)
+	// {
+	// 	m_rs = rs;
+	// 	m_immidiate = immidiate;
+	// 	instruction_number = num;
+	// 	m_token = token;
+	// 	m_branch_waits = branch_waits;
+	// 	m_mem_flag = mem_flag;
+	// }
 	int result;
 	int instruction_number;
 	int rd;
 	ISA m_token;
 	vector<int> m_branch_waits;
+	int m_rs = 0;
+	int m_immidiate = 0;
+	bool m_mem_flag;
 };
 
 class Dispatch
@@ -98,8 +123,6 @@ int executed_instructions;
 int g_clock;
 extern bool branch_taken;
 
-//TODO CHECK EXECUTE.CPP
-
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -119,6 +142,7 @@ int main(int argc, char *argv[])
 	PC = 0;
 	Fetch &fetch = Fetch::getInstance();
 	Decode &decode = Decode::getInstance();
+	static MEM &mem = MEM::getInstance();
 	ALU alu[N_WAY_SS];
 	int registers[N_REGISTERS] = { 0 };
 	Register_Usage registers_in_use[N_REGISTERS];
@@ -176,13 +200,36 @@ int main(int argc, char *argv[])
 			{
 				if (reorder_buffer[i]->instruction_number == next_to_commit)
 				{
-					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE)
+					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE &&
+					    reorder_buffer[i]->m_token != ST && reorder_buffer[i]->m_token != LD &&
+					    reorder_buffer[i]->m_token != EOP)
 					{
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
 						//cout << "freeing " << reorder_buffer[i]->rd << endl;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
 						reorder_buffer.erase(reorder_buffer.begin() + i);
 						next_to_commit++;
+						break;
+					}
+					else if (reorder_buffer[i]->m_token == LD)
+					{
+						mem.ld(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
+						registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
+						reorder_buffer.erase(reorder_buffer.begin() + i);
+						next_to_commit++;
+						break;
+					}
+					else if (reorder_buffer[i]->m_token == ST)
+					{
+						mem.st(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
+						registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
+						reorder_buffer.erase(reorder_buffer.begin() + i);
+						next_to_commit++;
+						break;
+					}
+					else if (reorder_buffer[i]->m_token == EOP)
+					{
+						end();
 						break;
 					}
 					else
@@ -199,21 +246,31 @@ int main(int argc, char *argv[])
 		{
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
-				results[i] = execute(alu[i], IDEX_command[i].token, registers, IDEX_registers[i], IDEX_immediate[i]);
-				if (IDEX_command[i].token != JI && IDEX_command[i].token != JR && // IDEX_command[i].token != BEQ &&
-				    // IDEX_command[i].token != BNE &&
-				    IDEX_command[i].token != LDI)
+				if (IDEX_command[i].token != LD && IDEX_command[i].token != ST && IDEX_command[i].token != EOP)
 				{
-					if (!alu[i].m_lock)
+					results[i] =
+					    execute(alu[i], IDEX_command[i].token, registers, IDEX_registers[i], IDEX_immediate[i]);
+				}
+				else
+				{
+					Reorder *tmp = new Reorder(IDEX_immediate[i], IDEX_command[i].instruction_number,
+					                           IDEX_registers[i][0], IDEX_command[i].token, IDEX_branch_waits[i], true);
+					reorder_buffer.push_back(tmp);
+				}
+				if (!alu[i].m_lock)
+				{
+					if (IDEX_command[i].token != NOP && IDEX_command[i].token != LD && IDEX_command[i].token != ST)
 					{
-						if (IDEX_command[i].token != NOP)
-						{
-							Reorder *tmp =
-							    new Reorder(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0],
-							                IDEX_command[i].token, IDEX_branch_waits[i]);
-							reorder_buffer.push_back(tmp);
-						}
+						Reorder *tmp = new Reorder(results[i], IDEX_command[i].instruction_number, IDEX_registers[i][0],
+						                           IDEX_command[i].token, IDEX_branch_waits[i], false);
+						reorder_buffer.push_back(tmp);
 					}
+					// else if (IDEX_command[i].token == LD || IDEX_command[i].token == ST)
+					// {
+					// 	Reorder *tmp =
+					// 	    new Reorder(IDEX_immediate[i], IDEX_command[i].instruction_number, IDEX_registers[i][0],
+					// 	                IDEX_command[i].token, IDEX_branch_waits[i], true);
+					// }
 				}
 				//else
 				{

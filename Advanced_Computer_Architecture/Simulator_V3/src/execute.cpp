@@ -3,12 +3,15 @@
 extern int executed_instructions;
 extern int g_clock;
 extern bool branch_taken;
-//TODO Move Registers to separate folder!
+
+int nop_count = 0;
+int missed_branch = 0;
+
 int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_file, int immediate)
 {
-	static int nop_count = 0;
-	static int missed_branch = 0;
-	static MEM &mem = MEM::getInstance();
+	// static int nop_count = 0;
+	// static int missed_branch = 0;
+	//static MEM &mem = MEM::getInstance();
 	int result;
 	switch (instructions)
 	{
@@ -120,12 +123,6 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		result = alu.slti(&registers[register_file[1]], immediate);
 		cout << " [ SLTI ] " << alu.slti(&registers[register_file[1]], immediate) << endl;
 		break;
-	case JI:
-		cout << " [ JI ] " << alu.ji(immediate) << endl;
-		break;
-	case JR:
-		cout << " [ JR ] " << alu.jr(&registers[register_file[0]]) << endl;
-		break;
 	case BEQ:
 		result = alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate);
 		cout << " [ BEQ ] ";
@@ -156,16 +153,13 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		cout << result << endl;
 		//cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
 		break;
-	case LD:
-		cout << " [ LD ] " << mem.ld(&registers[register_file[0]], immediate) << endl;
-		break;
-	case ST:
-		mem.st(&registers[register_file[0]], immediate);
-		cout << " [ ST ] " << endl;
-		break;
-	case LDI:
-		cout << " [ LDI ] " << alu.ldi(&registers[register_file[0]], immediate) << endl;
-		break;
+	// case LD:
+	// 	cout << " [ LD ] " << mem.ld(&registers[register_file[0]], immediate) << endl;
+	// 	break;
+	// case ST:
+	// 	mem.st(&registers[register_file[0]], immediate);
+	// 	cout << " [ ST ] " << endl;
+	// 	break;
 	case SEQ:
 		result = alu.seq(&registers[register_file[1]], immediate);
 		cout << " [ SEQ ] " << alu.seq(&registers[register_file[1]], immediate) << endl;
@@ -191,4 +185,16 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		executed_instructions++;
 	}
 	return result;
+}
+
+void end()
+{
+	cout << " [ EOP ] Program terminated successfully " << endl;
+	cout << " { " << (executed_instructions + nop_count) << " } Instructions Executed " << endl;
+	cout << " { " << (executed_instructions) << " } Useful Instructions Executed " << endl;
+	cout << " { " << ceil(g_clock) << " } Clock Cycles Taken " << endl;
+	cout << " { " << (executed_instructions + nop_count) / (ceil(g_clock)) << " } Instructions per Cycle" << endl;
+	cout << " { " << nop_count << " } NOP Instructions" << endl;
+	cout << " { " << missed_branch << " } Miss-Predicted Branches" << endl;
+	exit(EXIT_SUCCESS);
 }
