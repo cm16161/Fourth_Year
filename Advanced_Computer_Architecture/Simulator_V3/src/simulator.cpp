@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
 	{
 		if (g_clock > 4) // Commit Stage
 		{
-                  //cout << " Next to commit " << next_to_commit << endl;
+			//cout << " Next to commit " << next_to_commit << endl;
 			for (int i = 0; i < reorder_buffer.size(); i++)
 			{
 				//		cout << reorder_buffer[i]->instruction_number << endl;
@@ -215,18 +215,40 @@ int main(int argc, char *argv[])
 					}
 					else if (reorder_buffer[i]->m_token == LD)
 					{
-						mem.ld(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
-						registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
-						reorder_buffer.erase(reorder_buffer.begin() + i);
-						next_to_commit++;
+						if (!mem.m_lock)
+						{
+							mem.m_lock = true;
+							mem.m_delay = 5;
+						}
+						mem.m_delay--;
+						if (mem.m_delay <= 0)
+						{
+							mem.m_lock = false;
+							mem.ld(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
+							registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
+							reorder_buffer.erase(reorder_buffer.begin() + i);
+							next_to_commit++;
+						}
+
 						break;
 					}
 					else if (reorder_buffer[i]->m_token == ST)
 					{
-						mem.st(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
-						registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
-						reorder_buffer.erase(reorder_buffer.begin() + i);
-						next_to_commit++;
+						if (!mem.m_lock)
+						{
+							mem.m_lock = true;
+							mem.m_delay = 5;
+						}
+						mem.m_delay--;
+						if (mem.m_delay <= 0)
+						{
+							mem.m_lock = false;
+							mem.st(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
+							registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
+							reorder_buffer.erase(reorder_buffer.begin() + i);
+							next_to_commit++;
+						}
+
 						break;
 					}
 					else if (reorder_buffer[i]->m_token == EOP)

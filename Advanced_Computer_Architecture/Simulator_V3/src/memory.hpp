@@ -10,6 +10,8 @@ class MEM
 
 public:
 	static MEM &getInstance();
+	bool m_lock = false;
+	int m_delay = 0;
 	int LOAD(int index);
 	void STORE(int value, int index);
 	int ld(int *rs, int address);
