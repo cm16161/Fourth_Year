@@ -197,11 +197,13 @@ int main(int argc, char *argv[])
 		if (g_clock > 4) // Commit Stage
 		{
 			//cout << " Next to commit " << next_to_commit << endl;
+			vector<int> entries_to_free;
 			for (int i = 0; i < reorder_buffer.size(); i++)
 			{
 				//		cout << reorder_buffer[i]->instruction_number << endl;
 				if (reorder_buffer[i]->instruction_number == next_to_commit)
 				{
+					entries_to_free.push_back(i);
 					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE &&
 					    reorder_buffer[i]->m_token != ST && reorder_buffer[i]->m_token != LD &&
 					    reorder_buffer[i]->m_token != EOP)
@@ -209,9 +211,9 @@ int main(int argc, char *argv[])
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
 						//cout << "freeing " << reorder_buffer[i]->rd << endl;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
-						reorder_buffer.erase(reorder_buffer.begin() + i);
+						//reorder_buffer.erase(reorder_buffer.begin() + i);
 						next_to_commit++;
-						break;
+						//break;
 					}
 					else if (reorder_buffer[i]->m_token == LD)
 					{
@@ -226,11 +228,11 @@ int main(int argc, char *argv[])
 							mem.m_lock = false;
 							mem.ld(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
 							registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
-							reorder_buffer.erase(reorder_buffer.begin() + i);
+							//reorder_buffer.erase(reorder_buffer.begin() + i);
 							next_to_commit++;
 						}
 
-						break;
+						//break;
 					}
 					else if (reorder_buffer[i]->m_token == ST)
 					{
@@ -245,24 +247,28 @@ int main(int argc, char *argv[])
 							mem.m_lock = false;
 							mem.st(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
 							registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
-							reorder_buffer.erase(reorder_buffer.begin() + i);
+							//reorder_buffer.erase(reorder_buffer.begin() + i);
 							next_to_commit++;
 						}
 
-						break;
+						//break;
 					}
 					else if (reorder_buffer[i]->m_token == EOP)
 					{
 						end();
-						break;
+						//break;
 					}
 					else
 					{
-						reorder_buffer.erase(reorder_buffer.begin() + i);
+						//reorder_buffer.erase(reorder_buffer.begin() + i);
 						next_to_commit++;
-						break;
+						//break;
 					}
 				}
+			}
+			for (int i = 0; i < entries_to_free.size(); i++)
+			{
+				reorder_buffer.erase(reorder_buffer.begin() + entries_to_free[i] - i);
 			}
 		} // End of Commit Stage
 
@@ -271,7 +277,6 @@ int main(int argc, char *argv[])
 
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
-
 				if (IDEX_command[i].token != LD && IDEX_command[i].token != ST && IDEX_command[i].token != EOP)
 				{
 					results[i] =
@@ -345,6 +350,10 @@ int main(int argc, char *argv[])
 						}
 						dependent_branch.clear();
 
+						for (int i = 0; i < N_WAY_SS; i++)
+						{ // Release All ALUs on branch mispredict
+							alu[i].m_lock = false;
+						}
 						next_to_commit = instruction_number;
 						fetch_stop = false;
 						decode_stop = false;
@@ -415,43 +424,9 @@ int main(int argc, char *argv[])
 		{
 			vector<int> index_to_remove;
 			vector<int> remove_for_eop;
-			for (int i = 0; i < issue_station.size();
-			     i++) // Make sure that EOP can execute even if there are NOP's from blank execution
-			{
-				if (issue_station[i]->m_token == EOP)
-				{
-					for (int j = 0; j < issue_station.size(); j++)
-					{
-						if (issue_station[j]->m_token == EOP || issue_station[j]->m_token == NOP)
-						{
-							if (i != j)
-							{
-								if (i == j)
-								{
-									exit(-1);
-								}
-								remove_for_eop.push_back(j);
-							}
-						}
-					}
-				}
-			}
-
-			for (int i = 0; i < remove_for_eop.size(); i++)
-			{
-				issue_station.erase(issue_station.begin() + remove_for_eop[i] - i); // remove excess instructions
-			}
 
 			for (int i = 0; i < issue_station.size(); i++)
 			{
-				// if (issue_station[i]->m_token == EOP)
-				// {
-				// 	if (issue_station.size() != 1)
-				// 	{
-
-				// 		continue;
-				// 	}
-				// }
 				if (issue_station[i]->m_dependency == false)
 				{
 					Dispatch *tmp = new Dispatch(issue_station[i]->m_registers, issue_station[i]->m_immediate,
@@ -559,7 +534,8 @@ int main(int argc, char *argv[])
 					//cout << "skipping issue\n";
 				}
 			}
-			for (int i = 0; i < issue_station.size(); i++)
+
+			for (int i = 0; i < issue_station.size(); i++) // Update Dependencies for all entries in the Issue Station
 			{
 				bool dependency_not_met = false;
 				for (int j = 1; j < issue_station[i]->m_registers.size(); j++)

@@ -46,46 +46,136 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 
 		break;
 	case MUL:
-		result = alu.mul(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ MUL ] " << alu.mul(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 2;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.mul(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ MUL ] " << alu.mul(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case DIV:
-		result = alu.div(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ DIV ] " << alu.div(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 5;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.div(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ DIV ] " << alu.div(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case MOD:
-		result = alu.mod(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ MOD ] " << alu.mod(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 5;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.mod(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ MOD ] " << alu.mod(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case SLL:
-		result = alu.sll(&registers[register_file[1]], immediate);
-		cout << " [ SLL ] " << alu.sll(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.sll(&registers[register_file[1]], immediate);
+			cout << " [ SLL ] " << alu.sll(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case SRL:
-		result = alu.srl(&registers[register_file[1]], immediate);
-		cout << " [ SRL ] " << alu.srl(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.srl(&registers[register_file[1]], immediate);
+			cout << " [ SRL ] " << alu.srl(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case AND:
-		result = alu.and_op(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ AND ] " << alu.and_op(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.and_op(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ AND ] " << alu.and_op(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case ORR:
-		result = alu.orr(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ ORR ] " << alu.orr(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.orr(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ ORR ] " << alu.orr(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case NOR:
-		result = alu.nor(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ NOR ] " << alu.nor(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.nor(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ NOR ] " << alu.nor(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case SLT:
-		result = alu.slt(&registers[register_file[1]], &registers[register_file[2]]);
-		cout << " [ SLT ] " << alu.slt(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.slt(&registers[register_file[1]], &registers[register_file[2]]);
+			cout << " [ SLT ] " << alu.slt(&registers[register_file[1]], &registers[register_file[2]]) << endl;
+		}
 		break;
 	case ADDI:
 		if (alu.m_lock == false)
 		{
 			alu.m_lock = true;
-			alu.m_delay = 2;
+			alu.m_delay = 1;
 		}
 		alu.m_delay--;
 		if (alu.m_delay == 0)
@@ -96,32 +186,102 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		}
 		break;
 	case SUBI:
-		result = alu.subi(&registers[register_file[1]], immediate);
-		cout << " [ SUBI ] " << alu.subi(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.subi(&registers[register_file[1]], immediate);
+			cout << " [ SUBI ] " << alu.subi(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case MULI:
-		result = alu.muli(&registers[register_file[1]], immediate);
-		cout << " [ MULI ] " << alu.muli(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.muli(&registers[register_file[1]], immediate);
+			cout << " [ MULI ] " << alu.muli(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case DIVI:
-		result = alu.divi(&registers[register_file[1]], immediate);
-		cout << " [ DIVI ] " << alu.divi(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 5;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.divi(&registers[register_file[1]], immediate);
+			cout << " [ DIVI ] " << alu.divi(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case ANDI:
-		result = alu.andi(&registers[register_file[1]], immediate);
-		cout << " [ ANDI ] " << alu.andi(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.andi(&registers[register_file[1]], immediate);
+			cout << " [ ANDI ] " << alu.andi(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case ORI:
-		result = alu.ori(&registers[register_file[1]], immediate);
-		cout << " [ ORI ] " << alu.ori(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.ori(&registers[register_file[1]], immediate);
+			cout << " [ ORI ] " << alu.ori(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case MODI:
-		result = alu.modi(&registers[register_file[1]], immediate);
-		cout << " [ MODI ] " << alu.modi(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 5;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.modi(&registers[register_file[1]], immediate);
+			cout << " [ MODI ] " << alu.modi(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case SLTI:
-		result = alu.slti(&registers[register_file[1]], immediate);
-		cout << " [ SLTI ] " << alu.slti(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 1;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.slti(&registers[register_file[1]], immediate);
+			cout << " [ SLTI ] " << alu.slti(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case BEQ:
 		result = alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate);
@@ -129,11 +289,11 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		if (branch_taken)
 		{
 			missed_branch++;
-			cout << " Taken: ";
+			cout << "Taken: ";
 		}
 		else
 		{
-			cout << " Not Taken ";
+			cout << "Not Taken ";
 		}
 		cout << result << endl;
 		// cout << " [ BEQ ] " << alu.beq(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
@@ -144,11 +304,11 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		if (branch_taken)
 		{
 			missed_branch++;
-			cout << " Taken: ";
+			cout << "Taken: ";
 		}
 		else
 		{
-			cout << " Not Taken ";
+			cout << "Not Taken ";
 		}
 		cout << result << endl;
 		//cout << " [ BNE ] " << alu.bne(&registers[register_file[0]], &registers[register_file[1]], immediate) << endl;
@@ -161,8 +321,18 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 	// 	cout << " [ ST ] " << endl;
 	// 	break;
 	case SEQ:
-		result = alu.seq(&registers[register_file[1]], immediate);
-		cout << " [ SEQ ] " << alu.seq(&registers[register_file[1]], immediate) << endl;
+		if (alu.m_lock == false)
+		{
+			alu.m_lock = true;
+			alu.m_delay = 3;
+		}
+		alu.m_delay--;
+		if (alu.m_delay == 0)
+		{
+			alu.m_lock = false;
+			result = alu.seq(&registers[register_file[1]], immediate);
+			cout << " [ SEQ ] " << alu.seq(&registers[register_file[1]], immediate) << endl;
+		}
 		break;
 	case EOP:
 		cout << " [ EOP ] Program terminated successfully " << endl;
