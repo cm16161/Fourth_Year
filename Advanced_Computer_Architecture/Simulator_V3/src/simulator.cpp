@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#define N_WAY_SS 1
+#define N_WAY_SS 2
 
 class Instruction_Order
 {
@@ -117,7 +117,7 @@ public:
 	vector<int> m_branch_waits;
 };
 
-#define N_REGISTERS 256
+//#define N_REGISTERS 256
 int PC;
 int executed_instructions;
 int g_clock;
@@ -322,10 +322,10 @@ int main(int argc, char *argv[])
 							}
 							IFID_command[j].instruction = "NOP";
 						}
-						for (int j = i; j < N_WAY_SS; j++)
-						{
-							IDEX_command[j].token = NOP;
-						}
+						// for (int j = 0; j < N_WAY_SS; j++)
+						// {
+						// 	IDEX_command[j].token = NOP;
+						// }
 
 						vector<int> index_to_remove;
 						for (int j = 0; j < reorder_buffer.size(); j++)
@@ -353,7 +353,6 @@ int main(int argc, char *argv[])
 					}
 					else
 					{
-
 						if (!dependent_branch.empty())
 						{
 							if (IDEX_command[i].instruction_number == dependent_branch[0])

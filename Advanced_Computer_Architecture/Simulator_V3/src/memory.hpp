@@ -1,6 +1,7 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 #define MEM_SIZE 128
+#define N_REGISTERS 256
 #include <iostream>
 
 class MEM
