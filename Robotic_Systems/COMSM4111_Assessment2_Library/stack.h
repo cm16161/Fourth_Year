@@ -1,4 +1,5 @@
-#define MAX_SIZE 1024
+#define MAX_SIZE 25
+#define ROOT_MAX 5
 
 typedef struct {
   int x;

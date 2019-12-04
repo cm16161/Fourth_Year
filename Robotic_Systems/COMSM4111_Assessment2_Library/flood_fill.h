@@ -1,3 +1,5 @@
+#include "stack.h"
+
 typedef struct
 {
   Coordinate neighbours[4];
@@ -11,21 +13,26 @@ typedef struct {
 class FloodFill {
   public:
     FloodFill() {
-      for (int i = 0; i < 625; i++) {
+      for (int i = 0; i < MAX_SIZE; i++) {
         m_visited[i] = false;
+        m_added[i] = false;
       }
     }
 
-    bool m_visited[625];
+    bool m_visited[MAX_SIZE];
+    bool m_added[MAX_SIZE];
     Stack& m_stack = Stack::getInstance();
 
     Neighbours getNeighbours(Coordinate c);
     bool validateCoordinate(Coordinate c); // This is going to validate the height, width, visited
+    bool validateStack(Coordinate c);
     void addToStack(Coordinate c);
     Coordinate getCoordinate();
     Goto rotateTo(Coordinate src, Coordinate dst);
     bool visited(Coordinate c); // Use Hash Function: index = 25x+y
+    bool onStack(Coordinate c);
     void addToVisited(Coordinate c); // Use Hash Function: index = 25x+y
+    void addToAdded(Coordinate c);
     bool isEmpty(); // Check if underlying stack is empty
 };
 
@@ -39,10 +46,14 @@ Neighbours FloodFill::getNeighbours(Coordinate c) {
 }
 
 bool FloodFill::validateCoordinate(Coordinate c) {
-  if (c.x > 25 || c.x < 0 || c.y > 25 || c.y < 0) {
+  if (c.x >= ROOT_MAX || c.x < 0 || c.y >= ROOT_MAX || c.y < 0) {
     return false;
   }
   return !visited(c);
+}
+
+bool FloodFill::validateStack(Coordinate c) {
+  return !onStack(c);
 }
 
 void FloodFill::addToStack(Coordinate c) {
@@ -59,11 +70,19 @@ Goto FloodFill::rotateTo(Coordinate src, Coordinate dst) {
 }
 
 bool FloodFill::visited(Coordinate c) {
-  return m_visited[25 * c.x + c.y];
+  return m_visited[ROOT_MAX * c.x + c.y];
+}
+
+bool FloodFill::onStack(Coordinate c) {
+  return m_added[ROOT_MAX * c.x + c.y];
 }
 
 void FloodFill::addToVisited(Coordinate c) {
-  m_visited[25 * c.x + c.y] = true;
+  m_visited[ROOT_MAX * c.x + c.y] = true;
+}
+
+void FloodFill::addToAdded(Coordinate c) {
+  m_added[ROOT_MAX * c.x + c.y] = true;
 }
 
 bool FloodFill::isEmpty() {

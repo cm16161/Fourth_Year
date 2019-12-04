@@ -51,11 +51,10 @@ void Motor::setPower(int demand) {
   demand = abs(demand);
 
   // Keep between 0 255
-  demand = constrain( demand, 0, 255 );
+  demand = constrain( demand, 0, 50 );
   
   //Write out.
   analogWrite(pwm_pin, demand );
 }
 
 #endif
-

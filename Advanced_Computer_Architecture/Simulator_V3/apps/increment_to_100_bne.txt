@@ -2,6 +2,3 @@ ADDI $2 $2 #100
 ADDI $1 $1 #1
 BNE $1 $2 #2
 EOP
-NOP
-NOP
-NOP

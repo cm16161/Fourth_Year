@@ -6,10 +6,10 @@
 u8 USB_SendSpace(u8 ep);
 #define SERIAL_ACTIVE (USB_SendSpace(CDC_TX) >= 50)
 
-const byte MAP_RESOLUTION = 25;
-const byte MAP_DEFAULT_FEATURE = '#';
-const int MAP_X = 1800;
-const int MAP_Y = 1800;
+const byte MAP_RESOLUTION = 5;
+const byte MAP_DEFAULT_FEATURE = '_';
+const int MAP_X = 5;
+const int MAP_Y = 5;
 
 class Mapper {
   public:
@@ -77,14 +77,26 @@ void Mapper::updateMapFeature(byte feature, float y, float x) {
 void Mapper::updateMapFeature(byte feature, int y, int x) {
 
   if (x > MAP_X || x < 0 || y > MAP_Y || y < 0) {
-    if(SERIAL_ACTIVE) Serial.println(F("Error:Invalid co-ordinate"));
+    if(SERIAL_ACTIVE) {
+      Serial.println(F("Error:Invalid co-ordinate"));
+      Serial.print("x = ");
+      Serial.print(x);
+      Serial.print(", MAP_X = ");
+      Serial.print(MAP_X);
+      Serial.print(", y = ");
+      Serial.print(y);
+      Serial.print(", MAP_Y = ");
+      Serial.println(MAP_Y);
+       
+      }
     return;
   }
 
-  int x_index = poseToIndex(x, MAP_X, MAP_RESOLUTION);
-  int y_index = poseToIndex(y, MAP_Y, MAP_RESOLUTION);
+  //int x_index = poseToIndex(x, MAP_X, MAP_RESOLUTION);
+  //int y_index = poseToIndex(y, MAP_Y, MAP_RESOLUTION);
 
-  int eeprom_address = (x_index * MAP_RESOLUTION) + y_index;
+  //int eeprom_address = (x_index * MAP_RESOLUTION) + y_index;
+  int eeprom_address = (x * MAP_RESOLUTION) + y;
 
   if (eeprom_address > 1023) {
     if(SERIAL_ACTIVE)Serial.println(F("Error: EEPROM Address greater than 1023"));
