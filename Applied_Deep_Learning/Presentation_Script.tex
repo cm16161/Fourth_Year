@@ -1,8 +1,38 @@
+% Created 2019-12-05 Thu 23:41
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\author{Chetan Mistry}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={Chetan Mistry},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 26.3 (Org mode 9.1.9)},
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
 Slide 1: Hi, welcome to the presentation on applying deep learning to prefetching
 
 Slide 2: CPU's are designed so that they reduce latency as much as possible
          However, memory remains to be a significant bottleneck. So much so, that
-         most modern applications spend about 50% of total cycles are spent waiting
+         most modern applications spend about 50\% of total cycles are spent waiting
          for data from memory.
 
 Slide 3: Prefetching is the mechanism that loads data from an address in memory
@@ -13,9 +43,14 @@ Slide 3: Prefetching is the mechanism that loads data from an address in memory
 
 Slide 4: One particular method that a prefetcher loads an address is by
          looking at the stride, or delta, of recent memory addresses.
-         For example, accesses to addresses 0, 4, 8, 12,... seem to be
+         For example, accesses to addresses 0, 4, 8, 12,\ldots{} seem to be
          following a delta of 4, and so the prefetcher would load in addresses
          of multiples of 4 + offset.
+         A different type of prefetcher is a correlation prefetcher. This tries
+         to learn patterns in memory address accesses that aren't linear.
+         These prefetchers are require large tables to store address access
+         information which reduce performance and so they aren't used in
+         modern multicore processors
 
 Slide 5: Typically, memory address accesses are few and far between, this means
          that, when trying to predict an address, there are a large amount that
@@ -76,3 +111,4 @@ Slide 11: At each timestep, 10 predictions are made. If any of the deltas are
           perform at least as good as the other prefetchers.
 
 Slide 12: Thanks
+\end{document}

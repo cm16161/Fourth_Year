@@ -11,33 +11,45 @@ import time
 import math
 import logging
 
+
+# Change the following lines to configure 
+
+REGION = "us-east-1" # Region to deploy in
+IMAGE_ID = "ami-00dc79254d0461090" # Image ID to launch
+INSTANCE = "t2.micro" # Type of AWS instance to launch 
+KEYNAME = "" # Name of the AWS key file (NB. DO NOT INCLUDE .pem)
+SECURITY_GROUP_ID = "" # ID of the security group to assign a VM 
+
+# End of Configurations
+
 STOP_THREADS = False
 TIME_FOR_ALL = 21524
 FINISHED = 0
 
+
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--n_threads", help="Input the number of threads desired",
+    parser.add_argument("-n", "--n_threads", help="Input the number of Virtual Machines to use",
                         type=int, default="1")
     parser.add_argument("-d", "--difficulty", help="Input the difficulty value",
                         type=int, default="32")
     parser.add_argument("-c", "--confidence", help="Input a confidence value such that the program will complete successfully with that confidence percentage", type=float, default="100")
     parser.add_argument("-t", "--timeout", type=int, help="Input a time-out value in seconds such that the whole program will terminate in that given time", default="86400")
-    parser.add_argument("-l", "--log", action='store_true',default=False)
+    parser.add_argument("-l", "--log", action='store_true',help="Set this to output a logfile",default=False)
     args = parser.parse_args()
     return args
 
 def send_to_cloud(difficulty=1, start_val=0, step=1, end=2**32+1):
     global STOP_THREADS
     global FINISHED
-    ec2 = boto3.resource('ec2', region_name='us-east-1')
+    ec2 = boto3.resource('ec2', region_name=REGION)
     response = ec2.create_instances(InstanceInitiatedShutdownBehavior='terminate',
-                                    ImageId='ami-00dc79254d0461090',
+                                    ImageId=IMAGE_ID,
                                     MinCount=1,
                                     MaxCount=1,
-                                    InstanceType='t2.micro',
-                                    KeyName="Cloud_Computing",
-                                    SecurityGroupIds=["sg-0519526ab7b541838"]
+                                    InstanceType=INSTANCE,
+                                    KeyName=KEYNAME,
+                                    SecurityGroupIds=[SECURITY_GROUP_ID]
     )
 
     i = response[0]
@@ -55,8 +67,8 @@ def send_to_cloud(difficulty=1, start_val=0, step=1, end=2**32+1):
         while instance.public_ip_address is None:
             pass
 
-
-        key = paramiko.RSAKey.from_private_key_file("Cloud_Computing.pem")
+        key_file = KEYNAME+".pem"
+        key = paramiko.RSAKey.from_private_key_file(key_file)
         ssh = paramiko.SSHClient()
 
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())

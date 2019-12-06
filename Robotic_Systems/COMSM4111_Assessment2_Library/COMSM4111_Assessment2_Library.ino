@@ -211,13 +211,44 @@ void stopMotors() {
   R_Motor.setPower(0);
 }
 
+/*
+ * take current coordinate
+ * find neighbours 
+ * compare neighbours with current->index
+ * goto current->index-1
+ * return if abs(diff) curr.x -tgt.x + curr.y - tgt.y ==1 
+ */
+
+void moveForwards(){
+  L_Motor.setPower(20);
+  R_Motor.setPower(20);
+  delay(1000);
+  L_Motor.setPower(0);
+  R_Motor.setPower(0);
+}
+
+ void backTrack(Coordinate current){
+  Neighbours n = ff.getNeighbours(current);
+  int index = ff.getIndex(current);
+  for(int i = 0; i<4;i++){
+    if(ff.getIndex(n.neighbours[i]) == index-1){
+      rotateTo(current, n.neighbours[i]);
+      moveForwards();
+      curr = n.neighbours[i];
+      break;
+    }
+  }
+ }
+
 void rotateTo(Coordinate curr, Coordinate tgt) {
   int diff_x = curr.x - tgt.x;
   int diff_y = curr.y - tgt.y;
   float err = 0.1;
   RomiPose.update(e0_count, e1_count);
-  if (abs(diff_x) > 1 || abs(diff_y) > 1) {
-    Serial.println("Error: Abs diff to large");
+  if (abs(diff_x) > 1 || abs(diff_y) > 1 || abs(diff_y) + abs(diff_x) > 1) {
+    // Implement BackTrack
+    backTrack(curr);
+    //Serial.println("Error: Abs diff to large");
     return;
   }
 
@@ -275,13 +306,11 @@ void rotateTo(Coordinate curr, Coordinate tgt) {
 void goTo(Coordinate tgt) {
   //  Go forwards 1 unit in straight line
   //   Write power to motors.
-  L_Motor.setPower(20);
-  R_Motor.setPower(20);
-  delay(1000);
-  L_Motor.setPower(0);
-  R_Motor.setPower(0);
+  static int index = 1;
+  moveForwards();
   curr = tgt;
-  ff.addToVisited(curr);
+  ff.addToVisited(curr, index);
+  index++;
   RomiPose.update(e0_count, e1_count);
   //Map.updateMapFeature( ' ' , RomiPose.x, RomiPose.y );
   delay(1000);
@@ -310,6 +339,7 @@ void loop() {
       if (!init) {
         init = true;
         curr = tgt;
+        ff.addToVisited(curr, 0);
         Neighbours n = ff.getNeighbours(tgt);
         for (int i = 0; i < 4; i++) {
           if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i])) {
@@ -319,7 +349,7 @@ void loop() {
         }
       }
       RomiPose.update(e0_count, e1_count);
-      
+
       rotateTo(curr, tgt);
       stopMotors();
       delay(500);

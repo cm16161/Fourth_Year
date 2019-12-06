@@ -14,12 +14,12 @@ class FloodFill {
   public:
     FloodFill() {
       for (int i = 0; i < MAX_SIZE; i++) {
-        m_visited[i] = false;
+        m_visited[i] = -1;
         m_added[i] = false;
       }
     }
 
-    bool m_visited[MAX_SIZE];
+    int m_visited[MAX_SIZE];
     bool m_added[MAX_SIZE];
     Stack& m_stack = Stack::getInstance();
 
@@ -31,9 +31,10 @@ class FloodFill {
     Goto rotateTo(Coordinate src, Coordinate dst);
     bool visited(Coordinate c); // Use Hash Function: index = 25x+y
     bool onStack(Coordinate c);
-    void addToVisited(Coordinate c); // Use Hash Function: index = 25x+y
+    void addToVisited(Coordinate c, int index); // Use Hash Function: index = 25x+y
     void addToAdded(Coordinate c);
     bool isEmpty(); // Check if underlying stack is empty
+    int getIndex(Coordinate c);
 };
 
 Neighbours FloodFill::getNeighbours(Coordinate c) {
@@ -43,6 +44,10 @@ Neighbours FloodFill::getNeighbours(Coordinate c) {
   ret.neighbours[2] = Coordinate{c.x + 1, c.y};
   ret.neighbours[3] = Coordinate{c.x, c.y + 1};
   return ret;
+}
+
+int FloodFill::getIndex(Coordinate c){
+  return m_visited[ROOT_MAX*c.x + c.y];
 }
 
 bool FloodFill::validateCoordinate(Coordinate c) {
@@ -70,15 +75,20 @@ Goto FloodFill::rotateTo(Coordinate src, Coordinate dst) {
 }
 
 bool FloodFill::visited(Coordinate c) {
-  return m_visited[ROOT_MAX * c.x + c.y];
+  if(m_visited[ROOT_MAX*c.x + c.y] != -1){
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 bool FloodFill::onStack(Coordinate c) {
   return m_added[ROOT_MAX * c.x + c.y];
 }
 
-void FloodFill::addToVisited(Coordinate c) {
-  m_visited[ROOT_MAX * c.x + c.y] = true;
+void FloodFill::addToVisited(Coordinate c, int index) {
+  m_visited[ROOT_MAX * c.x + c.y] = index;
 }
 
 void FloodFill::addToAdded(Coordinate c) {
