@@ -212,14 +212,14 @@ void stopMotors() {
 }
 
 /*
- * take current coordinate
- * find neighbours 
- * compare neighbours with current->index
- * goto current->index-1
- * return if abs(diff) curr.x -tgt.x + curr.y - tgt.y ==1 
- */
+   take current coordinate
+   find neighbours
+   compare neighbours with current->index
+   goto current->index-1
+   return if abs(diff) curr.x -tgt.x + curr.y - tgt.y ==1
+*/
 
-void moveForwards(){
+void moveForwards() {
   L_Motor.setPower(20);
   R_Motor.setPower(20);
   delay(1000);
@@ -227,27 +227,53 @@ void moveForwards(){
   R_Motor.setPower(0);
 }
 
- void backTrack(Coordinate current){
-  Neighbours n = ff.getNeighbours(current);
-  int index = ff.getIndex(current);
-  for(int i = 0; i<4;i++){
-    if(ff.getIndex(n.neighbours[i]) == index-1){
-      rotateTo(current, n.neighbours[i]);
-      moveForwards();
-      curr = n.neighbours[i];
-      break;
+void silentGoTo(Coordinate tgt)
+{
+  moveForwards();
+  curr = tgt;
+  RomiPose.update(e0_count, e1_count);
+  delay(1000);
+}
+
+void backTrack(Coordinate tgt)
+{
+  Coordinate c = curr;
+  while (c.x != tgt.x || c.y != tgt.y)
+  {
+    Neighbours n = ff.getNeighbours(c);
+    for (auto i : n.neighbours)
+    {
+      if (i.x == tgt.x && i.y == tgt.y)
+      {
+        c.x = i.x;
+        c.y = i.y;
+        break;
+      }
+      else if (ff.getIndex(i) + 1 == ff.getIndex(c))
+      {
+        c.x = i.x;
+        c.y = i.y;
+      }
+    }
+    if (c.x != tgt.x || c.y != tgt.y)
+    {
+      rotateTo(c);
+      silentGoTo(c);
+      //curr = c; // Rotate and go to C
     }
   }
- }
+  rotateTo(c);
+}
 
-void rotateTo(Coordinate curr, Coordinate tgt) {
+void rotateTo(Coordinate tgt)
+{
   int diff_x = curr.x - tgt.x;
   int diff_y = curr.y - tgt.y;
   float err = 0.1;
   RomiPose.update(e0_count, e1_count);
   if (abs(diff_x) > 1 || abs(diff_y) > 1 || abs(diff_y) + abs(diff_x) > 1) {
     // Implement BackTrack
-    backTrack(curr);
+    backTrack(tgt);
     //Serial.println("Error: Abs diff to large");
     return;
   }
@@ -350,7 +376,7 @@ void loop() {
       }
       RomiPose.update(e0_count, e1_count);
 
-      rotateTo(curr, tgt);
+      rotateTo(tgt);
       stopMotors();
       delay(500);
       beep();

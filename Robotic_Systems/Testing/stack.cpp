@@ -1,6 +1,7 @@
 #include <iostream>
 
-#define MAX_SIZE 1024
+#define MAX_SIZE 25
+#define ROOT_MAX 5
 using namespace std;
 
 typedef struct
@@ -8,11 +9,6 @@ typedef struct
 	int x;
 	int y;
 } Coordinate;
-
-typedef struct
-{
-	Coordinate neighbours[4];
-} Neighbours;
 
 class Stack
 {
@@ -71,6 +67,11 @@ bool Stack::isEmpty()
 
 typedef struct
 {
+	Coordinate neighbours[4];
+} Neighbours;
+
+typedef struct
+{
 	float theta;
 	int distance; // Distance measured in Encoder Clicks
 } Goto;
@@ -80,23 +81,29 @@ class FloodFill
 public:
 	FloodFill()
 	{
-		for (int i = 0; i < 625; i++)
+		for (int i = 0; i < MAX_SIZE; i++)
 		{
-			m_visited[i] = false;
+			m_visited[i] = -1;
+			m_added[i] = false;
 		}
 	}
 
-	bool m_visited[625];
+	int m_visited[MAX_SIZE];
+	bool m_added[MAX_SIZE];
 	Stack &m_stack = Stack::getInstance();
 
 	Neighbours getNeighbours(Coordinate c);
 	bool validateCoordinate(Coordinate c); // This is going to validate the height, width, visited
+	bool validateStack(Coordinate c);
 	void addToStack(Coordinate c);
 	Coordinate getCoordinate();
 	Goto rotateTo(Coordinate src, Coordinate dst);
 	bool visited(Coordinate c); // Use Hash Function: index = 25x+y
-	void addToVisited(Coordinate c); // Use Hash Function: index = 25x+y
+	bool onStack(Coordinate c);
+	void addToVisited(Coordinate c, int index); // Use Hash Function: index = 25x+y
+	void addToAdded(Coordinate c);
 	bool isEmpty(); // Check if underlying stack is empty
+	int getIndex(Coordinate c);
 };
 
 Neighbours FloodFill::getNeighbours(Coordinate c)
@@ -109,13 +116,22 @@ Neighbours FloodFill::getNeighbours(Coordinate c)
 	return ret;
 }
 
+int FloodFill::getIndex(Coordinate c){
+  return m_visited[ROOT_MAX*c.x + c.y];
+}
+
 bool FloodFill::validateCoordinate(Coordinate c)
 {
-	if (c.x > 25 || c.x < 0 || c.y > 25 || c.y < 0)
+	if (c.x >= ROOT_MAX || c.x < 0 || c.y >= ROOT_MAX || c.y < 0)
 	{
 		return false;
 	}
 	return !visited(c);
+}
+
+bool FloodFill::validateStack(Coordinate c)
+{
+	return !onStack(c);
 }
 
 void FloodFill::addToStack(Coordinate c)
@@ -136,12 +152,29 @@ Goto FloodFill::rotateTo(Coordinate src, Coordinate dst)
 
 bool FloodFill::visited(Coordinate c)
 {
-	return m_visited[25 * c.x + c.y];
+	if (m_visited[ROOT_MAX * c.x + c.y] != -1)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
-void FloodFill::addToVisited(Coordinate c)
+bool FloodFill::onStack(Coordinate c)
 {
-	m_visited[25 * c.x + c.y] = true;
+	return m_added[ROOT_MAX * c.x + c.y];
+}
+
+void FloodFill::addToVisited(Coordinate c, int index)
+{
+	m_visited[ROOT_MAX * c.x + c.y] = index;
+}
+
+void FloodFill::addToAdded(Coordinate c)
+{
+	m_added[ROOT_MAX * c.x + c.y] = true;
 }
 
 bool FloodFill::isEmpty()
@@ -149,27 +182,161 @@ bool FloodFill::isEmpty()
 	return m_stack.isEmpty();
 }
 
-int main()
+FloodFill ff;
+Coordinate curr = { 0, 0 };
+
+void rotateTo(Coordinate tgt);
+void silentGoTo(Coordinate tgt)
 {
-	//Stack my_stack = Stack::getInstance();
-	FloodFill ff;
-	ff.addToVisited(Coordinate{ 0, 0 });
-	ff.addToVisited(Coordinate{ 1, 1 });
-	ff.addToVisited(Coordinate{ 5, 5 });
-	ff.addToVisited(Coordinate{ 7, 3 });
-	ff.addToVisited(Coordinate{ 24, 24 });
-	ff.addToVisited(Coordinate{ 10, 11 });
-	for (int i = 0; i < 625; i++)
+	cout << "(" << curr.x << ", " << curr.y << ") -> (" << tgt.x << ", " << tgt.y << ")" << endl;
+	curr = tgt;
+}
+
+void backTrack(Coordinate tgt)
+{
+	cout << "##############################\n";
+	cout << "(" << curr.x << ", " << curr.y << ") -> (" << tgt.x << ", " << tgt.y << ")" << endl;
+	cout << "##############################\n";
+	Coordinate c = curr;
+	cout << "(" << curr.x << ", " << curr.y << ") = " << ff.getIndex(curr) << endl;
+	while (c.x != tgt.x || c.y != tgt.y)
 	{
-		if (ff.m_visited[i])
+		Neighbours n = ff.getNeighbours(c);
+		cout << "##############################\n";
+		cout << "NEIGHBOUR to go to: \n";
+
+		for (auto i : n.neighbours)
 		{
-			cout << i << " has been visited\n";
+			if (i.x == tgt.x && i.y == tgt.y)
+			{
+				cout << "adjacent\n";
+				cout << "(" << curr.x << ", " << curr.y << ") -> (" << i.x << ", " << i.y << ")" << endl;
+				c.x = i.x;
+				c.y = i.y;
+				break;
+			}
+			else if (ff.getIndex(i) + 1 == ff.getIndex(c))
+			{
+				cout << "backtrack\n";
+				cout << "(" << c.x << ", " << c.y << ") -> (" << i.x << ", " << i.y << ")" << endl;
+				c.x = i.x;
+				c.y = i.y;
+			}
+		}
+		cout << "(" << c.x << ", " << c.y << ") = " << ff.getIndex(c) << endl;
+		cout << "##############################\n";
+		if (c.x != tgt.x || c.y != tgt.y)
+		{
+			cout << "backtracking location\n";
+			rotateTo(c);
+			silentGoTo(c);
+			//curr = c; // Rotate and go to C
 		}
 	}
-	Neighbours n = ff.getNeighbours(Coordinate{ 10, 11 });
-	for (auto i : n.neighbours)
+	cout << "Adjacent to target\n";
+	rotateTo(c);
+}
+
+void rotateTo(Coordinate tgt)
+{
+	int diff_x = curr.x - tgt.x;
+	int diff_y = curr.y - tgt.y;
+        float err = 0.1;
+	if (abs(diff_x) > 1 || abs(diff_y) > 1 || abs(diff_y) + abs(diff_x) > 1)
 	{
-		cout << i.x << ", " << i.y << endl;
+		// Implement BackTrack
+		//backTrack(curr);
+		cout << ("Error: Abs diff to large\n");
+		cout << "Backtrack\n";
+		backTrack(tgt);
+
+		return;
+	}
+
+	if (diff_x < 0)
+	{
+		//Rotate to PI/2
+		cout << ("Rotate to PI/2\n");
+		return;
+		//turnToTheta(PI/2);
+	}
+	else if (diff_x > 0)
+	{
+		//Rotate to 3PI/2
+		cout << ("Rotate to 3PI/2\n");
+		return;
+	}
+
+	else if (diff_y < 0)
+	{
+		//Rotate to PI
+		cout << ("Rotate to PI\n");
+		return;
+	}
+	else if (diff_y > 0)
+	{
+		//Rotate to 0
+		cout << ("Rotate to 0\n");
+		return;
+	}
+}
+
+void goTo(Coordinate tgt)
+{
+	//  Go forwards 1 unit in straight line
+	//   Write power to motors.
+	static int index = 1;
+	cout << "(" << curr.x << ", " << curr.y << ") -> (" << tgt.x << ", " << tgt.y << ")" << endl;
+	curr = tgt;
+	ff.addToVisited(curr, index);
+	index++;
+	//Map.updateMapFeature( ' ' , RomiPose.x, RomiPose.y );
+}
+
+int main()
+{
+	ff.addToStack(Coordinate{ 0, 0 });
+	bool init = false;
+	while (!ff.isEmpty())
+	{
+		Coordinate tgt = ff.getCoordinate();
+		if (!ff.visited(tgt))
+		{
+			if (!init)
+			{
+				init = true;
+				curr = tgt;
+				ff.addToVisited(curr, 0);
+				Neighbours n = ff.getNeighbours(tgt);
+				for (int i = 0; i < 4; i++)
+				{
+					if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i]))
+					{
+						ff.addToStack(n.neighbours[i]);
+						ff.addToAdded(n.neighbours[i]);
+					}
+				}
+			}
+			rotateTo(tgt);
+			goTo(tgt);
+			Neighbours n = ff.getNeighbours(tgt);
+			for (int i = 0; i < 4; i++)
+			{
+				if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i]))
+				{
+					ff.addToStack(n.neighbours[i]);
+					ff.addToAdded(n.neighbours[i]);
+				}
+			}
+		}
+	}
+	for (int i = 0; i < ROOT_MAX; i++)
+	{
+		for (int j = 0; j < ROOT_MAX; j++)
+		{
+			cout << ff.m_visited[ROOT_MAX * j + i] << "  ";
+		}
+		cout << endl;
 	}
 	return 0;
 }
