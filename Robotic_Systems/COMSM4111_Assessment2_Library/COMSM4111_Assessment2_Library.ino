@@ -332,14 +332,38 @@ void rotateTo(Coordinate tgt)
 void goTo(Coordinate tgt) {
   //  Go forwards 1 unit in straight line
   //   Write power to motors.
-  static int index = 1;
+  //static int index = 1;
   moveForwards();
   curr = tgt;
-  ff.addToVisited(curr, index);
-  index++;
+  //ff.addToVisited(curr, index);
+  //index++;
   RomiPose.update(e0_count, e1_count);
   //Map.updateMapFeature( ' ' , RomiPose.x, RomiPose.y );
   delay(1000);
+}
+
+void mapCoordinate() {
+  static int index = 1;
+  //Read Sensor Value
+  if (LineSensor.onLine( LINE_THRESHOLD ))
+  {
+    ff.addToVisited(curr, -5);
+    Map.updateMapFeature( 'W' , RomiPose.x, RomiPose.y );
+    Neighbours n = ff.getNeighbours(curr);
+    for (int i = 0; i < 4; i++) {
+      Coordinate tgt = n.neighbours[i];
+      if (ff.getIndex(tgt) == index) {
+        rotateTo(tgt);
+        goTo(tgt);
+      }
+    }
+  }
+  else
+  {
+    ff.addToVisited(curr, index);
+    Map.updateMapFeature( 'P', curr.x, curr.y );
+    index++;
+  }
 }
 
 /*****************************************************************************
@@ -353,7 +377,6 @@ void loop() {
   //    }
 
   bool init = false;
-  int order = 0;
   while (!ff.isEmpty()) {
     RomiPose.update( e0_count, e1_count );
     Coordinate tgt = ff.getCoordinate();
@@ -374,22 +397,25 @@ void loop() {
           }
         }
       }
-      RomiPose.update(e0_count, e1_count);
 
-      rotateTo(tgt);
-      stopMotors();
-      delay(500);
-      beep();
-      delay(500);
-      goTo(tgt);
-      Map.updateMapFeature( 'P', tgt.x, tgt.y );
-      order++;
-      Neighbours n = ff.getNeighbours(tgt);
-      for (int i = 0; i < 4; i++) {
-        if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i])) {
-          ff.addToStack(n.neighbours[i]);
-          ff.addToAdded(n.neighbours[i]);
+      else {
 
+        RomiPose.update(e0_count, e1_count);
+
+        rotateTo(tgt);
+        stopMotors();
+        delay(500);
+        beep();
+        delay(500);
+        goTo(tgt);
+        mapCoordinate();
+        Neighbours n = ff.getNeighbours(tgt);
+        for (int i = 0; i < 4; i++) {
+          if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i])) {
+            ff.addToStack(n.neighbours[i]);
+            ff.addToAdded(n.neighbours[i]);
+
+          }
         }
       }
     }

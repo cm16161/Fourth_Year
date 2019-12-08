@@ -116,8 +116,9 @@ Neighbours FloodFill::getNeighbours(Coordinate c)
 	return ret;
 }
 
-int FloodFill::getIndex(Coordinate c){
-  return m_visited[ROOT_MAX*c.x + c.y];
+int FloodFill::getIndex(Coordinate c)
+{
+	return m_visited[ROOT_MAX * c.x + c.y];
 }
 
 bool FloodFill::validateCoordinate(Coordinate c)
@@ -241,7 +242,7 @@ void rotateTo(Coordinate tgt)
 {
 	int diff_x = curr.x - tgt.x;
 	int diff_y = curr.y - tgt.y;
-        float err = 0.1;
+	float err = 0.1;
 	if (abs(diff_x) > 1 || abs(diff_y) > 1 || abs(diff_y) + abs(diff_x) > 1)
 	{
 		// Implement BackTrack
@@ -285,12 +286,29 @@ void goTo(Coordinate tgt)
 {
 	//  Go forwards 1 unit in straight line
 	//   Write power to motors.
-	static int index = 1;
+	//static int index = 1;
 	cout << "(" << curr.x << ", " << curr.y << ") -> (" << tgt.x << ", " << tgt.y << ")" << endl;
 	curr = tgt;
-	ff.addToVisited(curr, index);
-	index++;
+	//ff.addToVisited(curr, index);
+	//index++;
 	//Map.updateMapFeature( ' ' , RomiPose.x, RomiPose.y );
+}
+
+void mapCoordinate()
+{
+	static int index = 1;
+	//Read Sensor Value
+	if (sensor_val > threshold)
+	{
+		ff.addToVisited(curr, -5);
+                
+		//Map.updateMapFeature( 'W' , RomiPose.x, RomiPose.y );
+	}
+	else
+	{
+		ff.addToVisited(curr, index);
+		index++;
+	}
 }
 
 int main()
@@ -319,6 +337,7 @@ int main()
 			}
 			rotateTo(tgt);
 			goTo(tgt);
+			mapCoordinate();
 			Neighbours n = ff.getNeighbours(tgt);
 			for (int i = 0; i < 4; i++)
 			{
