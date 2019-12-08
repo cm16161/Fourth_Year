@@ -342,27 +342,21 @@ void goTo(Coordinate tgt) {
   delay(1000);
 }
 
-void mapCoordinate() {
+bool mapCoordinate() {
   static int index = 1;
   //Read Sensor Value
   if (LineSensor.onLine( LINE_THRESHOLD ))
   {
     ff.addToVisited(curr, -5);
     Map.updateMapFeature( 'W' , RomiPose.x, RomiPose.y );
-    Neighbours n = ff.getNeighbours(curr);
-    for (int i = 0; i < 4; i++) {
-      Coordinate tgt = n.neighbours[i];
-      if (ff.getIndex(tgt) == index) {
-        rotateTo(tgt);
-        goTo(tgt);
-      }
-    }
+    return false;
   }
   else
   {
     ff.addToVisited(curr, index);
     Map.updateMapFeature( 'P', curr.x, curr.y );
     index++;
+    return true;
   }
 }
 
@@ -408,15 +402,17 @@ void loop() {
         beep();
         delay(500);
         goTo(tgt);
-        mapCoordinate();
-        Neighbours n = ff.getNeighbours(tgt);
-        for (int i = 0; i < 4; i++) {
-          if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i])) {
-            ff.addToStack(n.neighbours[i]);
-            ff.addToAdded(n.neighbours[i]);
-
+        bool valid = mapCoordinate();
+        if (valid) {
+          Neighbours n = ff.getNeighbours(tgt);
+          for (int i = 0; i < 4; i++) {
+            if (ff.validateCoordinate(n.neighbours[i]) && ff.validateStack(n.neighbours[i])) {
+              ff.addToStack(n.neighbours[i]);
+              ff.addToAdded(n.neighbours[i]);
+            }
           }
         }
+
       }
     }
   }
