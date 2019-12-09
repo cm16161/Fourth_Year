@@ -22,6 +22,14 @@ int MEM::ld(int *rs, int address)
 	std::cout << " [ LD ] " << *rs << std::endl;
 	return *rs;
 }
+
+int MEM::ldr(int *rd, int *rs)
+{
+	*rd = LOAD(*rs);
+	std::cout << " [ LDR ] " << *rd << std::endl;
+	return *rd;
+}
+
 void MEM::st(int *rs, int address)
 {
 	STORE(*rs, address);

@@ -94,6 +94,10 @@ ISA Decode::decode(std::string inst)
 	{
 		return ST;
 	}
+        else if (inst.compare("LDR") == 0)
+          {
+            return LDR;
+          }
 	else if (inst.compare("EOP") == 0)
 	{
 		return EOP;

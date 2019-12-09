@@ -61,9 +61,18 @@ class Reorder
 public:
 	Reorder(int res, int num, int dest, ISA token, vector<int> branch_waits, bool mem_flag)
 	{
-		if (token != LD && token != ST)
+		if (token != LD && token != ST && token != LDR)
 		{
 			result = res;
+			instruction_number = num;
+			rd = dest;
+			m_token = token;
+			m_branch_waits = branch_waits;
+			m_mem_flag = mem_flag;
+		}
+		else if (token == LDR)
+		{
+			m_rs = res;
 			instruction_number = num;
 			rd = dest;
 			m_token = token;
@@ -200,14 +209,16 @@ int main(int argc, char *argv[])
 			vector<int> entries_to_free;
 			for (int i = 0; i < reorder_buffer.size(); i++)
 			{
-				//		cout << reorder_buffer[i]->instruction_number << endl;
+				// cout << reorder_buffer[i]->instruction_number << endl;
+				// cout << next_to_commit << endl;
 				if (reorder_buffer[i]->instruction_number == next_to_commit)
 				{
-					entries_to_free.push_back(i);
+
 					if (reorder_buffer[i]->m_token != BEQ && reorder_buffer[i]->m_token != BNE &&
 					    reorder_buffer[i]->m_token != ST && reorder_buffer[i]->m_token != LD &&
-					    reorder_buffer[i]->m_token != EOP)
+					    reorder_buffer[i]->m_token != LDR && reorder_buffer[i]->m_token != EOP)
 					{
+						entries_to_free.push_back(i);
 						registers[reorder_buffer[i]->rd] = reorder_buffer[i]->result;
 						//cout << "freeing " << reorder_buffer[i]->rd << endl;
 						registers_in_use[reorder_buffer[i]->rd].in_use = false;
@@ -225,6 +236,7 @@ int main(int argc, char *argv[])
 						mem.m_delay--;
 						if (mem.m_delay <= 0)
 						{
+							entries_to_free.push_back(i);
 							mem.m_lock = false;
 							mem.ld(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
 							registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
@@ -234,7 +246,7 @@ int main(int argc, char *argv[])
 
 						//break;
 					}
-					else if (reorder_buffer[i]->m_token == ST)
+					else if (reorder_buffer[i]->m_token == LDR)
 					{
 						if (!mem.m_lock)
 						{
@@ -244,13 +256,34 @@ int main(int argc, char *argv[])
 						mem.m_delay--;
 						if (mem.m_delay <= 0)
 						{
+							entries_to_free.push_back(i);
+							mem.m_lock = false;
+							mem.ldr(&registers[reorder_buffer[i]->rd], &registers[reorder_buffer[i]->m_rs]);
+							registers_in_use[reorder_buffer[i]->rd].in_use = false;
+							//reorder_buffer.erase(reorder_buffer.begin() + i);
+							next_to_commit++;
+						}
+
+						//break;
+					}
+					else if (reorder_buffer[i]->m_token == ST)
+					{
+						//mem.m_delay = 0;
+						if (!mem.m_lock)
+						{
+							mem.m_lock = true;
+							mem.m_delay = 5;
+						}
+						mem.m_delay--;
+						if (mem.m_delay <= 0)
+						{
+							entries_to_free.push_back(i);
 							mem.m_lock = false;
 							mem.st(&registers[reorder_buffer[i]->m_rs], reorder_buffer[i]->m_immidiate);
 							registers_in_use[reorder_buffer[i]->m_rs].in_use = false;
 							//reorder_buffer.erase(reorder_buffer.begin() + i);
 							next_to_commit++;
 						}
-
 						//break;
 					}
 					else if (reorder_buffer[i]->m_token == EOP)
@@ -277,10 +310,17 @@ int main(int argc, char *argv[])
 
 			for (int i = 0; i < N_WAY_SS; i++)
 			{
-				if (IDEX_command[i].token != LD && IDEX_command[i].token != ST && IDEX_command[i].token != EOP)
+				if (IDEX_command[i].token != LD && IDEX_command[i].token != ST && IDEX_command[i].token != LDR &&
+				    IDEX_command[i].token != EOP)
 				{
 					results[i] =
 					    execute(alu[i], IDEX_command[i].token, registers, IDEX_registers[i], IDEX_immediate[i]);
+				}
+				else if (IDEX_command[i].token == LDR)
+				{
+					Reorder *tmp = new Reorder(IDEX_registers[i][1], IDEX_command[i].instruction_number,
+					                           IDEX_registers[i][0], IDEX_command[i].token, IDEX_branch_waits[i], true);
+					reorder_buffer.push_back(tmp);
 				}
 				else
 				{

@@ -32,6 +32,7 @@ enum ISA
 	EOP,
 	LD,
 	ST,
+        LDR,
         SEQ,
 
 };
