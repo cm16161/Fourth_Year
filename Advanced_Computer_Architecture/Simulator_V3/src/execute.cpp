@@ -345,7 +345,7 @@ int execute(ALU &alu, ISA instructions, int registers[64], vector<int> register_
 		exit(EXIT_SUCCESS);
 
 	case NOP:
-          //cout << " [ NOP ]\n";
+		cout << " [ NOP ]\n";
 		nop_count++;
 		g_clock++;
 		break;
@@ -363,7 +363,8 @@ void end()
 	cout << " { " << (executed_instructions + nop_count) << " } Instructions Executed " << endl;
 	cout << " { " << (executed_instructions) << " } Useful Instructions Executed " << endl;
 	cout << " { " << ceil(g_clock) << " } Clock Cycles Taken " << endl;
-	cout << " { " << setprecision(3)<<(executed_instructions + nop_count) / (ceil(g_clock)) << " } Instructions per Cycle" << endl;
+	cout << " { " << setprecision(3) << (executed_instructions + nop_count) / (ceil(g_clock))
+	     << " } Instructions per Cycle" << endl;
 	cout << " { " << nop_count << " } NOP Instructions" << endl;
 	cout << " { " << missed_branch << " } Miss-Predicted Branches" << endl;
 	exit(EXIT_SUCCESS);
