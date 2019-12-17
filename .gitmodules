@@ -6,4 +6,4 @@
 	url = https://github.com/bris-sys-sec/labs.git
 [submodule "Robotic_Systems/robotExperiment"]
 	path = Robotic_Systems/robotExperiment
-	url = git@github.com:Daniel-Davies/robotExperiment.git
+	url = git@github.com:cm16161/robotExperiment.git

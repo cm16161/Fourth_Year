@@ -1,0 +1,14 @@
+4th CNN -> 1024FC
+
+Input to 4CNN: 21x43
+Apply Max pooling 2x2 with padding to reduce dimensions
+-> 11x22
+64 Layers of 11x22
+
+Input to 1024-FC-Layer = 11x22x64
+N-Params of FC Layer = 11x22x64x1024
+Output of 1024-FC-Layer = 1024
+
+Input to 10-FC-Layer = 1024
+N-Params = 1024*10
+Ouput of Last FC Layer = 10

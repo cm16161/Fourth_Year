@@ -1,0 +1,39 @@
+* Networks Technical Report
+
+* Abstract
+
+There are various communication protocols utilised by networks which have
+vulnerabilities which can be exploited by an attacker to enable them to do a
+variety of malicious things such as taking the network down or examining all
+data which passes through it.
+
+* Attacks
+
+** Denial of Service (Dos)
+
+Communication protocols, for example TCP, work by sending various signals
+between devices trying to communicate. For example, the  TCP signals SYN and ACK
+work as follows:
+
+- Client 1 sends a SYN signal to Client 2
+  - This signal is used to begin the communication between the 2 clients
+- Client 2 replies by sending an ACK signal back to Client 1
+  - When Client 1 receives this, it then knows that Client 2 is ready to receive
+    some data.
+
+This handshake can be exploited by having an attacker continually send SYN
+signals to Client 2. As a result it is in a constant state of returning ACK
+signals to the attacker is unable to receive any data from Client 1. This is
+known as a SYN-Flood attack due to the fact that a Client is flooded by SYN
+requests.
+
+** Man in the Middle
+
+** Session Hijacking
+
+** Task 1: ARP Spoofing
+
+*** What is ARP Spoofing?
+
+
+*** The attack
