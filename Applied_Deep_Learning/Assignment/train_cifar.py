@@ -47,7 +47,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--val-frequency",
-    default=1,
+    default=10,
     type=int,
     help="How frequently to test the model on the validation set in number of epochs",
 )
@@ -70,6 +70,7 @@ parser.add_argument(
     type=int,
     help="Number of worker processes used to load data.",
 )
+parser.add_argument("--dropout", default=0.5, type=float)
 
 
 class ImageShape(NamedTuple):
@@ -99,7 +100,7 @@ def main(args):
      num_workers=8, pin_memory=True
     )
 
-    model = CNN(height=len(train_loader), width=32, channels=1, class_count=10)
+    model = CNN(height=len(train_loader), width=32, channels=1, class_count=10, dropout=args.dropout)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
@@ -124,12 +125,13 @@ def main(args):
 
 
 class CNN(nn.Module):
-    def __init__(self, height: int, width: int, channels: int, class_count: int):
+    def __init__(self, height: int, width: int, channels: int,
+                 class_count: int, dropout: float):
         super().__init__()
         self.input_shape = ImageShape(height=height, width=width, channels=channels)
         self.class_count = class_count
-        #print(self.input_shape.channels)
-        #print(self.input_shape.width)
+        self.dropout = nn.Dropout(p=dropout)
+        
         self.conv1 = nn.Conv2d(
             in_channels=self.input_shape.channels,
             out_channels=32,
@@ -194,19 +196,19 @@ class CNN(nn.Module):
         #x = self.pool1(x)
         #print(images.shape)
         # print(x.shape)
-        x = F.relu(self.batchNorm2D_0(self.conv12(x)))
+        x = F.relu(self.batchNorm2D_0(self.conv12(self.dropout(x))))
         # print(x.shape)
         x = self.pool1(x)
         # print(x.shape)
         x = F.relu(self.batchNorm2D_1(self.conv2(x)))
         #print(x.shape)
-        x = F.relu(self.batchNorm2D_1(self.conv22(x)))
+        x = F.relu(self.batchNorm2D_1(self.conv22(self.dropout(x))))
         # print(x.shape)
         x = self.pool1(x)
         # print(x.shape)
         x = torch.flatten(x,1)
         # print(x.shape)
-        x = self.fc12(x)
+        x = self.fc12(self.dropout(x))
         # print(x.shape)
         s = nn.Sigmoid()
         x = s(x)
