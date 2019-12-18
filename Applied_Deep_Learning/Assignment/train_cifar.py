@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(
 default_dataset_dir = Path.home() / ".cache" / "torch" / "datasets"
 parser.add_argument("--dataset-root", default=default_dataset_dir)
 parser.add_argument("--log-dir", default=Path("logs"), type=Path)
-parser.add_argument("--learning-rate", default=1e-1, type=float, help="Learning rate")
+parser.add_argument("--learning-rate", default=1e-3, type=float, help="Learning rate")
 parser.add_argument(
     "--batch-size",
     default=128,
@@ -47,7 +47,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--val-frequency",
-    default=2,
+    default=1,
     type=int,
     help="How frequently to test the model on the validation set in number of epochs",
 )
@@ -320,7 +320,6 @@ class Trainer:
         self.model.eval()
 
         with torch.no_grad():
-            print(len(self.val_loader))
             for i, (batch, labels, filename) in enumerate(self.val_loader):
                 batch = batch.to(self.device)
                 labels = labels.to(self.device)
