@@ -128,13 +128,14 @@ class CNN(nn.Module):
         super().__init__()
         self.input_shape = ImageShape(height=height, width=width, channels=channels)
         self.class_count = class_count
-
+        #print(self.input_shape.channels)
+        #print(self.input_shape.width)
         self.conv1 = nn.Conv2d(
             in_channels=self.input_shape.channels,
             out_channels=32,
             kernel_size=(3, 3),
             stride=(2, 2),
-            padding=(2, 2)
+            padding=(43, 21)  
         )
 
         self.conv12 = nn.Conv2d(
@@ -147,7 +148,7 @@ class CNN(nn.Module):
         self.initialise_layer(self.conv1)
         self.initialise_layer(self.conv12)
 
-        self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
+        self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=(1,1))
         self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
 
         self.conv2 = nn.Conv2d(
@@ -189,22 +190,24 @@ class CNN(nn.Module):
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
         x = F.relu(self.batchNorm2D_0(self.conv1(images)))
-        print(images.shape)
         #x = (self.conv1(images))
         #x = self.pool1(x)
+        #print(images.shape)
+        # print(x.shape)
         x = F.relu(self.batchNorm2D_0(self.conv12(x)))
-        #print(x.shape)
+        # print(x.shape)
         x = self.pool1(x)
-        #print(x.shape)
+        # print(x.shape)
         x = F.relu(self.batchNorm2D_1(self.conv2(x)))
         #print(x.shape)
         x = F.relu(self.batchNorm2D_1(self.conv22(x)))
-        #print(x.shape)
+        # print(x.shape)
         x = self.pool1(x)
+        # print(x.shape)
         x = torch.flatten(x,1)
-        #print(x.shape)
-        x = self.fc1(x)
-        #print(x.shape)
+        # print(x.shape)
+        x = self.fc12(x)
+        # print(x.shape)
         s = nn.Sigmoid()
         x = s(x)
         x = self.fc2(x)

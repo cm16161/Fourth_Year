@@ -47,11 +47,11 @@ class UrbanSound8KDataset(data.Dataset):
        
         label = self.dataset[index]['classID']
         fname = self.dataset[index]['filename']
-        print(feature.size())
+        #print(feature.size())
         return feature, label, fname
 
     def __len__(self):
         return len(self.dataset)
 
-x = UrbanSound8KDataset('UrbanSound8K_test.pkl', 'MLMC')
-print(x.__getitem__(0))
+# x = UrbanSound8KDataset('UrbanSound8K_test.pkl', 'MLMC')
+# print(x.__getitem__(0))
