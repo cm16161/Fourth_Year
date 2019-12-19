@@ -17,7 +17,6 @@ class UrbanSound8KDataset(data.Dataset):
             chroma = self.dataset[index]['features']['chroma']
             sc = self.dataset[index]['features']['spectral_contrast']
             tn = self.dataset[index]['features']['tonnetz']
-            
             feature = np.concatenate((lms,chroma,sc,tn), axis=0)
             # print(self.dataset.keys())
             feature = torch.from_numpy(feature.astype(np.float32)).unsqueeze(0)
@@ -47,11 +46,10 @@ class UrbanSound8KDataset(data.Dataset):
        
         label = self.dataset[index]['classID']
         fname = self.dataset[index]['filename']
-        #print(feature.size())
         return feature, label, fname
 
     def __len__(self):
         return len(self.dataset)
 
-# x = UrbanSound8KDataset('UrbanSound8K_test.pkl', 'MLMC')
+# x = UrbanSound8KDataset('UrbanSound8K_test.pkl', 'LMC')
 # print(x.__getitem__(0))

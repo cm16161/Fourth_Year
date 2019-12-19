@@ -15,6 +15,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
 import sys; 
 import argparse
+from math import ceil
 from pathlib import Path
 
 torch.backends.cudnn.benchmark = True
@@ -29,13 +30,13 @@ parser.add_argument("--log-dir", default=Path("logs"), type=Path)
 parser.add_argument("--learning-rate", default=1e-3, type=float, help="Learning rate")
 parser.add_argument(
     "--batch-size",
-    default=128,
+    default=32,
     type=int,
     help="Number of images within each mini-batch",
 )
 parser.add_argument(
     "--epochs",
-    default=20,
+    default=50,
     type=int,
     help="Number of epochs (passes through the entire dataset) to train for",
 )
@@ -47,7 +48,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--val-frequency",
-    default=10,
+    default=1,
     type=int,
     help="How frequently to test the model on the validation set in number of epochs",
 )
@@ -59,7 +60,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--print-frequency",
-    default=10,
+    default=100,
     type=int,
     help="How frequently to print progress to the command line in number of steps",
 )
@@ -90,17 +91,18 @@ def main(args):
    
     train_loader = torch.utils.data.DataLoader( 
       UrbanSound8KDataset("UrbanSound8K_train.pkl", args.audiotype), 
-      batch_size=32, shuffle=True, 
+      batch_size=args.batch_size, shuffle=True, 
       num_workers=8, pin_memory=True
     ) 
 
     test_loader = torch.utils.data.DataLoader( 
      UrbanSound8KDataset("UrbanSound8K_test.pkl", args.audiotype), 
-     batch_size=32, shuffle=False, 
+     batch_size=args.batch_size, shuffle=False, 
      num_workers=8, pin_memory=True
     )
 
-    model = CNN(height=len(train_loader), width=32, channels=1, class_count=10, dropout=args.dropout)
+    dims = UrbanSound8KDataset('UrbanSound8K_test.pkl', args.audiotype).__getitem__(0)[0].shape
+    model = CNN(height=dims[1], width=dims[2], channels=1, class_count=10, dropout=args.dropout)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
@@ -128,6 +130,7 @@ class CNN(nn.Module):
     def __init__(self, height: int, width: int, channels: int,
                  class_count: int, dropout: float):
         super().__init__()
+
         self.input_shape = ImageShape(height=height, width=width, channels=channels)
         self.class_count = class_count
         self.dropout = nn.Dropout(p=dropout)
@@ -136,35 +139,42 @@ class CNN(nn.Module):
             in_channels=self.input_shape.channels,
             out_channels=32,
             kernel_size=(3, 3),
-            stride=(2, 2),
-            padding=(43, 21)  
+            padding=(1, 1),
         )
-
-        self.conv12 = nn.Conv2d(
-            in_channels=32,
-            out_channels=32,
-            kernel_size=(3, 3),
-            padding=(1, 1)
-        )
-
-        self.initialise_layer(self.conv1)
-        self.initialise_layer(self.conv12)
-
-        self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=(1,1))
-        self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))
 
         self.conv2 = nn.Conv2d(
             in_channels=32,
+            out_channels=32,
+            kernel_size=(3, 3),
+            padding=(1, 1),
+        )
+        
+        self.conv22 = nn.Conv2d(
+            in_channels=32,
+            out_channels=32,
+            kernel_size=(3, 3),
+            padding=(1, 1),
+            stride=(2,2)
+        )
+
+        
+
+        self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=(1,1))
+        self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), padding=(1,1))
+
+        self.conv3 = nn.Conv2d(
+            in_channels=32,
             out_channels=64,
             kernel_size=(3, 3),
             padding=(1, 1)
         )
 
-        self.conv22 = nn.Conv2d(
+        self.conv4 = nn.Conv2d(
             in_channels=64,
             out_channels=64,
             kernel_size=(3, 3),
-            padding=(1, 1)
+            padding=(1, 1),
+            stride = (2,2)
         )
 
         self.batchNorm2D_0 = nn.BatchNorm2d(
@@ -174,46 +184,56 @@ class CNN(nn.Module):
         self.batchNorm2D_1 = nn.BatchNorm2d(
             num_features = 64
         )
+
+        self.batchNorm1D = nn.BatchNorm1d(
+            num_features = 1024
+        )
         
+        params = ceil(height/4) * ceil(width/4)*64
+        self.fc1 = nn.Linear(params, 1024)
+        self.fc2 = nn.Linear(1024, self.class_count)
+
+        self.initialise_layer(self.conv1)
+
         self.initialise_layer(self.conv2)
         self.initialise_layer(self.conv22)
-
-        #Pooling layer here
         
-        self.fc1 = nn.Linear(3520, 1024)
+        self.initialise_layer(self.conv3)
+        self.initialise_layer(self.conv4)
         self.initialise_layer(self.fc1)
-        self.fc2 = nn.Linear(1024, 10)
         self.initialise_layer(self.fc2)
-        
-        self.fc12 = nn.Linear(15488, 1024)
-        self.initialise_layer(self.fc12)
 
         self.sigmoid = nn.Sigmoid()
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
-        x = F.relu(self.batchNorm2D_0(self.conv1(images)))
-        #x = (self.conv1(images))
-        #x = self.pool1(x)
-        #print(images.shape)
-        # print(x.shape)
-        x = F.relu(self.batchNorm2D_0(self.conv12(self.dropout(x))))
-        # print(x.shape)
+
+        # x = F.relu(self.batchNorm2D_0(self.conv1(images)))
+        # x = F.relu(self.batchNorm2D_0(self.conv2(x))
+        # x = self.pool1(x)
+        # x = F.relu(self.batchNorm2D_1(self.conv3(x)))
+        # x = F.relu(self.batchNorm2D_1(self.conv4(x))
+        # x = torch.flatten(x,start_dim=1)
+        # x = self.batchNorm1D(self.fc1(x))
+        # x = self.sigmoid(x)
+        # x = self.fc2(x)
+        #x = self.softmax(x)
+
+        x = F.relu((self.conv1(images)))
+
+        x = F.relu((self.conv2(x)))
+
         x = self.pool1(x)
-        # print(x.shape)
-        x = F.relu(self.batchNorm2D_1(self.conv2(x)))
-        #print(x.shape)
-        x = F.relu(self.batchNorm2D_1(self.conv22(self.dropout(x))))
-        # print(x.shape)
-        x = self.pool1(x)
-        # print(x.shape)
-        x = torch.flatten(x,1)
-        # print(x.shape)
-        x = self.fc12(self.dropout(x))
-        # print(x.shape)
-        s = nn.Sigmoid()
-        x = s(x)
-        x = self.fc2(x)
+
+        x = F.relu((self.conv3(x)))
         
+        x = F.relu((self.conv4(x)))
+        x = torch.flatten(x,1)
+
+        x = self.sigmoid(self.fc1(x))
+        
+        x = self.fc2(x)
+
         return x
 
     @staticmethod
@@ -337,6 +357,8 @@ class Trainer:
         )
         average_loss = total_loss / len(self.val_loader)
 
+        class_accuracy(np.array(results["labels"]), np.array(results["preds"]))
+
         self.summary_writer.add_scalars(
                 "accuracy",
                 {"test": accuracy},
@@ -353,8 +375,20 @@ class Trainer:
 def compute_accuracy(
     labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.Tensor, np.ndarray]
 ) -> float:
+    """
+    Args:
+        labels: ``(batch_size, class_count)`` tensor or array containing example labels
+        preds: ``(batch_size, class_count)`` tensor or array containing model prediction
+    """
     assert len(labels) == len(preds)
     return float((labels == preds).sum()) / len(labels)
+
+
+def class_accuracy(labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.Tensor, np.ndarray]):
+    assert len(labels) == len(preds)
+    for i in range(0,10):
+        idx = labels == i
+        print("Class "+str(i)+": "+str((labels[idx] == preds[idx]).sum()*100 / idx.sum())) # multipy by 100 to get a percentage
 
 
 def get_summary_writer_log_dir(args: argparse.Namespace) -> str:
