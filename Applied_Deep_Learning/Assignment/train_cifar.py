@@ -133,7 +133,6 @@ class CNN(nn.Module):
 
         self.input_shape = ImageShape(height=height, width=width, channels=channels)
         self.class_count = class_count
-        self.dropout = nn.Dropout(p=dropout)
         
         self.conv1 = nn.Conv2d(
             in_channels=self.input_shape.channels,
@@ -177,12 +176,19 @@ class CNN(nn.Module):
             stride = (2,2)
         )
 
+        self.batchNorm2D_first = nn.BatchNorm2d(
+            num_features = 1,
+            track_running_stats = False
+        )
+        
         self.batchNorm2D_0 = nn.BatchNorm2d(
-            num_features = 32
+            num_features = 32,
+            track_running_stats = False
         )
 
         self.batchNorm2D_1 = nn.BatchNorm2d(
-            num_features = 64
+            num_features = 64,
+            track_running_stats = False
         )
 
         self.batchNorm1D = nn.BatchNorm1d(
@@ -208,31 +214,46 @@ class CNN(nn.Module):
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
 
-        # x = F.relu(self.batchNorm2D_0(self.conv1(images)))
-        # x = F.relu(self.batchNorm2D_0(self.conv2(x))
+        #### THIS WORKS
+        
+        # x = F.relu((self.conv1(images)))
+        # x = F.relu((self.conv2(x)))
         # x = self.pool1(x)
-        # x = F.relu(self.batchNorm2D_1(self.conv3(x)))
-        # x = F.relu(self.batchNorm2D_1(self.conv4(x))
-        # x = torch.flatten(x,start_dim=1)
-        # x = self.batchNorm1D(self.fc1(x))
-        # x = self.sigmoid(x)
+        # x = F.relu((self.conv3(x)))
+        # x = F.relu((self.conv4(x)))
+        # x = torch.flatten(x,1)
+        # x = self.sigmoid(self.fc1(x))
         # x = self.fc2(x)
-        #x = self.softmax(x)
+        # x = self.softmax(x)
 
-        x = F.relu((self.conv1(images)))
+        #####################################
 
-        x = F.relu((self.conv2(x)))
-
+        ##############    <--------------------------------
+        
+        # x = F.relu(self.conv1(self.batchNorm2D_first(images)))
+        # x = F.relu(self.conv2(self.batchNorm2D_0(x)))
+        # x = self.pool1(x)
+        # x = F.relu(self.conv3(self.batchNorm2D_0(x)))
+        # x = F.relu(self.conv4(self.batchNorm2D_1(x)))
+        # x = torch.flatten(x,1)
+        # x = self.sigmoid(self.fc1(x))
+        # x = self.fc2(x)
+        # x = self.softmax(x)  
+        
+        #############################
+        dropout = nn.Dropout(p=0.5)
+        batchnorm32 = nn.BatchNorm2d(32)
+        batchnorm64 = nn.BatchNorm2d(64)
+        x = F.relu(batchnorm32(self.conv1(images)))
+        x = F.relu(batchnorm32(self.conv2(dropout(x))))
         x = self.pool1(x)
-
-        x = F.relu((self.conv3(x)))
-        
-        x = F.relu((self.conv4(x)))
-        x = torch.flatten(x,1)
-
-        x = self.sigmoid(self.fc1(x))
-        
+        x = F.relu(batchnorm64(self.conv3(x)))
+        x = F.relu(batchnorm64(self.conv4(dropout(x))))
+        x = torch.flatten(x,start_dim=1)
+        x = self.fc1(dropout(x))
+        x = self.sigmoid(x)
         x = self.fc2(x)
+        x = self.softmax(x)
 
         return x
 
