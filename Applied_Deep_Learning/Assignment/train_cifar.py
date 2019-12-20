@@ -188,9 +188,12 @@ class CNN(nn.Module):
             num_features=64,
             #track_running_stats=False
         )
-        self.dropout_1 = nn.Dropout(p=0.5)
-        self.dropout_2 = nn.Dropout(p=0.5)
-        self.dropout_3 = nn.Dropout(p=0.5)
+        self.dropout_1 = nn.Dropout(p=0.5,
+                                    inplace=True)
+        self.dropout_2 = nn.Dropout(p=0.5,
+                                    inplace=True)
+        self.dropout_3 = nn.Dropout(p=0.5,
+                                    inplace=True)
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
 
