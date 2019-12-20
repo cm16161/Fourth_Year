@@ -10,6 +10,7 @@ class UrbanSound8KDataset(data.Dataset):
         self.mode = mode
 
     def __getitem__(self, index):
+        feature = None
         if self.mode == 'LMC':
             # Edit here to load and concatenate the neccessary features to 
             # create the LMC feature

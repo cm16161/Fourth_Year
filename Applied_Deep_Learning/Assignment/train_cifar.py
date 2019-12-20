@@ -2,7 +2,7 @@
 import time
 from multiprocessing import cpu_count
 from typing import Union, NamedTuple
-from dataset import UrbanSound8KDataset
+
 import torch
 import torch.backends.cudnn
 import numpy as np
@@ -12,22 +12,25 @@ import torchvision.datasets
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from torchvision import transforms
 import sys; 
 import argparse
-from math import ceil
 from pathlib import Path
+from dataset import UrbanSound8KDataset 
+from collections import defaultdict
+
 
 torch.backends.cudnn.benchmark = True
 
 parser = argparse.ArgumentParser(
-    description="Train a simple CNN on audio",
+    description="Train a simple CNN on CIFAR-10",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
 default_dataset_dir = Path.home() / ".cache" / "torch" / "datasets"
 parser.add_argument("--dataset-root", default=default_dataset_dir)
 parser.add_argument("--log-dir", default=Path("logs"), type=Path)
 parser.add_argument("--learning-rate", default=1e-3, type=float, help="Learning rate")
+parser.add_argument("--dropout", default=0, type=float)
+parser.add_argument("--audiotype", default="LMC", type=str)
 parser.add_argument(
     "--batch-size",
     default=32,
@@ -39,12 +42,6 @@ parser.add_argument(
     default=50,
     type=int,
     help="Number of epochs (passes through the entire dataset) to train for",
-)
-parser.add_argument(
-    "--audiotype",
-    default="LMC",
-    type=str,
-    help="The audio type coming from the dataset loader (tonnetz, LMC...)",
 )
 parser.add_argument(
     "--val-frequency",
@@ -60,7 +57,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--print-frequency",
-    default=100,
+    default=10,
     type=int,
     help="How frequently to print progress to the command line in number of steps",
 )
@@ -71,7 +68,6 @@ parser.add_argument(
     type=int,
     help="Number of worker processes used to load data.",
 )
-parser.add_argument("--dropout", default=0.5, type=float)
 
 
 class ImageShape(NamedTuple):
@@ -87,22 +83,21 @@ else:
 
 
 def main(args):
-    transform = transforms.ToTensor()
-   
+    args.dataset_root.mkdir(parents=True, exist_ok=True)
+
     train_loader = torch.utils.data.DataLoader( 
-      UrbanSound8KDataset("UrbanSound8K_train.pkl", args.audiotype), 
-      batch_size=args.batch_size, shuffle=True, 
+      UrbanSound8KDataset('UrbanSound8K_train.pkl', args.audiotype), 
+      batch_size=32, shuffle=True, 
       num_workers=8, pin_memory=True
     ) 
+ 
+    val_loader = torch.utils.data.DataLoader( 
+        UrbanSound8KDataset('UrbanSound8K_test.pkl', args.audiotype), 
+        batch_size=32, shuffle=False, 
+        num_workers=8, pin_memory=True
+    ) 
 
-    test_loader = torch.utils.data.DataLoader( 
-     UrbanSound8KDataset("UrbanSound8K_test.pkl", args.audiotype), 
-     batch_size=args.batch_size, shuffle=False, 
-     num_workers=8, pin_memory=True
-    )
-
-    dims = UrbanSound8KDataset('UrbanSound8K_test.pkl', args.audiotype).__getitem__(0)[0].shape
-    model = CNN(height=dims[1], width=dims[2], channels=1, class_count=10, dropout=args.dropout)
+    model = CNN(height=85, width=41, channels=1, class_count=10, dropout=args.dropout)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
 
@@ -112,54 +107,43 @@ def main(args):
             str(log_dir),
             flush_secs=5
     )
+
     trainer = Trainer(
-        model, train_loader, test_loader, criterion, optimizer, summary_writer, DEVICE
+        model, train_loader, val_loader, criterion, optimizer, summary_writer, DEVICE
     )
 
     trainer.train(
         args.epochs,
         args.val_frequency,
         print_frequency=args.print_frequency,
-        log_frequency=args.log_frequency
+        log_frequency=args.log_frequency,
     )
 
     summary_writer.close()
 
 
 class CNN(nn.Module):
-    def __init__(self, height: int, width: int, channels: int,
-                 class_count: int, dropout: float):
+    def __init__(self, height: int, width: int, channels: int, class_count: int, dropout: float):
         super().__init__()
-
         self.input_shape = ImageShape(height=height, width=width, channels=channels)
         self.class_count = class_count
-        
+        self.dropoutApp = nn.Dropout(dropout)
+
         self.conv1 = nn.Conv2d(
             in_channels=self.input_shape.channels,
             out_channels=32,
             kernel_size=(3, 3),
-            padding=(1, 1),
+            padding=(1, 1)
         )
 
         self.conv2 = nn.Conv2d(
             in_channels=32,
             out_channels=32,
             kernel_size=(3, 3),
-            padding=(1, 1),
+            padding=(1, 1)
         )
-        
-        self.conv22 = nn.Conv2d(
-            in_channels=32,
-            out_channels=32,
-            kernel_size=(3, 3),
-            padding=(1, 1),
-            stride=(2,2)
-        )
-
-        
 
         self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=(1,1))
-        self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), padding=(1,1))
 
         self.conv3 = nn.Conv2d(
             in_channels=32,
@@ -173,87 +157,35 @@ class CNN(nn.Module):
             out_channels=64,
             kernel_size=(3, 3),
             padding=(1, 1),
-            stride = (2,2)
+            stride=(2,2)
         )
 
-        self.batchNorm2D_first = nn.BatchNorm2d(
-            num_features = 1,
-            track_running_stats = False
-        )
+        self.fc1 = nn.Linear(15488, 1024)
+        self.fc2 = nn.Linear(1024, 10)
+        self.sigmoid = nn.Sigmoid()
+        self.softmax = nn.Softmax(dim=1)
         
-        self.batchNorm2D_0 = nn.BatchNorm2d(
-            num_features = 32,
-            track_running_stats = False
-        )
-
-        self.batchNorm2D_1 = nn.BatchNorm2d(
-            num_features = 64,
-            track_running_stats = False
-        )
-
-        self.batchNorm1D = nn.BatchNorm1d(
-            num_features = 1024
-        )
-        
-        params = ceil(height/4) * ceil(width/4)*64
-        self.fc1 = nn.Linear(params, 1024)
-        self.fc2 = nn.Linear(1024, self.class_count)
-
         self.initialise_layer(self.conv1)
-
         self.initialise_layer(self.conv2)
-        self.initialise_layer(self.conv22)
-        
         self.initialise_layer(self.conv3)
         self.initialise_layer(self.conv4)
         self.initialise_layer(self.fc1)
         self.initialise_layer(self.fc2)
 
-        self.sigmoid = nn.Sigmoid()
-        self.softmax = nn.Softmax(dim=1)
-
     def forward(self, images: torch.Tensor) -> torch.Tensor:
-
-        #### THIS WORKS
+        x = F.relu(self.conv1(images))
+        x = F.relu(self.conv2(x))
         
-        # x = F.relu((self.conv1(images)))
-        # x = F.relu((self.conv2(x)))
-        # x = self.pool1(x)
-        # x = F.relu((self.conv3(x)))
-        # x = F.relu((self.conv4(x)))
-        # x = torch.flatten(x,1)
-        # x = self.sigmoid(self.fc1(x))
-        # x = self.fc2(x)
-        # x = self.softmax(x)
-
-        #####################################
-
-        ##############    <--------------------------------
-        
-        # x = F.relu(self.conv1(self.batchNorm2D_first(images)))
-        # x = F.relu(self.conv2(self.batchNorm2D_0(x)))
-        # x = self.pool1(x)
-        # x = F.relu(self.conv3(self.batchNorm2D_0(x)))
-        # x = F.relu(self.conv4(self.batchNorm2D_1(x)))
-        # x = torch.flatten(x,1)
-        # x = self.sigmoid(self.fc1(x))
-        # x = self.fc2(x)
-        # x = self.softmax(x)  
-        
-        #############################
-        dropout = nn.Dropout(p=0.5)
-        batchnorm32 = nn.BatchNorm2d(32)
-        batchnorm64 = nn.BatchNorm2d(64)
-        x = F.relu(batchnorm32(self.conv1(images)))
-        x = F.relu(batchnorm32(self.conv2(dropout(x))))
         x = self.pool1(x)
-        x = F.relu(batchnorm64(self.conv3(x)))
-        x = F.relu(batchnorm64(self.conv4(dropout(x))))
-        x = torch.flatten(x,start_dim=1)
-        x = self.fc1(dropout(x))
-        x = self.sigmoid(x)
-        x = self.fc2(x)
-        x = self.softmax(x)
+
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+
+        x = torch.flatten(x, start_dim=1)
+        
+        x = self.sigmoid(self.fc1(x))
+
+        x = self.softmax(self.fc2(x))
 
         return x
 
@@ -297,13 +229,15 @@ class Trainer:
         for epoch in range(start_epoch, epochs):
             self.model.train()
             data_load_start_time = time.time()
-            for i, (batch, labels, filename) in enumerate(self.train_loader): 
+            for i, (batch, labels, filename) in enumerate(self.train_loader):
                 batch = batch.to(self.device)
                 labels = labels.to(self.device)
                 data_load_end_time = time.time()
+
                 logits = self.model.forward(batch)
                 loss = self.criterion(logits, labels)
                 loss.backward()
+
                 self.optimizer.step()
                 self.optimizer.zero_grad()
 
@@ -317,6 +251,7 @@ class Trainer:
                     self.log_metrics(epoch, accuracy, loss, data_load_time, step_time)
                 if ((self.step + 1) % print_frequency) == 0:
                     self.print_metrics(epoch, accuracy, loss, data_load_time, step_time)
+                    compute_accuracy(labels,preds)
 
                 self.step += 1
                 data_load_start_time = time.time()
@@ -361,7 +296,8 @@ class Trainer:
         results = {"preds": [], "labels": []}
         total_loss = 0
         self.model.eval()
-
+        ground = {}
+        table = defaultdict(lambda: [0]*10)
         with torch.no_grad():
             for i, (batch, labels, filename) in enumerate(self.val_loader):
                 batch = batch.to(self.device)
@@ -373,12 +309,13 @@ class Trainer:
                 results["preds"].extend(list(preds))
                 results["labels"].extend(list(labels.cpu().numpy()))
 
-        accuracy = compute_accuracy(
-            np.array(results["labels"]), np.array(results["preds"])
-        )
-        average_loss = total_loss / len(self.val_loader)
+                for i in range(0,len(filename)):
+                    ground[filename[i]] = labels[i]
+                    table[filename[i]] = [sum(x) for x in zip(table[filename[i]], logits[i].tolist())]
 
-        class_accuracy(np.array(results["labels"]), np.array(results["preds"]))
+        accuracy = customAccuracy(table, ground)
+        #accuracy = compute_accuracy(np.array(results["labels"]), np.array(results["preds"]))
+        average_loss = total_loss / len(self.val_loader)
 
         self.summary_writer.add_scalars(
                 "accuracy",
@@ -393,6 +330,20 @@ class Trainer:
         print(f"validation loss: {average_loss:.5f}, accuracy: {accuracy * 100:2.2f}")
 
 
+def argmax(values):
+    return np.asarray(values).argmax()
+
+def customAccuracy(tab, ground):
+    correct = 0
+    total = len(ground)
+    for key in ground:
+        prediction = argmax(tab[key])
+        if prediction == ground[key]:
+            correct += 1
+
+    return float(correct / total)
+        
+
 def compute_accuracy(
     labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.Tensor, np.ndarray]
 ) -> float:
@@ -404,16 +355,39 @@ def compute_accuracy(
     assert len(labels) == len(preds)
     return float((labels == preds).sum()) / len(labels)
 
+def per_class_accuracy(labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.Tensor, np.ndarray]
+) -> float:
+     assert len(labels) == len(preds)
+     
+     for i in range(0,10):
+         idx = labels == i
+         print("Class: "+str(i)+": "+str(((labels[idx] == preds[idx]).sum()*100 / idx.sum()).item()))
 
-def class_accuracy(labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.Tensor, np.ndarray]):
-    assert len(labels) == len(preds)
-    for i in range(0,10):
-        idx = labels == i
-        print("Class "+str(i)+": "+str((labels[idx] == preds[idx]).sum()*100 / idx.sum())) # multipy by 100 to get a percentage
-
-
+def validation_accuracy(labels: Union[torch.Tensor, np.ndarray], preds: Union[torch.Tensor, np.ndarray]
+) -> float:
+    pass
+         
 def get_summary_writer_log_dir(args: argparse.Namespace) -> str:
-    tb_log_dir_prefix = f'CNN_bn_bs={args.batch_size}_lr={args.learning_rate}_momentum=0.9_run_'
+    """Get a unique directory that hasn't been logged to before for use with a TB
+    SummaryWriter.
+
+    Args:
+        args: CLI Arguments
+
+    Returns:
+        Subdirectory of log_dir with unique subdirectory name to prevent multiple runs
+        from getting logged to the same TB log directory (which you can't easily
+        untangle in TB).
+    """
+    #tb_log_dir_prefix = f'CNN_bn_bs={args.batch_size}_lr={args.learning_rate}_momentum=0.9_run_'
+    tb_log_dir_prefix = (
+      f"CNN_bn_"
+      f"bs={args.batch_size}_"
+      f"lr={args.learning_rate}_"
+      f"momentum=0.9_"
+      f"dropout={args.dropout}_"
+      f"run_"
+    )
     i = 0
     while i < 1000:
         tb_log_dir = args.log_dir / (tb_log_dir_prefix + str(i))
