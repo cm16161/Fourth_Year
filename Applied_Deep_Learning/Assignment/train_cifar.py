@@ -57,7 +57,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--print-frequency",
-    default=10,
+    default=1000,
     type=int,
     help="How frequently to print progress to the command line in number of steps",
 )
@@ -99,7 +99,7 @@ def main(args):
 
     model = CNN(height=85, width=41, channels=1, class_count=10, dropout=args.dropout)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-3)
 
     log_dir = get_summary_writer_log_dir(args)
     print(f"Writing logs to {log_dir}")
@@ -172,20 +172,48 @@ class CNN(nn.Module):
         self.initialise_layer(self.fc1)
         self.initialise_layer(self.fc2)
 
+        self.batchnorm32_1 = nn.BatchNorm2d(
+            num_features=32,
+            #track_running_stats=False
+        )
+        self.batchnorm32_2 = nn.BatchNorm2d(
+            num_features=32,
+            #track_running_stats=False
+        )
+        self.batchnorm64_1 = nn.BatchNorm2d(
+            num_features=64,
+            #track_running_stats=False
+        )
+        self.batchnorm64_2 = nn.BatchNorm2d(
+            num_features=64,
+            #track_running_stats=False
+        )
+        self.dropout_1 = nn.Dropout(p=0.5)
+        self.dropout_2 = nn.Dropout(p=0.5)
+        self.dropout_3 = nn.Dropout(p=0.5)
+
     def forward(self, images: torch.Tensor) -> torch.Tensor:
-        x = F.relu(self.conv1(images))
-        x = F.relu(self.conv2(x))
+
         
+        
+        x = F.relu(self.batchnorm32_1(self.conv1(images)))
+
+        x = self.dropout_1(x)
+        x = F.relu(self.batchnorm32_2(self.conv2(x)))
         x = self.pool1(x)
 
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
+        x = F.relu(self.batchnorm64_1(self.conv3(x)))
+
+        x = self.dropout_2(x)
+        x = F.relu(self.batchnorm64_2(self.conv4(x)))
 
         x = torch.flatten(x, start_dim=1)
         
+        x = self.dropout_3(x)
         x = self.sigmoid(self.fc1(x))
 
-        x = self.softmax(self.fc2(x))
+        x = self.fc2(x)
+        #x = self.softmax(self.fc2(x))
 
         return x
 
