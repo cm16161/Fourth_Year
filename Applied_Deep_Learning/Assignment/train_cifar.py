@@ -99,7 +99,7 @@ def main(args):
 
     model = CNN(height=85, width=41, channels=1, class_count=10, dropout=args.dropout)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=7.5e-4, betas=(0.9,0.9))
 
     log_dir = get_summary_writer_log_dir(args)
     print(f"Writing logs to {log_dir}")
@@ -189,11 +189,14 @@ class CNN(nn.Module):
             #track_running_stats=False
         )
         self.dropout_1 = nn.Dropout(p=0.5,
-                                    inplace=True)
+         #                          inplace=True
+        )
         self.dropout_2 = nn.Dropout(p=0.5,
-                                    inplace=True)
+         #                           inplace=True
+        )
         self.dropout_3 = nn.Dropout(p=0.5,
-                                    inplace=True)
+        #                            inplace=True
+        )
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
 
