@@ -7,3 +7,6 @@
 [submodule "Robotic_Systems/robotExperiment"]
 	path = Robotic_Systems/robotExperiment
 	url = git@github.com:cm16161/robotExperiment.git
+[submodule "Applied_Deep_Learning/AppliedDeepLearning"]
+	path = Applied_Deep_Learning/AppliedDeepLearning
+	url = git@github.com:Daniel-Davies/AppliedDeepLearning.git

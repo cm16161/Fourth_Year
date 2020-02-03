@@ -2,6 +2,7 @@ import torch
 from torch.utils import data
 import numpy as np
 import pickle
+from scipy.special import softmax
 
 
 class UrbanSound8KDataset(data.Dataset):
@@ -18,6 +19,10 @@ class UrbanSound8KDataset(data.Dataset):
             chroma = self.dataset[index]['features']['chroma']
             sc = self.dataset[index]['features']['spectral_contrast']
             tn = self.dataset[index]['features']['tonnetz']
+            lms = softmax(lms)
+            chroma = softmax(chroma)
+            sc = softmax(sc)
+            tn = softmax(tn)
             feature = np.concatenate((lms,chroma,sc,tn), axis=0)
             # print(self.dataset.keys())
             feature = torch.from_numpy(feature.astype(np.float32)).unsqueeze(0)
